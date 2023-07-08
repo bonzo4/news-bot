@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export const config = {
     developers: ['238109509606834176'],
-    syndicateGuildId: '1010780163811856445',
+    syndicateGuildId: '980331064029495358',
     syndicateInvite: 'https://discord.gg/syndicatenetwork',
     syndicateChannels: {
-        guildJoined: '1084579282673729597',
-        guildCount: '1112456217101615194',
-        memberCount: '1112456238983295047',
+        guildJoined: '1065018457441177714',
+        guildCount: '1111837698559328316',
+        memberCount: '1111837810740183080',
     },
     syndicateIcon:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',
     client: {
-        id: '1061682756209344634',
+        id: '1053779815418843166',
         token: process.env.TOKEN || '',
         intents: [
             'Guilds',
@@ -36,7 +36,7 @@ export const config = {
     },
     api: {
         port: 3001,
-        secret: '00000000-0000-0000-0000-000000000000',
+        secret: '7cd07e5276c1480d114b0b1ad748591b',
     },
     sharding: {
         spawnDelay: 5,
