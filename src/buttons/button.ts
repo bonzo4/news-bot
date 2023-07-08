@@ -5,7 +5,7 @@ import { EventData } from '../models/internal-models.js';
 
 export interface Button {
     ids: string[];
-    cooldown?: RateLimiter;
+    cooldown: RateLimiter;
     deferType: ButtonDeferType;
     requireGuild?: boolean;
     requireAdmin?: boolean;

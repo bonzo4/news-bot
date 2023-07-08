@@ -5,6 +5,7 @@ import {
     ButtonStyle,
     CategoryChannel,
 } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { channelButtons } from './channel-button-event.js';
 import { Button, ButtonDeferType } from './index.js';
@@ -62,6 +63,7 @@ export class SystemButtons implements Button {
     requireEmbedAuthorTag = false;
     requireClientPerms = [];
     requireAdmin = true;
+    cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction): Promise<void> {
         intr;

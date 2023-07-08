@@ -1,4 +1,5 @@
 import { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
 import { EventData } from '../models/internal-models.js';
@@ -29,6 +30,7 @@ export class TagMenu implements Menu {
     ids = ['tag'];
     deferType: MenuDeferType = MenuDeferType.REPLY;
     requireAdmin = true;
+    cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: StringSelectMenuInteraction, data: EventData): Promise<void> {
         if (data.userData.staff_role !== 'ADMIN') {

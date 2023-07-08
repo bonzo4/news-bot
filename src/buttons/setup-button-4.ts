@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './index.js';
 import { setupMentionButtons } from './setup-button-5.js';
@@ -21,6 +22,7 @@ export class OtherNewsChannelButtons implements Button {
     deferType = ButtonDeferType.REPLY;
     requireGuild = true;
     requireEmbedAuthorTag = false;
+    cooldown = new RateLimiter(1, 5000);
     requireClientPerms = [];
     requireAdmin = true;
 

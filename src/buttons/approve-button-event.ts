@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
 import { EventData } from '../models/internal-models.js';
@@ -18,6 +19,7 @@ export function approveNewsButtons(newsId: number): ActionRowBuilder<ButtonBuild
 export class ApproveNewsButtons implements Button {
     ids: string[] = ['approve'];
     deferType = ButtonDeferType.REPLY;
+    cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
         if (data.userData.staff_role !== 'ADMIN') {

@@ -5,6 +5,7 @@ import {
     ButtonStyle,
     channelMention,
 } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
 import { addMentionMenu } from '../menus/mention-add-menu-event.js';
@@ -43,6 +44,7 @@ export class MentionButtons implements Button {
     requireGuild = true;
     requireEmbedAuthorTag = false;
     requireClientPerms = [];
+    cooldown = new RateLimiter(1, 5000);
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {

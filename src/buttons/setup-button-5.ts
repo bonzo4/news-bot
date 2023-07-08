@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './index.js';
 import { setupReferralButtons } from './setup-button-6.js';
@@ -29,6 +30,7 @@ export class SetupMentionButtons implements Button {
     requireEmbedAuthorTag = false;
     requireClientPerms = [];
     requireAdmin = true;
+    cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction): Promise<void> {
         if (intr.customId.split('_')[1] === 'skip' || intr.customId.split('_')[1] === 'next') {

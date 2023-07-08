@@ -286,10 +286,11 @@ export class Bot {
                         intr,
                         `An error occurred while processing the command. Please try again later.`
                     );
-                await Logger.error({
-                    message: Logs.error.command,
+                Logger.warn({
+                    message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
+                    userId: intr.user.id,
                 });
             }
         } else if (intr.isButton()) {
@@ -300,10 +301,11 @@ export class Bot {
                     intr,
                     `An error occurred while processing the button. Please try again later.`
                 );
-                await Logger.error({
-                    message: Logs.error.button,
+                Logger.warn({
+                    message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
+                    userId: intr.user.id,
                 });
             }
         } else if (intr.isModalSubmit()) {
@@ -314,10 +316,11 @@ export class Bot {
                     intr,
                     `An error occurred while processing your submission. Please try again later.`
                 );
-                await Logger.error({
-                    message: Logs.error.modal,
+                Logger.warn({
+                    message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
+                    userId: intr.user.id,
                 });
             }
         } else if (intr.isAnySelectMenu()) {
@@ -328,10 +331,11 @@ export class Bot {
                     intr,
                     `An error occurred while processing your selection. Please try again later.`
                 );
-                await Logger.error({
+                Logger.warn({
                     message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
+                    userId: intr.user.id,
                 });
             }
         }

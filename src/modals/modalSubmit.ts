@@ -5,7 +5,7 @@ import { EventData } from '../models/internal-models.js';
 
 export interface ModalSubmit {
     ids: string[];
-    cooldown?: RateLimiter;
+    cooldown: RateLimiter;
     deferType: ModalDeferType;
     requireGuild?: boolean;
     requireAdmin?: boolean;

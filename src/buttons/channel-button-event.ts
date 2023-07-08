@@ -5,6 +5,7 @@ import {
     ButtonStyle,
     channelMention,
 } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
 import { addChannelMenu } from '../menus/channel-add-menu-event.js';
@@ -40,6 +41,7 @@ export function channelButtons(): ActionRowBuilder<ButtonBuilder> {
 export class ChannelButtons implements Button {
     ids = ['channel'];
     deferType = ButtonDeferType.REPLY;
+    cooldown = new RateLimiter(1, 5000);
     requireGuild = true;
     requireAdmin = true;
 

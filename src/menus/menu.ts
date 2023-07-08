@@ -5,7 +5,7 @@ import { EventData } from '../models/internal-models.js';
 
 export interface Menu {
     ids: string[];
-    cooldown?: RateLimiter;
+    cooldown: RateLimiter;
     deferType: MenuDeferType;
     requireGuild?: boolean;
     requireAdmin?: boolean;

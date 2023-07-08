@@ -5,6 +5,7 @@ import {
     ButtonStyle,
     CategoryChannel,
 } from 'discord.js';
+import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './index.js';
 import { setupMentionButtons } from './setup-button-5.js';
@@ -38,6 +39,7 @@ export class SetupNewsChannelButtons implements Button {
     ids: string[] = ['setupNewsChannel'];
     deferType = ButtonDeferType.REPLY;
     requireGuild = true;
+    cooldown = new RateLimiter(1, 5000);
     requireEmbedAuthorTag = false;
     requireClientPerms = [];
     requireAdmin = true;
