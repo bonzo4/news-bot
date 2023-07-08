@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export const config = {
-    developers: ['123456789012345678'],
+    developers: ['238109509606834176'],
     syndicateGuildId: '1010780163811856445',
     syndicateInvite: 'https://discord.gg/syndicatenetwork',
     syndicateChannels: {
@@ -54,7 +54,7 @@ export const config = {
     },
     jobs: {
         updateServerCount: {
-            schedule: '*/10 * * * *',
+            schedule: '0 0 * * *',
             log: false,
         },
     },

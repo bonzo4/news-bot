@@ -430,8 +430,8 @@ export class Bot {
                     ? `${Math.floor((memberCount / 1000000) * 10) / 10}M+`
                     : `${memberCount}`;
 
-            await guildCountChannel.setName(`Guilds: ${guildCount}`);
-            await memberCountChannel.setName(`Members: ${memberCountString}`);
+            await guildCountChannel.setName(`In: ${guildCount} Communities`);
+            await memberCountChannel.setName(`Reach: ${memberCountString} Members`);
         } catch (error) {
             await Logger.error({
                 message: `Failed to broadcast stats`,

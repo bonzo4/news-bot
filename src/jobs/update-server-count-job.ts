@@ -5,7 +5,7 @@ import { botSites } from '../config/botSites.js';
 import { config } from '../config/config.js';
 import { CustomClient } from '../extensions/index.js';
 import { BotSite } from '../models/config-models.js';
-import { HttpService, Lang, Logger } from '../services/index.js';
+import { HttpService, Logger } from '../services/index.js';
 import { ShardUtils } from '../utils/index.js';
 
 export class UpdateServerCountJob implements Job {
@@ -23,9 +23,9 @@ export class UpdateServerCountJob implements Job {
         let guildCount = await ShardUtils.guildCount(this.shardManager);
         let memberCount = await ShardUtils.memberCount(this.shardManager);
 
-        let type = ActivityType.Streaming;
-        let name = `to ${guildCount.toLocaleString()} servers`;
-        let url = Lang.getCom('links.twitter');
+        let type = ActivityType.Listening;
+        let name = `to ${guildCount.toLocaleString()} Communities`;
+        let url = 'https://twitter.com/SyndicateNTWRK';
 
         await this.shardManager.broadcastEval(
             (client: CustomClient, context) => {
