@@ -48,8 +48,10 @@ export class Logger {
 
     public static async error(options: LoggerOptions): Promise<void> {
         const { message, obj, guildId, userId, newsId } = options;
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        const messageError = obj ? message + obj.message : message;
         await BotErrorDbUtils.createError({
-            message: message ? message : obj ? obj.message : 'No message or object provided',
+            message: message ? message : obj ? messageError : 'No message or object provided',
             guild_id: guildId,
             user_id: userId,
             news_id: newsId,

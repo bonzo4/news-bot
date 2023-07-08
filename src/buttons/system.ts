@@ -92,7 +92,7 @@ export class SystemButtons implements Button {
             case 'moreNews': {
                 await InteractionUtils.success(
                     intr,
-                    'Please open a ticker here: **https://discord.gg/syndicatenetwork** to inquire about more news.'
+                    'Please open a ticket here: **https://discord.gg/syndicatenetwork** to inquire about more news.'
                 );
             }
         }
