@@ -150,6 +150,10 @@ export class ScheduledNews extends CronJob {
                     message: `Error sending news to guild: ${err}`,
                     guildId,
                     newsId: news.id,
+                }).catch(async err => {
+                    await Logger.error({
+                        message: `Error logging error: ${err}`,
+                    });
                 });
             }
         }

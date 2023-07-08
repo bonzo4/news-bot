@@ -52,9 +52,9 @@ export class Logger {
         const messageError = obj ? message + obj.message : message;
         await BotErrorDbUtils.createError({
             message: message ? message : obj ? messageError : 'No message or object provided',
-            guild_id: guildId,
-            user_id: userId,
-            news_id: newsId,
+            guild_id: guildId ? guildId : null,
+            user_id: userId ? userId : null,
+            news_id: newsId ? newsId : null,
         });
         // Log just a message if no error object
         if (!obj) {
