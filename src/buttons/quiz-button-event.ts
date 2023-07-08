@@ -80,9 +80,9 @@ export class QuizButtons implements Button {
                 return;
             }
             const results = await this.getResults(quizId);
-            const resultsMessage = `⚫┃**Results**\n\n*Question*: ${
-                quiz.question
-            }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
+            const resultsMessage = `**Results**\n\n*Question*: ${quiz.question}\n\n💡┃*Answer*: ${
+                quiz.answer
+            }\n\n${this.formateResults(results)}`;
             await InteractionUtils.success(intr, resultsMessage);
             return;
         }

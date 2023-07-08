@@ -80,7 +80,7 @@ export class PollButtons implements Button {
                 return;
             }
             const results = await this.getResults(pollId);
-            const resultsMessage = `⚫┃**Results**\n\n*Question*: ${
+            const resultsMessage = `**Results**\n\n❓┃*Question*: ${
                 poll.question
             }\n\n${this.formateResults(results)}`;
             await InteractionUtils.success(intr, resultsMessage);
