@@ -15,6 +15,10 @@ export class BannerUtils {
     public static async createBanner(guild: Guild): Promise<string> {
         try {
             let bannerUrl = await this.getBanner(guild.id);
+            if (bannerUrl) {
+                await GuildDbUtils.updateBanner(guild, bannerUrl);
+                return bannerUrl;
+            }
             const bannerPath = await this.buildBanner(guild);
             if (!bannerUrl) bannerUrl = await this.saveBanner({ guild, filePath: bannerPath });
             await GuildDbUtils.updateBanner(guild, bannerUrl);
