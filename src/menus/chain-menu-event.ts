@@ -11,7 +11,13 @@ export async function setupChainMenu(): Promise<ActionRowBuilder<StringSelectMen
     const tags = await TagDbUtils.getAllTags();
 
     const tagNames = tags
-        .filter(tag => tag.name !== 'all' && tag.name !== 'guild' && tag.name !== 'direct')
+        .filter(
+            tag =>
+                tag.name !== 'all' &&
+                tag.name !== 'guild' &&
+                tag.name !== 'direct' &&
+                tag.name !== 'test'
+        )
         .map(tag => tag.name);
 
     return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents([
