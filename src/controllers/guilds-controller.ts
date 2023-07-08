@@ -1,18 +1,15 @@
 import { ShardingManager } from 'discord.js';
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
-import { createRequire } from 'node:module';
 
 import { Controller } from './index.js';
+import { config } from '../config/config.js';
 import { GetGuildsResponse } from '../models/cluster-api/index.js';
-
-const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 
 export class GuildsController implements Controller {
     public path = '/guilds';
     public router: Router = router();
-    public authToken: string = Config.api.secret;
+    public authToken: string = config.api.secret;
 
     constructor(private shardManager: ShardingManager) {}
 

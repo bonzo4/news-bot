@@ -1,19 +1,16 @@
 import { ButtonInteraction } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
-import { createRequire } from 'node:module';
 
 import { EventHandler } from './index.js';
 import { Button, ButtonDeferType } from '../buttons/index.js';
-import { EventDataService } from '../services/index.js';
+import { config } from '../config/config.js';
+import { EventDataService, Logger } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
-
-const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 
 export class ButtonHandler implements EventHandler {
     private rateLimiter = new RateLimiter(
-        Config.rateLimiting.buttons.amount,
-        Config.rateLimiting.buttons.interval * 1000
+        config.rateLimiting.buttons.amount,
+        config.rateLimiting.buttons.interval * 1000
     );
 
     constructor(private buttons: Button[], private eventDataService: EventDataService) {}
@@ -36,23 +33,11 @@ export class ButtonHandler implements EventHandler {
             return;
         }
 
-        if (button.requireGuild && !intr.guild) {
-            return;
-        }
-
-        // Check if the embeds author equals the users tag
-        if (
-            button.requireEmbedAuthorTag &&
-            intr.message.embeds[0]?.author?.name !== intr.user.tag
-        ) {
-            return;
-        }
-
         // Defer interaction
         // NOTE: Anything after this point we should be responding to the interaction
         switch (button.deferType) {
             case ButtonDeferType.REPLY: {
-                await InteractionUtils.deferReply(intr);
+                await InteractionUtils.deferReply(intr, true);
                 break;
             }
             case ButtonDeferType.UPDATE: {
@@ -74,10 +59,26 @@ export class ButtonHandler implements EventHandler {
         });
 
         // Execute the button
-        await button.execute(intr, data);
+        let passesChecks = await InteractionUtils.runChecks(button, intr);
+        if (passesChecks) {
+            try {
+                await button.execute(intr, data);
+            } catch (err) {
+                await InteractionUtils.error(
+                    intr,
+                    err.reply ??
+                        'An error occurred while executing this button. Please try again later.'
+                );
+                await Logger.error({
+                    message: `Error executing button ${intr.customId}:\n${err.message}`,
+                    guildId: intr.guildId,
+                    userId: intr.user.id,
+                });
+            }
+        }
     }
 
     private findButton(id: string): Button {
-        return this.buttons.find(button => button.ids.includes(id));
+        return this.buttons.find(button => button.ids.includes(id.split('_')[0]));
     }
 }

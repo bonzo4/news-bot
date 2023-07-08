@@ -1,11 +1,12 @@
 import { Shard, ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
 
+import { config } from '../config/config.js';
+import { debug } from '../config/debug.js';
 import { JobService, Logger } from '../services/index.js';
+import { startInsertNewsChannel, startUpdateNewsChannel } from '../webhooks/news.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
-let Debug = require('../../config/debug.json');
 let Logs = require('../../lang/logs.json');
 
 export class Manager {
@@ -17,25 +18,33 @@ export class Manager {
         let shardList = this.shardManager.shardList as number[];
 
         try {
-            Logger.info(
-                Logs.info.managerSpawningShards
+            await Logger.info({
+                message: Logs.info.managerSpawningShards
                     .replaceAll('{SHARD_COUNT}', shardList.length.toLocaleString())
-                    .replaceAll('{SHARD_LIST}', shardList.join(', '))
-            );
+                    .replaceAll('{SHARD_LIST}', shardList.join(', ')),
+            });
             await this.shardManager.spawn({
                 amount: this.shardManager.totalShards,
-                delay: Config.sharding.spawnDelay * 1000,
-                timeout: Config.sharding.spawnTimeout * 1000,
+                delay: config.sharding.spawnDelay * 1000,
+                timeout: config.sharding.spawnTimeout * 1000,
             });
-            Logger.info(Logs.info.managerAllShardsSpawned);
+            await Logger.info({
+                message: Logs.info.managerAllShardsSpawned,
+            });
         } catch (error) {
-            Logger.error(Logs.error.managerSpawningShards, error);
+            await Logger.error({
+                message: Logs.error.managerSpawningShards,
+                obj: error,
+            });
             return;
         }
 
-        if (Debug.dummyMode.enabled) {
+        if (debug.dummyMode.enabled) {
             return;
         }
+
+        startInsertNewsChannel(this.shardManager);
+        startUpdateNewsChannel(this.shardManager);
 
         this.jobService.start();
     }
@@ -44,7 +53,9 @@ export class Manager {
         this.shardManager.on('shardCreate', shard => this.onShardCreate(shard));
     }
 
-    private onShardCreate(shard: Shard): void {
-        Logger.info(Logs.info.managerLaunchedShard.replaceAll('{SHARD_ID}', shard.id.toString()));
+    private async onShardCreate(shard: Shard): Promise<void> {
+        await Logger.info({
+            message: Logs.info.managerLaunchedShard.replaceAll('{SHARD_ID}', shard.id.toString()),
+        });
     }
 }

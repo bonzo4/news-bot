@@ -1,5 +1,8 @@
 import {
+    AnySelectMenuInteraction,
     BaseMessageOptions,
+    ButtonInteraction,
+    ChatInputCommandInteraction,
     DiscordAPIError,
     RESTJSONErrorCodes as DiscordApiErrors,
     EmbedBuilder,
@@ -7,6 +10,7 @@ import {
     Message,
     MessageEditOptions,
     MessageReaction,
+    ModalSubmitInteraction,
     StartThreadOptions,
     TextBasedChannel,
     ThreadChannel,
@@ -166,4 +170,17 @@ export class MessageUtils {
             }
         }
     }
+
+    public static async warning(intr: InteractionTypes, msg: string): Promise<Message> {
+        const embed = new EmbedBuilder().setDescription(msg).setColor(0xff0000).setTimestamp();
+        return await intr.editReply({
+            embeds: [embed],
+        });
+    }
 }
+
+type InteractionTypes =
+    | ButtonInteraction
+    | AnySelectMenuInteraction
+    | ChatInputCommandInteraction
+    | ModalSubmitInteraction;

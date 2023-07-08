@@ -1,0 +1,12 @@
+export const debug = {
+    override: {
+        shardMode: {
+            enabled: false,
+            value: 'worker',
+        },
+    },
+    dummyMode: {
+        enabled: false,
+        whitelist: ['212772875793334272', '478288246858711040'],
+    },
+};

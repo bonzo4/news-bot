@@ -32,12 +32,21 @@ export class ShardUtils {
         return Number((BigInt(guildId) >> 22n) % BigInt(shardCount));
     }
 
-    public static async serverCount(
+    public static async guildCount(
         shardInterface: ShardingManager | ShardClientUtil
     ): Promise<number> {
         let shardGuildCounts = (await shardInterface.fetchClientValues(
             'guilds.cache.size'
         )) as number[];
         return MathUtils.sum(shardGuildCounts);
+    }
+
+    public static async memberCount(
+        shardInterface: ShardingManager | ShardClientUtil
+    ): Promise<number> {
+        const totalMembers = await shardInterface.broadcastEval(c =>
+            c.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0)
+        );
+        return MathUtils.sum(totalMembers);
     }
 }

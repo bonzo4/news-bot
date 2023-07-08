@@ -23,13 +23,10 @@
         "error": "#ff4a4a"
     },
     "links": {
-        "author": "https://github.com/",
-        "docs": "https://top.gg/",
-        "donate": "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=EW389DYYSS4FC",
-        "invite": "https://discord.com/",
+        "invite": "https://discord.gg/sAwydQEjWB",
         "source": "https://github.com/",
-        "stream": "https://www.twitch.tv/novakevin",
-        "support": "https://support.discord.com/",
+        "twitter": "https://twitter.com/SyndicateNEWS_",
+        "support": "https://discord.gg/sAwydQEjWB",
         "template": "https://github.com/KevinNovak/Discord-Bot-TypeScript-Template",
         "vote": "https://top.gg/"
     }

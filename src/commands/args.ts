@@ -1,51 +1,54 @@
-import { APIApplicationCommandBasicOption, ApplicationCommandOptionType } from 'discord.js';
-
-import { HelpOption, InfoOption } from '../enums/index.js';
-import { Language } from '../models/enum-helpers/index.js';
-import { Lang } from '../services/index.js';
+import {
+    APIApplicationCommandChannelOption,
+    APIApplicationCommandOption,
+    APIApplicationCommandRoleOption,
+    APIApplicationCommandSubcommandOption,
+    ApplicationCommandOptionType,
+    ChannelType,
+} from 'discord.js';
 
 export class Args {
-    public static readonly HELP_OPTION: APIApplicationCommandBasicOption = {
-        name: Lang.getRef('arguments.option', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('arguments.option'),
-        description: Lang.getRef('argDescs.helpOption', Language.Default),
-        description_localizations: Lang.getRefLocalizationMap('argDescs.helpOption'),
-        type: ApplicationCommandOptionType.String,
-        choices: [
-            {
-                name: Lang.getRef('helpOptionDescs.contactSupport', Language.Default),
-                name_localizations: Lang.getRefLocalizationMap('helpOptionDescs.contactSupport'),
-                value: HelpOption.CONTACT_SUPPORT,
-            },
-            {
-                name: Lang.getRef('helpOptionDescs.commands', Language.Default),
-                name_localizations: Lang.getRefLocalizationMap('helpOptionDescs.commands'),
-                value: HelpOption.COMMANDS,
-            },
-        ],
+    public static readonly CHANNEL_ADD_OPTIONS: APIApplicationCommandChannelOption = {
+        name: 'add',
+        description: 'Designate a channel to become a news channel.',
+        type: ApplicationCommandOptionType.Channel,
+        channel_types: [ChannelType.GuildText],
     };
-    public static readonly INFO_OPTION: APIApplicationCommandBasicOption = {
-        name: Lang.getRef('arguments.option', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('arguments.option'),
-        description: Lang.getRef('argDescs.helpOption', Language.Default),
-        description_localizations: Lang.getRefLocalizationMap('argDescs.helpOption'),
-        type: ApplicationCommandOptionType.String,
-        choices: [
-            {
-                name: Lang.getRef('infoOptions.about', Language.Default),
-                name_localizations: Lang.getRefLocalizationMap('infoOptions.about'),
-                value: InfoOption.ABOUT,
-            },
-            {
-                name: Lang.getRef('infoOptions.translate', Language.Default),
-                name_localizations: Lang.getRefLocalizationMap('infoOptions.translate'),
-                value: InfoOption.TRANSLATE,
-            },
-            {
-                name: Lang.getRef('infoOptions.dev', Language.Default),
-                name_localizations: Lang.getRefLocalizationMap('infoOptions.dev'),
-                value: InfoOption.DEV,
-            },
-        ],
+    public static readonly CHANNEL_REMOVE_OPTIONS: APIApplicationCommandChannelOption = {
+        name: 'remove',
+        description: 'Designate a channel to remove from news channel.',
+        type: ApplicationCommandOptionType.Channel,
+        channel_types: [ChannelType.GuildText],
+    };
+    public static readonly CHANNEL_LIST_OPTIONS: APIApplicationCommandSubcommandOption = {
+        name: 'list',
+        description: 'List all news channels.',
+        type: ApplicationCommandOptionType.Subcommand,
+    };
+    public static readonly CHANNEL_MANAGE_OPTIONS: APIApplicationCommandSubcommandOption = {
+        name: 'manage',
+        description: 'Manage news channels.',
+        type: ApplicationCommandOptionType.Subcommand,
+    };
+    public static readonly MENTION_ADD_OPTIONS: APIApplicationCommandRoleOption = {
+        name: 'add',
+        description: 'Designate a role to be mentioned when a news article is posted.',
+        type: ApplicationCommandOptionType.Role,
+    };
+    public static readonly MENTION_REMOVE_OPTIONS: APIApplicationCommandRoleOption = {
+        name: 'remove',
+        description:
+            'Designate a role to remove from being mentioned when a news article is posted.',
+        type: ApplicationCommandOptionType.Role,
+    };
+    public static readonly MENTION_LIST_OPTIONS: APIApplicationCommandOption = {
+        name: 'list',
+        description: 'List all roles that are mentioned when a news article is posted.',
+        type: ApplicationCommandOptionType.Subcommand,
+    };
+    public static readonly MENTION_MANAGE_OPTIONS: APIApplicationCommandOption = {
+        name: 'manage',
+        description: 'Manage roles that are mentioned when a news article is posted.',
+        type: ApplicationCommandOptionType.Subcommand,
     };
 }

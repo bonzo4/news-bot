@@ -10,28 +10,35 @@ let Logs = require('../../lang/logs.json');
 export class JobService {
     constructor(private jobs: Job[]) {}
 
-    public start(): void {
+    public async start(): Promise<void> {
         for (let job of this.jobs) {
             schedule.scheduleJob(job.schedule, async () => {
                 try {
                     if (job.log) {
-                        Logger.info(Logs.info.jobRun.replaceAll('{JOB}', job.name));
+                        await Logger.info({
+                            message: Logs.info.jobRun.replaceAll('{JOB}', job.name),
+                        });
                     }
 
                     await job.run();
 
                     if (job.log) {
-                        Logger.info(Logs.info.jobCompleted.replaceAll('{JOB}', job.name));
+                        await Logger.info({
+                            message: Logs.info.jobCompleted.replaceAll('{JOB}', job.name),
+                        });
                     }
                 } catch (error) {
-                    Logger.error(Logs.error.job.replaceAll('{JOB}', job.name), error);
+                    await Logger.error({
+                        message: Logs.error.job.replaceAll('{JOB}', job.name),
+                        obj: error,
+                    });
                 }
             });
-            Logger.info(
-                Logs.info.jobScheduled
+            await Logger.info({
+                message: Logs.info.jobScheduled
                     .replaceAll('{JOB}', job.name)
-                    .replaceAll('{SCHEDULE}', job.schedule)
-            );
+                    .replaceAll('{SCHEDULE}', job.schedule),
+            });
         }
     }
 }

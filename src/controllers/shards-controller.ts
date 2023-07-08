@@ -4,6 +4,7 @@ import router from 'express-promise-router';
 import { createRequire } from 'node:module';
 
 import { Controller } from './index.js';
+import { config } from '../config/config.js';
 import { CustomClient } from '../extensions/index.js';
 import { mapClass } from '../middleware/index.js';
 import {
@@ -15,13 +16,12 @@ import {
 import { Logger } from '../services/index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 let Logs = require('../../lang/logs.json');
 
 export class ShardsController implements Controller {
     public path = '/shards';
     public router: Router = router();
-    public authToken: string = Config.api.secret;
+    public authToken: string = config.api.secret;
 
     constructor(private shardManager: ShardingManager) {}
 
@@ -45,7 +45,10 @@ export class ShardsController implements Controller {
                     let uptime = (await shard.fetchClientValue('uptime')) as number;
                     shardInfo.uptimeSecs = Math.floor(uptime / 1000);
                 } catch (error) {
-                    Logger.error(Logs.error.managerShardInfo, error);
+                    await Logger.error({
+                        message: Logs.error.managerShardInfo,
+                        obj: error,
+                    });
                     shardInfo.error = true;
                 }
 

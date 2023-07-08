@@ -13,7 +13,10 @@ export interface Command {
     names: string[];
     cooldown?: RateLimiter;
     deferType: CommandDeferType;
-    requireClientPerms: PermissionsString[];
+    requireClientPerms?: PermissionsString[];
+    requireAdmin?: boolean;
+    requireGuild?: boolean;
+    requireSyndicatedGuild?: boolean;
     autocomplete?(
         intr: AutocompleteInteraction,
         option: AutocompleteFocusedOption

@@ -1,77 +1,137 @@
 import {
     ApplicationCommandType,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
-    RESTPostAPIContextMenuApplicationCommandsJSONBody,
 } from 'discord.js';
 
-import { Args } from './index.js';
-import { Language } from '../models/enum-helpers/index.js';
-import { Lang } from '../services/index.js';
+// import { Args } from './index.js';
 
-export const ChatCommandMetadata: {
+export const NewsCommandMetadata: {
     [command: string]: RESTPostAPIChatInputApplicationCommandsJSONBody;
 } = {
-    HELP: {
+    direct: {
         type: ApplicationCommandType.ChatInput,
-        name: Lang.getRef('chatCommands.help', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('chatCommands.help'),
-        description: Lang.getRef('commandDescs.help', Language.Default),
-        description_localizations: Lang.getRefLocalizationMap('commandDescs.help'),
+        name: `direct`,
+        name_localizations: {},
+        description: 'Sign up for Syndicate Direct.',
+        description_localizations: {},
         dm_permission: true,
         default_member_permissions: undefined,
-        options: [
-            {
-                ...Args.HELP_OPTION,
-                required: true,
-            },
-        ],
+        options: [],
     },
-    INFO: {
+    unsubscribe: {
         type: ApplicationCommandType.ChatInput,
-        name: Lang.getRef('chatCommands.info', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('chatCommands.info'),
-        description: Lang.getRef('commandDescs.info', Language.Default),
-        description_localizations: Lang.getRefLocalizationMap('commandDescs.info'),
+        name: `unsubscribe`,
+        name_localizations: {},
+        description: 'Unsubscribe from Syndicate Direct.',
+        description_localizations: {},
         dm_permission: true,
         default_member_permissions: undefined,
-        options: [
-            {
-                ...Args.INFO_OPTION,
-                required: true,
-            },
-        ],
+        options: [],
     },
-    TEST: {
+    channel: {
         type: ApplicationCommandType.ChatInput,
-        name: Lang.getRef('chatCommands.test', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('chatCommands.test'),
-        description: Lang.getRef('commandDescs.test', Language.Default),
-        description_localizations: Lang.getRefLocalizationMap('commandDescs.test'),
+        name: `news`,
+        name_localizations: {},
+        description: 'Set the channel for news posts.',
+        description_localizations: {},
+        dm_permission: false,
+        default_member_permissions: undefined,
+        options: [],
+    },
+    approve: {
+        type: ApplicationCommandType.ChatInput,
+        name: `approve`,
+        name_localizations: {},
+        description: 'Approve a news article.',
+        description_localizations: {},
         dm_permission: true,
+        default_member_permissions: undefined,
+        options: [],
+    },
+};
+
+export const GuildCommandMetadata: {
+    [command: string]: RESTPostAPIChatInputApplicationCommandsJSONBody;
+} = {
+    setup: {
+        type: ApplicationCommandType.ChatInput,
+        name: `setup`,
+        name_localizations: {},
+        description: 'Set up the bot for your server.',
+        description_localizations: {},
+        dm_permission: false,
+        default_member_permissions: undefined,
+        options: [],
+    },
+    channel: {
+        type: ApplicationCommandType.ChatInput,
+        name: `channel`,
+        name_localizations: {},
+        description: 'Set channels for news posts.',
+        dm_permission: false,
+        default_member_permissions: undefined,
+        options: [],
+    },
+    mention: {
+        type: ApplicationCommandType.ChatInput,
+        name: `mention`,
+        name_localizations: {},
+        description: 'Set roles to be mentioned when a news article is posted.',
+        dm_permission: false,
+        default_member_permissions: undefined,
+        options: [],
+    },
+    referral: {
+        type: ApplicationCommandType.ChatInput,
+        name: `referral`,
+        name_localizations: {},
+        description: 'Set up a referral for your server.',
+        dm_permission: false,
         default_member_permissions: undefined,
     },
 };
 
-export const MessageCommandMetadata: {
-    [command: string]: RESTPostAPIContextMenuApplicationCommandsJSONBody;
+export const GeneralCommandMetadata: {
+    [command: string]: RESTPostAPIChatInputApplicationCommandsJSONBody;
 } = {
-    VIEW_DATE_SENT: {
-        type: ApplicationCommandType.Message,
-        name: Lang.getRef('messageCommands.viewDateSent', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('messageCommands.viewDateSent'),
-        default_member_permissions: undefined,
+    ambassador: {
+        type: ApplicationCommandType.ChatInput,
+        name: `ambassador`,
+        name_localizations: {},
+        description: 'Become an ambassador for the Syndicate Network.',
+        description_localizations: {},
         dm_permission: true,
+        default_member_permissions: undefined,
+        options: [],
+    },
+    trial: {
+        type: ApplicationCommandType.ChatInput,
+        name: `trial`,
+        name_localizations: {},
+        description: 'Become a trial member of the Syndicate Network.',
+        description_localizations: {},
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [],
     },
 };
 
-export const UserCommandMetadata: {
-    [command: string]: RESTPostAPIContextMenuApplicationCommandsJSONBody;
-} = {
-    VIEW_DATE_JOINED: {
-        type: ApplicationCommandType.User,
-        name: Lang.getRef('userCommands.viewDateJoined', Language.Default),
-        name_localizations: Lang.getRefLocalizationMap('userCommands.viewDateJoined'),
-        default_member_permissions: undefined,
-        dm_permission: true,
-    },
-};
+// export const ChatCommandMetadata: {
+//     [command: string]: RESTPostAPIChatInputApplicationCommandsJSONBody;
+// } = {
+//     HELP: {
+//         type: ApplicationCommandType.ChatInput,
+//         name: Lang.getRef('chatCommands.help', Language.Default),
+//         name_localizations: Lang.getRefLocalizationMap('chatCommands.help'),
+//         description: Lang.getRef('commandDescs.help', Language.Default),
+//         description_localizations: Lang.getRefLocalizationMap('commandDescs.help'),
+//         dm_permission: true,
+//         default_member_permissions: undefined,
+//         options: [
+//             {
+//                 ...Args.HELP_OPTION,
+//                 required: true,
+//             },
+//         ],
+//     },
+// };

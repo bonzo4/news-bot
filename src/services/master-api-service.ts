@@ -1,15 +1,12 @@
-import { createRequire } from 'node:module';
 import { URL } from 'node:url';
 
 import { HttpService } from './index.js';
+import { config } from '../config/config.js';
 import {
     LoginClusterResponse,
     RegisterClusterRequest,
     RegisterClusterResponse,
 } from '../models/master-api/index.js';
-
-const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 
 export class MasterApiService {
     private clusterId: string;
@@ -18,16 +15,16 @@ export class MasterApiService {
 
     public async register(): Promise<void> {
         let reqBody: RegisterClusterRequest = {
-            shardCount: Config.clustering.shardCount,
+            shardCount: config.clustering.shardCount,
             callback: {
-                url: Config.clustering.callbackUrl,
-                token: Config.api.secret,
+                url: config.clustering.callbackUrl,
+                token: config.api.secret,
             },
         };
 
         let res = await this.httpService.post(
-            new URL('/clusters', Config.clustering.masterApi.url),
-            Config.clustering.masterApi.token,
+            new URL('/clusters', config.clustering.masterApi.url),
+            config.clustering.masterApi.token,
             reqBody
         );
 
@@ -41,8 +38,8 @@ export class MasterApiService {
 
     public async login(): Promise<LoginClusterResponse> {
         let res = await this.httpService.put(
-            new URL(`/clusters/${this.clusterId}/login`, Config.clustering.masterApi.url),
-            Config.clustering.masterApi.token
+            new URL(`/clusters/${this.clusterId}/login`, config.clustering.masterApi.url),
+            config.clustering.masterApi.token
         );
 
         if (!res.ok) {
@@ -54,8 +51,8 @@ export class MasterApiService {
 
     public async ready(): Promise<void> {
         let res = await this.httpService.put(
-            new URL(`/clusters/${this.clusterId}/ready`, Config.clustering.masterApi.url),
-            Config.clustering.masterApi.token
+            new URL(`/clusters/${this.clusterId}/ready`, config.clustering.masterApi.url),
+            config.clustering.masterApi.token
         );
 
         if (!res.ok) {

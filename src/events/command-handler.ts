@@ -11,19 +11,18 @@ import { createRequire } from 'node:module';
 
 import { EventHandler } from './index.js';
 import { Command, CommandDeferType } from '../commands/index.js';
+import { config } from '../config/config.js';
 import { DiscordLimits } from '../constants/index.js';
-import { EventData } from '../models/internal-models.js';
-import { EventDataService, Lang, Logger } from '../services/index.js';
+import { EventDataService, Logger } from '../services/index.js';
 import { CommandUtils, InteractionUtils } from '../utils/index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../../config/config.json');
 let Logs = require('../../lang/logs.json');
 
 export class CommandHandler implements EventHandler {
     private rateLimiter = new RateLimiter(
-        Config.rateLimiting.commands.amount,
-        Config.rateLimiting.commands.interval * 1000
+        config.rateLimiting.commands.amount,
+        config.rateLimiting.commands.interval * 1000
     );
 
     constructor(public commands: Command[], private eventDataService: EventDataService) {}
@@ -47,21 +46,23 @@ export class CommandHandler implements EventHandler {
         // Try to find the command the user wants
         let command = CommandUtils.findCommand(this.commands, commandParts);
         if (!command) {
-            Logger.error(
-                Logs.error.commandNotFound
+            await Logger.error({
+                message: Logs.error.commandNotFound
                     .replaceAll('{INTERACTION_ID}', intr.id)
-                    .replaceAll('{COMMAND_NAME}', commandName)
-            );
+                    .replaceAll('{COMMAND_NAME}', commandName),
+                guildId: intr.guild?.id,
+            });
             return;
         }
 
         if (intr instanceof AutocompleteInteraction) {
             if (!command.autocomplete) {
-                Logger.error(
-                    Logs.error.autocompleteNotFound
+                await Logger.error({
+                    message: Logs.error.autocompleteNotFound
                         .replaceAll('{INTERACTION_ID}', intr.id)
-                        .replaceAll('{COMMAND_NAME}', commandName)
-                );
+                        .replaceAll('{COMMAND_NAME}', commandName),
+                    guildId: intr.guild?.id,
+                });
                 return;
             }
 
@@ -73,28 +74,30 @@ export class CommandHandler implements EventHandler {
                     choices?.slice(0, DiscordLimits.CHOICES_PER_AUTOCOMPLETE)
                 );
             } catch (error) {
-                Logger.error(
-                    intr.channel instanceof TextChannel ||
+                await Logger.error({
+                    message:
+                        intr.channel instanceof TextChannel ||
                         intr.channel instanceof NewsChannel ||
                         intr.channel instanceof ThreadChannel
-                        ? Logs.error.autocompleteGuild
-                              .replaceAll('{INTERACTION_ID}', intr.id)
-                              .replaceAll('{OPTION_NAME}', commandName)
-                              .replaceAll('{COMMAND_NAME}', commandName)
-                              .replaceAll('{USER_TAG}', intr.user.tag)
-                              .replaceAll('{USER_ID}', intr.user.id)
-                              .replaceAll('{CHANNEL_NAME}', intr.channel.name)
-                              .replaceAll('{CHANNEL_ID}', intr.channel.id)
-                              .replaceAll('{GUILD_NAME}', intr.guild?.name)
-                              .replaceAll('{GUILD_ID}', intr.guild?.id)
-                        : Logs.error.autocompleteOther
-                              .replaceAll('{INTERACTION_ID}', intr.id)
-                              .replaceAll('{OPTION_NAME}', commandName)
-                              .replaceAll('{COMMAND_NAME}', commandName)
-                              .replaceAll('{USER_TAG}', intr.user.tag)
-                              .replaceAll('{USER_ID}', intr.user.id),
-                    error
-                );
+                            ? Logs.error.autocompleteGuild
+                                  .replaceAll('{INTERACTION_ID}', intr.id)
+                                  .replaceAll('{OPTION_NAME}', commandName)
+                                  .replaceAll('{COMMAND_NAME}', commandName)
+                                  .replaceAll('{USER_TAG}', intr.user.tag)
+                                  .replaceAll('{USER_ID}', intr.user.id)
+                                  .replaceAll('{CHANNEL_NAME}', intr.channel.name)
+                                  .replaceAll('{CHANNEL_ID}', intr.channel.id)
+                                  .replaceAll('{GUILD_NAME}', intr.guild?.name)
+                                  .replaceAll('{GUILD_ID}', intr.guild?.id)
+                            : Logs.error.autocompleteOther
+                                  .replaceAll('{INTERACTION_ID}', intr.id)
+                                  .replaceAll('{OPTION_NAME}', commandName)
+                                  .replaceAll('{COMMAND_NAME}', commandName)
+                                  .replaceAll('{USER_TAG}', intr.user.tag)
+                                  .replaceAll('{USER_ID}', intr.user.id),
+                    obj: error,
+                    guildId: intr.guild?.id,
+                });
             }
             return;
         }
@@ -131,52 +134,22 @@ export class CommandHandler implements EventHandler {
             args: intr instanceof ChatInputCommandInteraction ? intr.options : undefined,
         });
 
-        try {
-            // Check if interaction passes command checks
-            let passesChecks = await CommandUtils.runChecks(command, intr, data);
-            if (passesChecks) {
-                // Execute the command
+        let passesChecks = await InteractionUtils.runChecks(command, intr);
+        if (passesChecks) {
+            try {
                 await command.execute(intr, data);
+            } catch (error) {
+                await InteractionUtils.error(
+                    intr,
+                    error.reply ??
+                        'An error occurred while executing this command. Please try again later.'
+                );
+                await Logger.error({
+                    message: `Error executing command ${command.names}: ${error.message}`,
+                    guildId: intr.guildId,
+                    userId: intr.user.id,
+                });
             }
-        } catch (error) {
-            await this.sendError(intr, data);
-
-            // Log command error
-            Logger.error(
-                intr.channel instanceof TextChannel ||
-                    intr.channel instanceof NewsChannel ||
-                    intr.channel instanceof ThreadChannel
-                    ? Logs.error.commandGuild
-                          .replaceAll('{INTERACTION_ID}', intr.id)
-                          .replaceAll('{COMMAND_NAME}', commandName)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
-                          .replaceAll('{USER_ID}', intr.user.id)
-                          .replaceAll('{CHANNEL_NAME}', intr.channel.name)
-                          .replaceAll('{CHANNEL_ID}', intr.channel.id)
-                          .replaceAll('{GUILD_NAME}', intr.guild?.name)
-                          .replaceAll('{GUILD_ID}', intr.guild?.id)
-                    : Logs.error.commandOther
-                          .replaceAll('{INTERACTION_ID}', intr.id)
-                          .replaceAll('{COMMAND_NAME}', commandName)
-                          .replaceAll('{USER_TAG}', intr.user.tag)
-                          .replaceAll('{USER_ID}', intr.user.id),
-                error
-            );
-        }
-    }
-
-    private async sendError(intr: CommandInteraction, data: EventData): Promise<void> {
-        try {
-            await InteractionUtils.send(
-                intr,
-                Lang.getEmbed('errorEmbeds.command', data.lang, {
-                    ERROR_CODE: intr.id,
-                    GUILD_ID: intr.guild?.id ?? Lang.getRef('other.na', data.lang),
-                    SHARD_ID: (intr.guild?.shardId ?? 0).toString(),
-                })
-            );
-        } catch {
-            // Ignore
         }
     }
 }

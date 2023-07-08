@@ -1,34 +1,31 @@
-import { ActivityType, ShardingManager } from 'discord.js';
-import { createRequire } from 'node:module';
+import { ActivityType, Client, ShardingManager } from 'discord.js';
 
 import { Job } from './index.js';
+import { botSites } from '../config/botSites.js';
+import { config } from '../config/config.js';
 import { CustomClient } from '../extensions/index.js';
 import { BotSite } from '../models/config-models.js';
 import { HttpService, Lang, Logger } from '../services/index.js';
 import { ShardUtils } from '../utils/index.js';
 
-const require = createRequire(import.meta.url);
-let BotSites: BotSite[] = require('../../config/bot-sites.json');
-let Config = require('../../config/config.json');
-let Logs = require('../../lang/logs.json');
-
 export class UpdateServerCountJob implements Job {
     public name = 'Update Server Count';
-    public schedule: string = Config.jobs.updateServerCount.schedule;
-    public log: boolean = Config.jobs.updateServerCount.log;
+    public schedule = '0 0 * * *';
+    public log: boolean = config.jobs.updateServerCount.log;
 
     private botSites: BotSite[];
 
     constructor(private shardManager: ShardingManager, private httpService: HttpService) {
-        this.botSites = BotSites.filter(botSite => botSite.enabled);
+        this.botSites = botSites.filter(botSite => botSite.enabled);
     }
 
     public async run(): Promise<void> {
-        let serverCount = await ShardUtils.serverCount(this.shardManager);
+        let guildCount = await ShardUtils.guildCount(this.shardManager);
+        let memberCount = await ShardUtils.memberCount(this.shardManager);
 
         let type = ActivityType.Streaming;
-        let name = `to ${serverCount.toLocaleString()} servers`;
-        let url = Lang.getCom('links.stream');
+        let name = `to ${guildCount.toLocaleString()} servers`;
+        let url = Lang.getCom('links.twitter');
 
         await this.shardManager.broadcastEval(
             (client: CustomClient, context) => {
@@ -37,29 +34,44 @@ export class UpdateServerCountJob implements Job {
             { context: { type, name, url } }
         );
 
-        Logger.info(
-            Logs.info.updatedServerCount.replaceAll('{SERVER_COUNT}', serverCount.toLocaleString())
-        );
+        Logger.info({
+            message: `Guild Count: ${guildCount.toLocaleString()}\n\nMember count: ${memberCount.toLocaleString()}`,
+        });
 
-        for (let botSite of this.botSites) {
-            try {
-                let body = JSON.parse(
-                    botSite.body.replaceAll('{{SERVER_COUNT}}', serverCount.toString())
-                );
-                let res = await this.httpService.post(botSite.url, botSite.authorization, body);
+        await this.shardManager.broadcastEval(broadcastStats, {
+            context: { guildCount, memberCount },
+        });
 
-                if (!res.ok) {
-                    throw res;
-                }
-            } catch (error) {
-                Logger.error(
-                    Logs.error.updatedServerCountSite.replaceAll('{BOT_SITE}', botSite.name),
-                    error
-                );
-                continue;
-            }
+        // for (let botSite of this.botSites) {
+        //     try {
+        //         let body = JSON.parse(
+        //             botSite.body.replaceAll('{{SERVER_COUNT}}', serverCount.toString())
+        //         );
+        //         let res = await this.httpService.post(botSite.url, botSite.authorization, body);
 
-            Logger.info(Logs.info.updatedServerCountSite.replaceAll('{BOT_SITE}', botSite.name));
-        }
+        //         if (!res.ok) {
+        //             throw res;
+        //         }
+        //     } catch (error) {
+        //         await Logger.error({
+        //             message: Logs.error.updatedServerCountSite.replaceAll(
+        //                 '{BOT_SITE}',
+        //                 botSite.name
+        //             ),
+        //             obj: error,
+        //         });
+        //         continue;
+        //     }
+        //     await Logger.info({
+        //         message: Logs.info.updatedServerCountSite.replaceAll('{BOT_SITE}', botSite.name),
+        //     });
+        // }
     }
+}
+
+export async function broadcastStats(
+    client: Client,
+    { guildCount, memberCount }: { guildCount: number; memberCount: number }
+): Promise<void> {
+    client.emit('botStats', { guildCount, memberCount });
 }

@@ -8,6 +8,7 @@ import {
 
 import { Language } from '../models/enum-helpers/language.js';
 import { EventData } from '../models/internal-models.js';
+import { UserDbUtils } from '../utils/database/user-db-utils.js';
 
 export class EventDataService {
     public async create(
@@ -33,7 +34,11 @@ export class EventDataService {
             Language.Enabled.includes(options.guild.preferredLocale)
                 ? options.guild.preferredLocale
                 : Language.Default;
-
+        if (options.user) {
+            let userData = await UserDbUtils.getUser(options.user);
+            if (!userData) userData = await UserDbUtils.createUser(options.user);
+            return new EventData(lang, langGuild, userData);
+        }
         return new EventData(lang, langGuild);
     }
 }

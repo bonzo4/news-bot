@@ -2,6 +2,8 @@ import { ShardingManager } from 'discord.js';
 import { createRequire } from 'node:module';
 import 'reflect-metadata';
 
+import { config } from './config/config.js';
+import { debug } from './config/debug.js';
 import { GuildsController, RootController, ShardsController } from './controllers/index.js';
 import { Job, UpdateServerCountJob } from './jobs/index.js';
 import { Api } from './models/api.js';
@@ -10,17 +12,17 @@ import { HttpService, JobService, Logger, MasterApiService } from './services/in
 import { MathUtils, ShardUtils } from './utils/index.js';
 
 const require = createRequire(import.meta.url);
-let Config = require('../config/config.json');
-let Debug = require('../config/debug.json');
 let Logs = require('../lang/logs.json');
 
 async function start(): Promise<void> {
-    Logger.info(Logs.info.appStarted);
+    Logger.info({
+        message: Logs.info.appStarted,
+    });
 
     // Dependencies
     let httpService = new HttpService();
     let masterApiService = new MasterApiService(httpService);
-    if (Config.clustering.enabled) {
+    if (config.clustering.enabled) {
         await masterApiService.register();
     }
 
@@ -28,32 +30,39 @@ async function start(): Promise<void> {
     let shardList: number[];
     let totalShards: number;
     try {
-        if (Config.clustering.enabled) {
+        if (config.clustering.enabled) {
             let resBody = await masterApiService.login();
             shardList = resBody.shardList;
-            let requiredShards = await ShardUtils.requiredShardCount(Config.client.token);
+            let requiredShards = await ShardUtils.requiredShardCount(
+                config.client.token || process.env.TOKEN
+            );
             totalShards = Math.max(requiredShards, resBody.totalShards);
         } else {
             let recommendedShards = await ShardUtils.recommendedShardCount(
-                Config.client.token,
-                Config.sharding.serversPerShard
+                config.client.token || process.env.TOKEN,
+                config.sharding.serversPerShard
             );
             shardList = MathUtils.range(0, recommendedShards);
             totalShards = recommendedShards;
         }
     } catch (error) {
-        Logger.error(Logs.error.retrieveShards, error);
+        await Logger.error({
+            message: Logs.error.retrieveShards,
+            obj: error,
+        });
         return;
     }
 
     if (shardList.length === 0) {
-        Logger.warn(Logs.warn.managerNoShards);
+        Logger.warn({
+            message: Logs.warn.managerNoShards,
+        });
         return;
     }
 
     let shardManager = new ShardingManager('dist/start-bot.js', {
-        token: Config.client.token,
-        mode: Debug.override.shardMode.enabled ? Debug.override.shardMode.value : 'process',
+        token: config.client.token || process.env.TOKEN,
+        mode: debug.override.shardMode.enabled ? 'worker' : 'process',
         respawn: true,
         totalShards,
         shardList,
@@ -61,7 +70,7 @@ async function start(): Promise<void> {
 
     // Jobs
     let jobs: Job[] = [
-        Config.clustering.enabled ? undefined : new UpdateServerCountJob(shardManager, httpService),
+        config.clustering.enabled ? undefined : new UpdateServerCountJob(shardManager, httpService),
         // TODO: Add new jobs here
     ].filter(Boolean);
 
@@ -76,15 +85,21 @@ async function start(): Promise<void> {
     // Start
     await manager.start();
     await api.start();
-    if (Config.clustering.enabled) {
+    if (config.clustering.enabled) {
         await masterApiService.ready();
     }
 }
 
 process.on('unhandledRejection', (reason, _promise) => {
-    Logger.error(Logs.error.unhandledRejection, reason);
+    Logger.error({
+        message: `An unhandled promise rejection occurred.\n${reason}`,
+        obj: reason,
+    });
 });
 
-start().catch(error => {
-    Logger.error(Logs.error.unspecified, error);
+start().catch(async error => {
+    await Logger.error({
+        message: `An error occurred while starting the manager.\n${error}`,
+        obj: error,
+    });
 });
