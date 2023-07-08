@@ -102,6 +102,12 @@ export class ComponentUtils {
                     break;
                 case 'LINK': {
                     const link = await LinkDbUtils.getLinkById(interaction.id);
+                    const isDiscordLink =
+                        link.url.includes('discord.com') || link.url.includes('discordapp.com');
+                    if (isDiscordLink) {
+                        component = [linkButton(link)];
+                        break;
+                    }
                     component = [
                         await linkButtonForGuild({ link, newsId: embed.news_id, guildId }),
                     ];
