@@ -18,7 +18,7 @@ export class Manager {
         let shardList = this.shardManager.shardList as number[];
 
         try {
-            await Logger.info({
+            Logger.info({
                 message: Logs.info.managerSpawningShards
                     .replaceAll('{SHARD_COUNT}', shardList.length.toLocaleString())
                     .replaceAll('{SHARD_LIST}', shardList.join(', ')),
@@ -28,7 +28,7 @@ export class Manager {
                 delay: config.sharding.spawnDelay * 1000,
                 timeout: config.sharding.spawnTimeout * 1000,
             });
-            await Logger.info({
+            Logger.info({
                 message: Logs.info.managerAllShardsSpawned,
             });
         } catch (error) {
@@ -54,7 +54,7 @@ export class Manager {
     }
 
     private async onShardCreate(shard: Shard): Promise<void> {
-        await Logger.info({
+        Logger.info({
             message: Logs.info.managerLaunchedShard.replaceAll('{SHARD_ID}', shard.id.toString()),
         });
     }

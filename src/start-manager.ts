@@ -26,7 +26,6 @@ async function start(): Promise<void> {
     }
 
     // Sharding
-    let shardList: number[];
     // let totalShards: number;
     // try {
     //     if (config.clustering.enabled) {
@@ -58,6 +57,8 @@ async function start(): Promise<void> {
     //     });
     //     return;
     // }
+
+    const shardList = Array.from({ length: 6 }, (_, i) => i);
 
     let shardManager = new ShardingManager('dist/start-bot.js', {
         token: config.client.token || process.env.TOKEN,
