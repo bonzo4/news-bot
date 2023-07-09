@@ -5,6 +5,7 @@ import { Button, ButtonDeferType } from './index.js';
 import { setupMentionButtons } from './setup-button-5.js';
 import { addMentionMenu } from '../menus/mention-add-menu-event.js';
 import { SetupMessages } from '../messages/setup.js';
+import { Logger } from '../services/logger.js';
 import { GuildSettingsDbUtils, InteractionUtils } from '../utils/index.js';
 
 export function otherNewsChannelButtons(): ActionRowBuilder<ButtonBuilder> {
@@ -27,19 +28,31 @@ export class OtherNewsChannelButtons implements Button {
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {
-        const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
-        if (!guildSettings) {
+        try {
+            const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+            if (!guildSettings) {
+                await InteractionUtils.warn(
+                    intr,
+                    'Something went wrong. Please try again or contact the developer.'
+                );
+                return;
+            }
+            if (intr.customId.split('_')[1] === 'skip') {
+                await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
+                    addMentionMenu(),
+                    setupMentionButtons(),
+                ]);
+            }
+        } catch (error) {
             await InteractionUtils.warn(
                 intr,
-                'Something went wrong. Please try again or contact the developer.'
+                `Something went wrong with the setup. Please run **/setup** again.`
             );
-            return;
-        }
-        if (intr.customId.split('_')[1] === 'skip') {
-            await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
-                addMentionMenu(),
-                setupMentionButtons(),
-            ]);
+            await Logger.error({
+                message: `Error setting up : ${error.message ? error.message : error}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
         }
     }
 }

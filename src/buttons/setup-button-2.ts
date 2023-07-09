@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { Button, ButtonDeferType } from './button.js';
 import { setupNewsChannelButtons } from './setup-button-3.js';
 import { SetupMessages } from '../messages/setup.js';
+import { Logger } from '../services/logger.js';
 import { InteractionUtils } from '../utils/index.js';
 
 export function setupChainButtons(): ActionRowBuilder<ButtonBuilder> {
@@ -26,9 +27,21 @@ export class SetupChainButtons implements Button {
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {
-        if (intr.customId.split('_')[1] === 'skip')
-            await InteractionUtils.send(intr, SetupMessages.newsChannel(), true, [
-                setupNewsChannelButtons(),
-            ]);
+        try {
+            if (intr.customId.split('_')[1] === 'skip')
+                await InteractionUtils.send(intr, SetupMessages.newsChannel(), true, [
+                    setupNewsChannelButtons(),
+                ]);
+        } catch (error) {
+            await InteractionUtils.error(
+                intr,
+                'There was an error setting up please contact staff for assistance'
+            );
+            await Logger.error({
+                message: `Error setting up : ${error.message ? error.message : error}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+        }
     }
 }

@@ -3,6 +3,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
 import { EventData } from '../models/internal-models.js';
+import { Logger } from '../services/logger.js';
 import { EmbedDbUtils } from '../utils/database/embed-db-utils.js';
 import { InteractionDbUtils } from '../utils/database/interaction-db-utils.js';
 import { PollChoice, PollChoicesDbUtils } from '../utils/database/poll-choice-db-utils.js';
@@ -62,66 +63,79 @@ export class PollButtons implements Button {
     cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
-        const userData = data.userData;
+        try {
+            const userData = data.userData;
 
-        if (intr.customId.split('_')[1] === 'results') {
-            const pollId = parseInt(intr.customId.split('_')[2]);
-            const poll = await PollDbUtils.getPollById(pollId);
+            if (intr.customId.split('_')[1] === 'results') {
+                const pollId = parseInt(intr.customId.split('_')[2]);
+                const poll = await PollDbUtils.getPollById(pollId);
+                if (!poll) {
+                    await InteractionUtils.warn(intr, 'Invalid poll.');
+                    return;
+                }
+                const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndPollId(
+                    userData.id,
+                    pollId
+                );
+                if (!interactionDoc) {
+                    await InteractionUtils.warn(intr, 'Please vote to view the results.');
+                    return;
+                }
+                const results = await this.getResults(pollId);
+                const resultsMessage = `**Results**\n\n❓┃*Question*: ${
+                    poll.question
+                }\n\n${this.formateResults(results)}`;
+                await InteractionUtils.success(intr, resultsMessage);
+                return;
+            }
+
+            const choiceId = parseInt(intr.customId.split('_')[1]);
+            const choice = await PollChoicesDbUtils.getChoiceById(choiceId);
+            if (!choice) {
+                await InteractionUtils.warn(intr, 'Invalid choice.');
+                return;
+            }
+            const poll = await PollDbUtils.getPollById(choice.poll_id);
             if (!poll) {
                 await InteractionUtils.warn(intr, 'Invalid poll.');
                 return;
             }
+            const embed = await EmbedDbUtils.getEmbedById(poll.embed_id);
             const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndPollId(
                 userData.id,
-                pollId
+                poll.id
             );
-            if (!interactionDoc) {
-                await InteractionUtils.warn(intr, 'Please vote to view the results.');
+            if (interactionDoc) {
+                await InteractionUtils.warn(intr, 'You already voted.');
                 return;
             }
-            const results = await this.getResults(pollId);
-            const resultsMessage = `**Results**\n\n❓┃*Question*: ${
+
+            await InteractionDbUtils.createInteraction({
+                user_id: userData.id,
+                news_id: embed.news_id,
+                poll_choice_id: choice.id,
+                guild_id: intr.guildId,
+                poll_id: poll.id,
+            });
+
+            const results = await this.getResults(poll.id);
+            const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
                 poll.question
             }\n\n${this.formateResults(results)}`;
+
             await InteractionUtils.success(intr, resultsMessage);
-            return;
-        }
+        } catch (error) {
+            await InteractionUtils.error(
+                intr,
+                `There was an error using this poll. Please contact a staff member or try again later.`
+            );
+            await Logger.error({
+                message: `Error using quiz: ${error.message ? error.message : error}`,
 
-        const choiceId = parseInt(intr.customId.split('_')[1]);
-        const choice = await PollChoicesDbUtils.getChoiceById(choiceId);
-        if (!choice) {
-            await InteractionUtils.warn(intr, 'Invalid choice.');
-            return;
+                guildId: intr.guild ? intr.guild.id : null,
+                userId: intr.user.id,
+            });
         }
-        const poll = await PollDbUtils.getPollById(choice.poll_id);
-        if (!poll) {
-            await InteractionUtils.warn(intr, 'Invalid poll.');
-            return;
-        }
-        const embed = await EmbedDbUtils.getEmbedById(poll.embed_id);
-        const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndPollId(
-            userData.id,
-            poll.id
-        );
-        if (interactionDoc) {
-            await InteractionUtils.warn(intr, 'You already voted.');
-            return;
-        }
-
-        await InteractionDbUtils.createInteraction({
-            user_id: userData.id,
-            news_id: embed.news_id,
-            poll_choice_id: choice.id,
-            guild_id: intr.guildId,
-            poll_id: poll.id,
-        });
-
-        const results = await this.getResults(poll.id);
-        const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
-            poll.question
-        }\n\n${this.formateResults(results)}`;
-
-        await InteractionUtils.success(intr, resultsMessage);
     }
 
     private async getResults(pollId: number): Promise<Result[]> {

@@ -52,7 +52,10 @@ export class ScheduledNews extends CronJob {
                         message: `News sent for id: ${newsId}`,
                         newsId,
                     });
-                    await client.shard.broadcastEval(broadcastNewsSent, { context: { newsId } });
+                    const shard = client.guilds.cache.first().shardId;
+                    await client.shard.broadcastEval(broadcastNewsSent, {
+                        context: { newsId, shard },
+                    });
                     this.stop();
                 })
                 .catch(async error => {
@@ -350,9 +353,10 @@ export class ScheduledNews extends CronJob {
 
 export async function broadcastNewsSent(
     client: Client,
-    { newsId }: { newsId: number }
+    { newsId, shard }: { newsId: number; shard: number }
 ): Promise<void> {
     client.emit('newsSent', {
         newsId,
+        shard,
     });
 }

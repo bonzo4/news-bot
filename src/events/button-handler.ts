@@ -64,16 +64,16 @@ export class ButtonHandler implements EventHandler {
             try {
                 await button.execute(intr, data);
             } catch (err) {
-                await InteractionUtils.error(
-                    intr,
-                    err.reply ??
-                        'An error occurred while executing this button. Please try again later.'
-                );
                 await Logger.error({
                     message: `Error executing button ${intr.customId}:\n${err.message}`,
                     guildId: intr.guildId,
                     userId: intr.user.id,
                 });
+                await InteractionUtils.error(
+                    intr,
+                    err.reply ??
+                        'An error occurred while executing this button. Please try again later.'
+                );
             }
         }
     }

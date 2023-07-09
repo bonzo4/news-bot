@@ -10,6 +10,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { Button, ButtonDeferType } from './button.js';
 import { addMentionMenu } from '../menus/mention-add-menu-event.js';
 import { removeMentionMenu } from '../menus/mention-remove-menu-event.js';
+import { Logger } from '../services/logger.js';
 import { GuildSettingsDbUtils, InteractionUtils, MentionDbUtils } from '../utils/index.js';
 
 export function mentionButtons(): ActionRowBuilder<ButtonBuilder> {
@@ -48,52 +49,69 @@ export class MentionButtons implements Button {
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {
-        const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
-        if (!guildSettings) {
-            await InteractionUtils.warn(
-                intr,
-                'Please run `/setup` first before using this command.'
-            );
-            return;
-        }
-        switch (intr.customId.split('_')[1]) {
-            case 'add': {
-                const addMenu = addMentionMenu();
-                await InteractionUtils.success(
+        try {
+            const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+            if (!guildSettings) {
+                await InteractionUtils.warn(
                     intr,
-                    'Please select the role you would like to add.',
-                    [addMenu]
+                    'Please run `/setup` first before using this command.'
                 );
-                break;
+                return;
             }
-            case 'remove': {
-                const removeMenu = removeMentionMenu();
-                await InteractionUtils.success(
-                    intr,
-                    'Please select the role you would like to remove.',
-                    [removeMenu]
-                );
-                break;
-            }
-            case 'view': {
-                const mentionRoles = await MentionDbUtils.getAllMentionRolesByGuild(guildSettings);
-                if (mentionRoles.length === 0) {
-                    await InteractionUtils.warn(
+            switch (intr.customId.split('_')[1]) {
+                case 'add': {
+                    const addMenu = addMentionMenu();
+                    await InteractionUtils.success(
                         intr,
-                        'There are currently no roles to be mentioned.'
+                        'Please select the role you would like to add.',
+                        [addMenu]
                     );
-                    return;
+                    break;
                 }
-                const mentionString = mentionRoles
-                    .map(channel => channelMention(channel.id))
-                    .join('\n📢 ');
-                await InteractionUtils.send(intr, `Roles to be mentioned:\n📢 ${mentionString}`);
-                break;
+                case 'remove': {
+                    const removeMenu = removeMentionMenu();
+                    await InteractionUtils.success(
+                        intr,
+                        'Please select the role you would like to remove.',
+                        [removeMenu]
+                    );
+                    break;
+                }
+                case 'view': {
+                    const mentionRoles = await MentionDbUtils.getAllMentionRolesByGuild(
+                        guildSettings
+                    );
+                    if (mentionRoles.length === 0) {
+                        await InteractionUtils.warn(
+                            intr,
+                            'There are currently no roles to be mentioned.'
+                        );
+                        return;
+                    }
+                    const mentionString = mentionRoles
+                        .map(channel => channelMention(channel.id))
+                        .join('\n📢 ');
+                    await InteractionUtils.send(
+                        intr,
+                        `Roles to be mentioned:\n📢 ${mentionString}`
+                    );
+                    break;
+                }
+                default: {
+                    await InteractionUtils.warn(intr, 'This button does not exist.');
+                    break;
+                }
             }
-            default: {
-                await InteractionUtils.warn(intr, 'This button does not exist.');
-                break;
-            }
+        } catch (error) {
+            await InteractionUtils.error(
+                intr,
+                `There was an error managing your channels please contact a staff member.`
+            );
+            await Logger.error({
+                message: `Error managing news: ${error.message ? error.message : error}`,
+                guildId: intr.guild ? intr.guild.id : null,
+                userId: intr.user.id,
+            });
         }
     }
 }

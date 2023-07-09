@@ -103,9 +103,12 @@ export class Bot {
             'scheduleNews',
             async ({ newsId }: { newsId: number }) => await this.scheduleNews(newsId)
         );
-        this.options.client.on('newsSent', async ({ newsId }: { newsId: number }) => {
-            await this.onNewsSent(newsId);
-        });
+        this.options.client.on(
+            'newsSent',
+            async ({ newsId, shard }: { newsId: number; shard: number }) => {
+                await this.onNewsSent(newsId, shard);
+            }
+        );
         this.options.client.on(
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
@@ -441,7 +444,7 @@ export class Bot {
         }
     }
 
-    private async onNewsSent(newsId: number): Promise<void> {
+    private async onNewsSent(newsId: number, shard: number): Promise<void> {
         try {
             const syndicateGuild = this.options.client.guilds.cache.get(config.syndicateGuildId);
             if (!syndicateGuild) return;
@@ -455,9 +458,7 @@ export class Bot {
             if (!adminChannel) {
                 return;
             }
-            await adminChannel.send(
-                `Shard (${syndicateGuild.shardId}/${this.options.client.shard.ids.length}) finished sending news ${newsId}`
-            );
+            await adminChannel.send(`Shard (${shard}/${6}) finished sending news ${newsId}`);
         } catch (error) {
             await Logger.error({
                 message: `Failed to send news sent notification for news ${newsId}`,

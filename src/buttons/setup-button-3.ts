@@ -11,6 +11,7 @@ import { Button, ButtonDeferType } from './index.js';
 import { setupMentionButtons } from './setup-button-5.js';
 import { addMentionMenu } from '../menus/mention-add-menu-event.js';
 import { SetupMessages } from '../messages/setup.js';
+import { Logger } from '../services/logger.js';
 import { GuildSettings } from '../utils/database/guild-settings-db-utils.js';
 import {
     ChannelDbUtils,
@@ -45,23 +46,35 @@ export class SetupNewsChannelButtons implements Button {
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {
-        const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
-        if (!guildSettings) {
+        try {
+            const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+            if (!guildSettings) {
+                await InteractionUtils.warn(
+                    intr,
+                    `Something went wrong with the setup. Please run **/setup** again.`
+                );
+                return;
+            }
+            if (intr.customId.split('_')[1] === 'skip') {
+                await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
+                    addMentionMenu(),
+                    setupMentionButtons(),
+                ]);
+                return;
+            }
+
+            await this.createNewsChannel(intr, guildSettings);
+        } catch (error) {
             await InteractionUtils.warn(
                 intr,
                 `Something went wrong with the setup. Please run **/setup** again.`
             );
-            return;
+            await Logger.error({
+                message: `Error setting up : ${error.message ? error.message : error}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
         }
-        if (intr.customId.split('_')[1] === 'skip') {
-            await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
-                addMentionMenu(),
-                setupMentionButtons(),
-            ]);
-            return;
-        }
-
-        await this.createNewsChannel(intr, guildSettings);
     }
 
     private async createNewsChannel(

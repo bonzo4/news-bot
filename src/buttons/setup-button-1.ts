@@ -5,6 +5,7 @@ import { Button, ButtonDeferType } from './button.js';
 import { setupChainButtons } from './setup-button-2.js';
 import { setupChainMenu } from '../menus/chain-menu-event.js';
 import { SetupMessages } from '../messages/setup.js';
+import { Logger } from '../services/logger.js';
 import { InteractionUtils } from '../utils/index.js';
 
 export function setupButtons(): ActionRowBuilder<ButtonBuilder> {
@@ -27,9 +28,21 @@ export class SetupButtons implements Button {
     requireAdmin = true;
 
     async execute(intr: ButtonInteraction): Promise<void> {
-        await InteractionUtils.send(intr, SetupMessages.chain(), true, [
-            await setupChainMenu(),
-            setupChainButtons(),
-        ]);
+        try {
+            await InteractionUtils.send(intr, SetupMessages.chain(), true, [
+                await setupChainMenu(),
+                setupChainButtons(),
+            ]);
+        } catch (error) {
+            await InteractionUtils.error(
+                intr,
+                'There was an error setting up please contact staff for assistance'
+            );
+            await Logger.error({
+                message: `Error setting up : ${error.message ? error.message : error}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+        }
     }
 }
