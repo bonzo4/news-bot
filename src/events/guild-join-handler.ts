@@ -19,11 +19,13 @@ export class GuildJoinHandler implements EventHandler {
             const guildDoc = await GuildDbUtils.createGuild(guild);
             let banner = guildDoc.banner;
             if (!banner) banner = await BannerUtils.createBanner(guild);
-            if (!guildDoc.left_at)
+            const createdAt = new Date(guildDoc.created_at);
+            // check if guild is new
+            if (createdAt.getTime() > Date.now() - 1000 * 60 * 60) {
                 await guild.client.shard.broadcastEval(broadcastBanner, {
                     context: { bannerUrl: banner },
                 });
-
+            }
             // check if guild settings exist in db & if channels exists
             const guildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
             let categoryChannel: CategoryChannel;
