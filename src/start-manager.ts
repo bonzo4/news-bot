@@ -9,7 +9,6 @@ import { Job, UpdateServerCountJob } from './jobs/index.js';
 import { Api } from './models/api.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
-import { MathUtils, ShardUtils } from './utils/index.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
@@ -28,43 +27,43 @@ async function start(): Promise<void> {
 
     // Sharding
     let shardList: number[];
-    let totalShards: number;
-    try {
-        if (config.clustering.enabled) {
-            let resBody = await masterApiService.login();
-            shardList = resBody.shardList;
-            let requiredShards = await ShardUtils.requiredShardCount(
-                config.client.token || process.env.TOKEN
-            );
-            totalShards = Math.max(requiredShards, resBody.totalShards);
-        } else {
-            let recommendedShards = await ShardUtils.recommendedShardCount(
-                config.client.token || process.env.TOKEN,
-                config.sharding.serversPerShard
-            );
-            shardList = MathUtils.range(0, recommendedShards);
-            totalShards = recommendedShards;
-        }
-    } catch (error) {
-        await Logger.error({
-            message: Logs.error.retrieveShards,
-            obj: error,
-        });
-        return;
-    }
+    // let totalShards: number;
+    // try {
+    //     if (config.clustering.enabled) {
+    //         let resBody = await masterApiService.login();
+    //         shardList = resBody.shardList;
+    // let requiredShards = await ShardUtils.requiredShardCount(
+    //     config.client.token || process.env.TOKEN
+    // );
+    //         totalShards = Math.max(requiredShards, resBody.totalShards);
+    //     } else {
+    //         let recommendedShards = await ShardUtils.recommendedShardCount(
+    //             config.client.token || process.env.TOKEN,
+    //             config.sharding.serversPerShard
+    //         );
+    //         shardList = MathUtils.range(0, recommendedShards);
+    //         totalShards = recommendedShards;
+    //     }
+    // } catch (error) {
+    //     await Logger.error({
+    //         message: Logs.error.retrieveShards,
+    //         obj: error,
+    //     });
+    //     return;
+    // }
 
-    if (shardList.length === 0) {
-        Logger.warn({
-            message: Logs.warn.managerNoShards,
-        });
-        return;
-    }
+    // if (shardList.length === 0) {
+    //     Logger.warn({
+    //         message: Logs.warn.managerNoShards,
+    //     });
+    //     return;
+    // }
 
     let shardManager = new ShardingManager('dist/start-bot.js', {
         token: config.client.token || process.env.TOKEN,
         mode: debug.override.shardMode.enabled ? 'worker' : 'process',
         respawn: true,
-        totalShards,
+        totalShards: 6,
         shardList,
     });
 

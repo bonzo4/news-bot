@@ -34,11 +34,14 @@ export class BannerUtils {
     }
 
     private static async getBanner(guildId: string): Promise<string | null> {
-        const {
-            data: { publicUrl },
-        } = supabase.storage.from(`banners`).getPublicUrl(`${guildId}.png`);
-
-        return publicUrl;
+        try {
+            const {
+                data: { publicUrl },
+            } = supabase.storage.from(`banners`).getPublicUrl(`${guildId}.png`);
+            return publicUrl;
+        } catch (err) {
+            return null;
+        }
     }
 
     private static async buildBanner(guild: Guild): Promise<string> {
@@ -46,11 +49,10 @@ export class BannerUtils {
             const backgroundImage = await Jimp.read('./public/background.jpg');
             const font = await Jimp.loadFont('./public/PoppinsBold.fnt');
             // regex for removing emojis from guild name
-            const nameNoEmojis = this.stripEmojis(guild.name);
-            const name =
-                nameNoEmojis.length > 20 ? `${nameNoEmojis.slice(0, 20)}...` : nameNoEmojis;
+            const name = guild.name;
+            const formattedName = name.length > 20 ? `${name.slice(0, 20)}...` : name;
             const x = backgroundImage.getWidth() / 2 - Jimp.measureText(font, name) / 2;
-            let finalImage = backgroundImage.print(font, x, 565, name);
+            let finalImage = backgroundImage.print(font, x, 565, formattedName);
             const guildIconUrl = guild.iconURL({ size: 1024, extension: 'png' });
             if (guildIconUrl) {
                 const iconImage = await Jimp.read(guildIconUrl);

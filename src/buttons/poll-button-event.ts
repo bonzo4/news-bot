@@ -138,10 +138,12 @@ export class PollButtons implements Button {
     }
 
     private formateResults(results: Result[]): string {
+        const totalVotes = results.reduce((a, b) => a + b.votes, 0);
         let text = '';
         results.forEach(result => {
-            text += `${result.emoji}┃${result.text}: ${result.votes}\n`;
+            const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
+            text += `${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
         });
-        return text;
+        return text + `\nTotal votes: ${totalVotes}`;
     }
 }

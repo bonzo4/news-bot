@@ -22,7 +22,7 @@ import {
 } from 'discord.js';
 import { createRequire } from 'node:module';
 
-import { systemButtons } from '../buttons/system.js';
+import { systemButtons, systemLinks } from '../buttons/system.js';
 import { config } from '../config/config.js';
 import { debug } from '../config/debug.js';
 import { ChannelDeleteHandler } from '../events/channel-delete-handler.js';
@@ -94,16 +94,22 @@ export class Bot {
         );
         this.options.client.on(
             Events.MessageReactionAdd,
-            (messageReaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) =>
-                this.onReaction(messageReaction, user)
+            async (
+                messageReaction: MessageReaction | PartialMessageReaction,
+                user: User | PartialUser
+            ) => await this.onReaction(messageReaction, user)
         );
-        this.options.client.on('scheduleNews', ({ newsId }: { newsId: number }) =>
-            this.scheduleNews(newsId, this.options.client)
+        this.options.client.on(
+            'scheduleNews',
+            async ({ newsId }: { newsId: number }) => await this.scheduleNews(newsId)
         );
+        this.options.client.on('newsSent', async ({ newsId }: { newsId: number }) => {
+            await this.onNewsSent(newsId);
+        });
         this.options.client.on(
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
-                await this.broadcastStats(guildCount, memberCount, this.options.client);
+                await this.broadcastStats(guildCount, memberCount);
                 await this.updateAllGuilds();
             }
         );
@@ -116,8 +122,9 @@ export class Bot {
                 await this.guildReferral(guildId, userId, this.options.client);
             }
         );
-        this.options.client.rest.on(RESTEvents.RateLimited, (rateLimitData: RateLimitData) =>
-            this.onRateLimit(rateLimitData)
+        this.options.client.rest.on(
+            RESTEvents.RateLimited,
+            async (rateLimitData: RateLimitData) => await this.onRateLimit(rateLimitData)
         );
     }
 
@@ -144,7 +151,27 @@ export class Bot {
         Logger.info({
             message: Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag),
         });
-        await this.updateAllGuilds();
+        await this.updateAllGuildInvitesAndAnnouncementChannels();
+    }
+
+    private async updateAllGuildInvitesAndAnnouncementChannels(): Promise<void> {
+        if (!this.ready || debug.dummyMode.enabled) {
+            return;
+        }
+        this.options.client.guilds.cache.map(async guild => {
+            try {
+                const guildDoc = await GuildDbUtils.getGuildById(guild.id);
+                if (!guildDoc) return;
+                // scrape invites and announcement channels
+                await GuildDbUtils.updateGuild(guild);
+                await this.updateSystemMessage(guild);
+            } catch (error) {
+                await Logger.error({
+                    message: `An error occurred while updating a guild.\n${error}`,
+                    guildId: guild.id,
+                });
+            }
+        });
     }
 
     private async updateAllGuilds(): Promise<void> {
@@ -176,7 +203,7 @@ export class Bot {
         await systemChannel.bulkDelete(100);
         await systemChannel.send({
             embeds: [SetupMessages.systemMessage()],
-            components: [systemButtons()],
+            components: [systemLinks(), systemButtons()],
         });
     }
 
@@ -386,7 +413,7 @@ export class Bot {
         }
     }
 
-    private async scheduleNews(newsId: number, client: Client): Promise<void> {
+    private async scheduleNews(newsId: number): Promise<void> {
         try {
             const news = await NewsDbUtils.getNews(newsId);
             if (!news) {
@@ -404,7 +431,7 @@ export class Bot {
             new ScheduledNews({
                 newsId: newsId,
                 schedule: new Date(news.schedule),
-                client: client,
+                client: this.options.client,
             }).start();
         } catch (error) {
             await Logger.error({
@@ -414,13 +441,36 @@ export class Bot {
         }
     }
 
-    private async broadcastStats(
-        guildCount: number,
-        memberCount: number,
-        client: Client
-    ): Promise<void> {
+    private async onNewsSent(newsId: number): Promise<void> {
         try {
-            const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
+            const syndicateGuild = this.options.client.guilds.cache.get(config.syndicateGuildId);
+            if (!syndicateGuild) return;
+            const news = await NewsDbUtils.getNews(newsId);
+            if (!news) {
+                return;
+            }
+            const adminChannel = syndicateGuild.channels.cache.get(
+                '988242915027460146'
+            ) as TextChannel;
+            if (!adminChannel) {
+                return;
+            }
+            await adminChannel.send(
+                `Shard (${this.options.client.guilds.cache.first().shardId}/${
+                    this.options.client.shard.ids.length
+                }) finished sending news ${newsId}`
+            );
+        } catch (error) {
+            await Logger.error({
+                message: `Failed to send news sent notification for news ${newsId}`,
+                obj: error,
+            });
+        }
+    }
+
+    private async broadcastStats(guildCount: number, memberCount: number): Promise<void> {
+        try {
+            const syndicateGuild = this.options.client.guilds.cache.get(config.syndicateGuildId);
             if (!syndicateGuild) return;
             const guildCountChannel = syndicateGuild.channels.cache.get(
                 config.syndicateChannels.guildCount

@@ -52,6 +52,12 @@ export class ScheduledNews extends CronJob {
                         message: `News sent for id: ${newsId}`,
                         newsId,
                     });
+                    await client.shard.broadcastEval(
+                        (client, { newsId }) => {
+                            client.emit('newsSent', newsId);
+                        },
+                        { context: { newsId } }
+                    );
                     this.stop();
                 })
                 .catch(async error => {
@@ -173,6 +179,10 @@ export class ScheduledNews extends CronJob {
                 await Logger.error({
                     message: `Error sending news to user: ${err}`,
                     userId: directChannel.user_id,
+                }).catch(async err => {
+                    await Logger.error({
+                        message: `Error logging error: ${err}`,
+                    });
                 });
             }
         }
@@ -206,6 +216,10 @@ export class ScheduledNews extends CronJob {
                     message: `Error sending news to guild: ${err}`,
                     guildId,
                     newsId: news.id,
+                }).catch(async err => {
+                    await Logger.error({
+                        message: `Error logging error: ${err}`,
+                    });
                 });
             }
         }
@@ -235,6 +249,10 @@ export class ScheduledNews extends CronJob {
                     message: `Error sending news to user: ${err}`,
                     userId,
                     newsId: news.id,
+                }).catch(async err => {
+                    await Logger.error({
+                        message: `Error logging error: ${err}`,
+                    });
                 });
             }
         }

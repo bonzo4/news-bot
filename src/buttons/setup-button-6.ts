@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './index.js';
-import { systemButtons } from './system.js';
+import { systemButtons, systemLinks } from './system.js';
 import { SetupMessages } from '../messages/setup.js';
 import { referralModal } from '../modals/referral-modal-event.js';
 import { InteractionUtils, ReferralDbUtils } from '../utils/index.js';
@@ -41,7 +41,7 @@ export class SetupReferralButtons implements Button {
             await intr.channel.bulkDelete(100);
             await intr.channel.send({
                 embeds: [SetupMessages.systemMessage()],
-                components: [systemButtons()],
+                components: [systemLinks(), systemButtons()],
             });
             await InteractionUtils.success(intr, 'Setup complete');
             return;
@@ -51,7 +51,7 @@ export class SetupReferralButtons implements Button {
             await intr.channel.bulkDelete(100);
             await intr.channel.send({
                 embeds: [SetupMessages.systemMessage()],
-                components: [systemButtons()],
+                components: [systemLinks(), systemButtons()],
             });
             await InteractionUtils.success(intr, 'Setup complete');
             return;

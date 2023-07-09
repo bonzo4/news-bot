@@ -3,7 +3,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './index.js';
 import { setupReferralButtons } from './setup-button-6.js';
-import { systemButtons } from './system.js';
+import { systemButtons, systemLinks } from './system.js';
 import { SetupMessages } from '../messages/setup.js';
 import { ReferralDbUtils } from '../utils/index.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
@@ -39,7 +39,7 @@ export class SetupMentionButtons implements Button {
                 await intr.channel.bulkDelete(100);
                 await intr.channel.send({
                     embeds: [SetupMessages.systemMessage()],
-                    components: [systemButtons()],
+                    components: [systemLinks(), systemButtons()],
                 });
                 await InteractionUtils.success(intr, 'Setup complete');
                 return;

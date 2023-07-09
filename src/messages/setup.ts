@@ -97,18 +97,6 @@ export class SetupMessages {
                     value: `> **/ping** - designate up to 3 roles to be pinged when the news gets sent out
                 > **/channels** - setup news for a different channel`,
                 },
-                {
-                    name: 'Syndicate Discord:',
-                    value: '> https://discord.gg/QZDFwWqr9F',
-                },
-                {
-                    name: 'Syndicate Twitter:',
-                    value: '> https://twitter.com/SyndicateCREATE',
-                },
-                {
-                    name: 'Syndicate Website:',
-                    value: '> https://www.syndicatenetwork.io/',
-                },
             ])
             .setFooter({
                 text: 'Powered by Syndicate',

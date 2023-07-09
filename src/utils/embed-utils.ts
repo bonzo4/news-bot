@@ -30,6 +30,18 @@ type UserEmbedLinkOptions = {
     userId: string;
 } & EmbedLinkOptions;
 
+type EmbedImageOptions = {
+    image: string;
+} & EmbedLinkOptions;
+
+type GuildEmbedImageOptions = {
+    guildId: string;
+} & EmbedImageOptions;
+
+type UserEmbedImageOptions = {
+    userId: string;
+} & EmbedImageOptions;
+
 export class EmbedUtils {
     public static removeId(content: Json): any {
         let parsedContent = JSON.parse(content.toString());
@@ -45,12 +57,15 @@ export class EmbedUtils {
             embed,
             guildId,
         });
-        if (embed.order === 0)
-            formattedContent = await this.formatFooterForGuild({
+        if (embed.news_image) {
+            const image = this.getImage(formattedContent);
+            formattedContent = await this.formatImageForGuild({
                 embed,
                 guildId,
                 content: formattedContent,
+                image,
             });
+        }
         return formattedContent;
     }
 
@@ -73,14 +88,16 @@ export class EmbedUtils {
         return this.replaceLinks(content, links, formattedLinks);
     }
 
-    public static async formatFooterForGuild(options: GuildEmbedLinkOptions): Promise<any> {
-        const { content, guildId, embed } = options;
+    public static async formatImageForGuild(options: GuildEmbedImageOptions): Promise<any> {
+        // change to news image
+        const { content, guildId, embed, image } = options;
         const newsImage = await NewsTrackerDbUtils.createNewsTracker({
             news_id: embed.news_id,
             guild_id: guildId,
+            image_url: image,
         });
         const newImage = `${config.imageUrl}/${newsImage.id}`;
-        const formattedContent = this.replaceFooter(content, newImage);
+        const formattedContent = this.replaceImage(content, newImage);
         return formattedContent;
     }
 
@@ -92,12 +109,15 @@ export class EmbedUtils {
             embed,
             userId,
         });
-        if (embed.order === 0)
-            formattedContent = await this.formatFooterForDirect({
+        if (embed.news_image) {
+            const image = this.getImage(formattedContent);
+            formattedContent = await this.formatImageForDirect({
                 embed,
                 userId,
                 content: formattedContent,
+                image,
             });
+        }
         return formattedContent;
     }
 
@@ -119,27 +139,26 @@ export class EmbedUtils {
         return this.replaceLinks(content, links, formattedLinks);
     }
 
-    public static async formatFooterForDirect(options: UserEmbedLinkOptions): Promise<any> {
-        const { embed, userId, content } = options;
+    public static async formatImageForDirect(options: UserEmbedImageOptions): Promise<any> {
+        const { embed, userId, content, image } = options;
         const newsImage = await NewsTrackerDbUtils.createNewsTracker({
             news_id: embed.news_id,
             user_id: userId,
+            image_url: image,
         });
         const newImage = `${config.imageUrl}/${newsImage.id}`;
-        const formattedContent = this.replaceFooter(content, newImage);
+        const formattedContent = this.replaceImage(content, newImage);
         return formattedContent;
     }
 
-    private static replaceFooter(content: any, newImage: string): any {
-        const contentWithFooter: Embed = {
+    private static replaceImage(content: any, newImage: string): any {
+        const contentWithImage: Embed = {
             ...content,
-            footer: {
-                text: 'Powered by Syndicate',
-                ...content.footer,
-                iconURL: newImage,
+            image: {
+                url: newImage,
             },
         };
-        return contentWithFooter;
+        return contentWithImage;
     }
 
     private static replaceLinks(content: any, oldLinks: string[], newLinks: string[]): any {
@@ -148,6 +167,11 @@ export class EmbedUtils {
             contentString = contentString.replace(oldLinks[i], newLinks[i]);
         }
         return JSON.parse(contentString);
+    }
+
+    private static getImage(content: any): string {
+        if (content.image) return content.image.url;
+        return '';
     }
 
     private static getAllLinks(content: any): string[] {

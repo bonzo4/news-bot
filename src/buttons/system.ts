@@ -56,6 +56,34 @@ export function systemButtons(): ActionRowBuilder<ButtonBuilder> {
     return row;
 }
 
+export function systemLinks(): ActionRowBuilder<ButtonBuilder> {
+    const row = new ActionRowBuilder<ButtonBuilder>();
+
+    const discordLink = new ButtonBuilder()
+        .setLabel('Discord')
+        .setStyle(ButtonStyle.Link)
+        .setURL('https://discord.gg/syndicatenetwork');
+
+    const twitterLink = new ButtonBuilder()
+        .setLabel('Twitter')
+        .setStyle(ButtonStyle.Link)
+        .setURL('https://twitter.com/SyndicateNTWRK');
+
+    const threadsLink = new ButtonBuilder()
+        .setLabel('Threads (By Instagram)')
+        .setStyle(ButtonStyle.Link)
+        .setURL('https://www.threads.net/@syndicatenetwork_');
+
+    const telegramLink = new ButtonBuilder()
+        .setLabel('Join our telegram for founders')
+        .setStyle(ButtonStyle.Link)
+        .setURL('https://t.me/+2RFMCPVu2xk4ODFh');
+
+    row.addComponents([discordLink, twitterLink, threadsLink, telegramLink]);
+
+    return row;
+}
+
 export class SystemButtons implements Button {
     ids: string[] = ['system'];
     deferType = ButtonDeferType.REPLY;

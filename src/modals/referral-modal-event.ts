@@ -9,7 +9,7 @@ import {
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
-import { systemButtons } from '../buttons/system.js';
+import { systemButtons, systemLinks } from '../buttons/system.js';
 import { SetupMessages } from '../messages/setup.js';
 import { UserDbUtils } from '../utils/database/user-db-utils.js';
 import { ReferralDbUtils } from '../utils/index.js';
@@ -64,7 +64,7 @@ export class ReferralModal implements ModalSubmit {
         if (setup)
             await intr.channel.send({
                 embeds: [SetupMessages.systemMessage()],
-                components: [systemButtons()],
+                components: [systemLinks(), systemButtons()],
             });
 
         await intr.client.shard.broadcastEval(broadcastReferral, {
