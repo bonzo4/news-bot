@@ -1,5 +1,6 @@
 import { Guild } from 'discord.js';
 import Jimp from 'jimp';
+import fetch from 'node-fetch';
 import { promises as fs } from 'node:fs';
 
 import { GuildDbUtils } from './database/guild-db-utils.js';
@@ -38,6 +39,9 @@ export class BannerUtils {
             const {
                 data: { publicUrl },
             } = supabase.storage.from(`banners`).getPublicUrl(`${guildId}.png`);
+            const image = await fetch(publicUrl);
+            const imageData = (await image.json()) as { error: string; statusCode: string };
+            if (imageData.error || imageData.statusCode === '404') return null;
             return publicUrl;
         } catch (err) {
             return null;

@@ -456,9 +456,7 @@ export class Bot {
                 return;
             }
             await adminChannel.send(
-                `Shard (${this.options.client.guilds.cache.first().shardId}/${
-                    this.options.client.shard.ids.length
-                }) finished sending news ${newsId}`
+                `Shard (${syndicateGuild.shardId}/${this.options.client.shard.ids.length}) finished sending news ${newsId}`
             );
         } catch (error) {
             await Logger.error({
