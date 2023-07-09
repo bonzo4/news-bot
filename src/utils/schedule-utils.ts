@@ -52,12 +52,7 @@ export class ScheduledNews extends CronJob {
                         message: `News sent for id: ${newsId}`,
                         newsId,
                     });
-                    await client.shard.broadcastEval(
-                        (client, { newsId }) => {
-                            client.emit('newsSent', newsId);
-                        },
-                        { context: { newsId } }
-                    );
+                    await client.shard.broadcastEval(broadcastNewsSent, { context: { newsId } });
                     this.stop();
                 })
                 .catch(async error => {
@@ -351,4 +346,13 @@ export class ScheduledNews extends CronJob {
 
         return true;
     }
+}
+
+export async function broadcastNewsSent(
+    client: Client,
+    { newsId }: { newsId: number }
+): Promise<void> {
+    client.emit('newsSent', {
+        newsId,
+    });
 }
