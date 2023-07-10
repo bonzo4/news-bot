@@ -317,7 +317,7 @@ export class Bot {
                         `An error occurred while processing the command. Please try again later.`
                     );
                 await Logger.error({
-                    message: Logs.error.menu,
+                    message: `Error while processing command: ${error}`,
                     obj: error,
                     guildId: intr.guild?.id,
                     userId: intr.user.id,
@@ -332,7 +332,7 @@ export class Bot {
                     `An error occurred while processing the button. Please try again later.`
                 );
                 await Logger.error({
-                    message: Logs.error.menu,
+                    message: `Error while processing button: ${error}`,
                     obj: error,
                     guildId: intr.guild?.id,
                     userId: intr.user.id,
@@ -347,7 +347,7 @@ export class Bot {
                     `An error occurred while processing your submission. Please try again later.`
                 );
                 await Logger.error({
-                    message: Logs.error.menu,
+                    message: `Error while processing modal: ${error}`,
                     obj: error,
                     guildId: intr.guild?.id,
                     userId: intr.user.id,
@@ -362,7 +362,7 @@ export class Bot {
                     `An error occurred while processing your selection. Please try again later.`
                 );
                 await Logger.error({
-                    message: Logs.error.menu,
+                    message: `Error while processing menu: ${error}`,
                     obj: error,
                     guildId: intr.guild?.id,
                     userId: intr.user.id,
