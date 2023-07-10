@@ -18,7 +18,7 @@ export class ModalSubmitHandler implements EventHandler {
 
     public async process(intr: ModalSubmitInteraction): Promise<void> {
         // Don't respond to self, or other bots
-        if (intr.user.id === intr.client.user?.id || intr.user.bot) {
+        if (intr.user.id === intr.client.user?.id) {
             return;
         }
 

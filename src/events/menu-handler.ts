@@ -17,7 +17,7 @@ export class MenuHandler implements EventHandler {
     constructor(private menus: Menu[], private eventDataService: EventDataService) {}
 
     public async process(intr: AnySelectMenuInteraction): Promise<void> {
-        if (intr.user.id === intr.client.user?.id || intr.user.bot) {
+        if (intr.user.id === intr.client.user?.id) {
             return;
         }
 
