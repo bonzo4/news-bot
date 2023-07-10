@@ -12,7 +12,7 @@ export class UserDbUtils {
             .upsert({
                 id: user.id,
                 name: user.username,
-                image: user.displayAvatarURL(),
+                icon: user.displayAvatarURL(),
             })
             .select()
             .single();
