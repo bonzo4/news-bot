@@ -144,17 +144,24 @@ export class Bot {
     }
 
     private async onReady(): Promise<void> {
-        let userTag = this.options.client.user?.tag;
+        try {
+            let userTag = this.options.client.user?.tag;
 
-        if (!debug.dummyMode.enabled) {
-            this.options.jobService.start();
+            if (!debug.dummyMode.enabled) {
+                this.options.jobService.start();
+            }
+
+            this.ready = true;
+            Logger.info({
+                message: Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag),
+            });
+            await this.updateAllGuildInvitesAndAnnouncementChannels();
+        } catch (error) {
+            await Logger.error({
+                message: `An error occurred while starting the bot.\n${error}`,
+                obj: error,
+            });
         }
-
-        this.ready = true;
-        Logger.info({
-            message: Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag),
-        });
-        await this.updateAllGuildInvitesAndAnnouncementChannels();
     }
 
     private async updateAllGuildInvitesAndAnnouncementChannels(): Promise<void> {
@@ -458,7 +465,7 @@ export class Bot {
             if (!adminChannel) {
                 return;
             }
-            await adminChannel.send(`Shard (${shard}/${6}) finished sending news ${newsId}`);
+            await adminChannel.send(`Shard (${shard + 1}/${6}) finished sending news ${newsId}`);
         } catch (error) {
             await Logger.error({
                 message: `Failed to send news sent notification for news ${newsId}`,

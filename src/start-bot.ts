@@ -213,6 +213,13 @@ process.on('unhandledRejection', async (reason, _promise) => {
     });
 });
 
+process.on('error', async error => {
+    await Logger.error({
+        message: `An error occurred.\n${error}`,
+        obj: error,
+    });
+});
+
 start().catch(async error => {
     await Logger.error({
         message: `An error occurred while starting the bot.\n${error}`,

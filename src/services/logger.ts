@@ -55,6 +55,10 @@ export class Logger {
             guild_id: guildId ? guildId : null,
             user_id: userId ? userId : null,
             news_id: newsId ? newsId : null,
+        }).catch(async err => {
+            await Logger.error({
+                message: `Could not create bot error in database: ${err.message}`,
+            });
         });
         // Log just a message if no error object
         if (!obj) {
