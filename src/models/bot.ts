@@ -316,7 +316,7 @@ export class Bot {
                         intr,
                         `An error occurred while processing the command. Please try again later.`
                     );
-                Logger.warn({
+                await Logger.error({
                     message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
@@ -331,7 +331,7 @@ export class Bot {
                     intr,
                     `An error occurred while processing the button. Please try again later.`
                 );
-                Logger.warn({
+                await Logger.error({
                     message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
@@ -346,7 +346,7 @@ export class Bot {
                     intr,
                     `An error occurred while processing your submission. Please try again later.`
                 );
-                Logger.warn({
+                await Logger.error({
                     message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
@@ -361,7 +361,7 @@ export class Bot {
                     intr,
                     `An error occurred while processing your selection. Please try again later.`
                 );
-                Logger.warn({
+                await Logger.error({
                     message: Logs.error.menu,
                     obj: error,
                     guildId: intr.guild?.id,
