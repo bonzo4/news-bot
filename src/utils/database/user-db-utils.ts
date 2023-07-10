@@ -9,7 +9,7 @@ export class UserDbUtils {
     public static async createUser(user: User): Promise<UserDoc> {
         const { data: userDoc, error } = await supabase
             .from('discord_users')
-            .insert({
+            .upsert({
                 id: user.id,
                 name: user.username,
                 image: user.displayAvatarURL(),

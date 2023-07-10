@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventHandler } from './index.js';
 import { Button, ButtonDeferType } from '../buttons/index.js';
 import { config } from '../config/config.js';
+import { EventData } from '../models/internal-models.js';
 import { EventDataService, Logger } from '../services/index.js';
 import { InteractionUtils } from '../utils/index.js';
 
@@ -51,18 +52,27 @@ export class ButtonHandler implements EventHandler {
             return;
         }
 
-        // Get data from database
-        let data = await this.eventDataService.create({
-            user: intr.user,
-            channel: intr.channel,
-            guild: intr.guild,
-        });
+        let eventData: EventData;
+        try {
+            eventData = await this.eventDataService.create({
+                user: intr.user,
+                channel: intr.channel,
+                guild: intr.guild,
+            });
+        } catch (err) {
+            await Logger.error({
+                message: `Error creating event data for button ${intr.customId}:\n${err.message}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+            throw err;
+        }
 
         // Execute the button
         let passesChecks = await InteractionUtils.runChecks(button, intr);
         if (passesChecks) {
             try {
-                await button.execute(intr, data);
+                await button.execute(intr, eventData);
             } catch (err) {
                 await Logger.error({
                     message: `Error executing button ${intr.customId}:\n${err.message}`,

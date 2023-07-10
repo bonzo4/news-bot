@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventHandler } from './event-handler.js';
 import { config } from '../config/config.js';
 import { Menu, MenuDeferType } from '../menus/index.js';
+import { EventData } from '../models/internal-models.js';
 import { EventDataService } from '../services/event-data-service.js';
 import { Logger } from '../services/index.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
@@ -46,15 +47,25 @@ export class MenuHandler implements EventHandler {
             return;
         }
 
-        let data = await this.eventDataService.create({
-            user: intr.user,
-            guild: intr.guild,
-            channel: intr.channel,
-        });
+        let eventData: EventData;
+        try {
+            eventData = await this.eventDataService.create({
+                user: intr.user,
+                channel: intr.channel,
+                guild: intr.guild,
+            });
+        } catch (err) {
+            await Logger.error({
+                message: `Error creating event data for button ${intr.customId}:\n${err.message}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+            throw err;
+        }
         let passesChecks = await InteractionUtils.runChecks(menu, intr);
         if (passesChecks) {
             try {
-                await menu.execute(intr, data);
+                await menu.execute(intr, eventData);
             } catch (err: any) {
                 await InteractionUtils.error(
                     intr,

@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { EventHandler } from './index.js';
 import { config } from '../config/config.js';
 import { ModalDeferType, ModalSubmit } from '../modals/modalSubmit.js';
+import { EventData } from '../models/internal-models.js';
 import { EventDataService } from '../services/event-data-service.js';
 import { Logger } from '../services/logger.js';
 import { InteractionUtils } from '../utils/index.js';
@@ -51,18 +52,27 @@ export class ModalSubmitHandler implements EventHandler {
             return;
         }
 
-        // Get data from database
-        let data = await this.eventDataService.create({
-            user: intr.user,
-            channel: intr.channel,
-            guild: intr.guild,
-        });
+        let eventData: EventData;
+        try {
+            eventData = await this.eventDataService.create({
+                user: intr.user,
+                channel: intr.channel,
+                guild: intr.guild,
+            });
+        } catch (err) {
+            await Logger.error({
+                message: `Error creating event data for button ${intr.customId}:\n${err.message}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+            throw err;
+        }
 
         // Execute the modal
         let passesChecks = await InteractionUtils.runChecks(modal, intr);
         if (passesChecks) {
             try {
-                await modal.execute(intr, data);
+                await modal.execute(intr, eventData);
             } catch (err) {
                 await InteractionUtils.error(
                     intr,

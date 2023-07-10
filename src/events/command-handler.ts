@@ -13,6 +13,7 @@ import { EventHandler } from './index.js';
 import { Command, CommandDeferType } from '../commands/index.js';
 import { config } from '../config/config.js';
 import { DiscordLimits } from '../constants/index.js';
+import { EventData } from '../models/internal-models.js';
 import { EventDataService, Logger } from '../services/index.js';
 import { CommandUtils, InteractionUtils } from '../utils/index.js';
 
@@ -126,18 +127,26 @@ export class CommandHandler implements EventHandler {
             return;
         }
 
-        // Get data from database
-        let data = await this.eventDataService.create({
-            user: intr.user,
-            channel: intr.channel,
-            guild: intr.guild,
-            args: intr instanceof ChatInputCommandInteraction ? intr.options : undefined,
-        });
+        let eventData: EventData;
+        try {
+            eventData = await this.eventDataService.create({
+                user: intr.user,
+                channel: intr.channel,
+                guild: intr.guild,
+            });
+        } catch (err) {
+            await Logger.error({
+                message: `Error creating event data for button ${intr.commandName}:\n${err.message}`,
+                guildId: intr.guildId,
+                userId: intr.user.id,
+            });
+            throw err;
+        }
 
         let passesChecks = await InteractionUtils.runChecks(command, intr);
         if (passesChecks) {
             try {
-                await command.execute(intr, data);
+                await command.execute(intr, eventData);
             } catch (error) {
                 await InteractionUtils.error(
                     intr,

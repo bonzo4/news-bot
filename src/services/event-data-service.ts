@@ -35,7 +35,7 @@ export class EventDataService {
                 ? options.guild.preferredLocale
                 : Language.Default;
         if (options.user) {
-            let userData = await UserDbUtils.getUser(options.user);
+            let userData = await UserDbUtils.getUserById(options.user.id);
             if (!userData) userData = await UserDbUtils.createUser(options.user);
             return new EventData(lang, langGuild, userData);
         }
