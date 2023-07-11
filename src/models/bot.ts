@@ -113,7 +113,7 @@ export class Bot {
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
                 await this.broadcastStats(guildCount, memberCount);
-                await this.updateAllGuilds();
+                await this.dailyUpdateAllGuilds();
             }
         );
         this.options.client.on('guildBanner', async ({ bannerUrl }: { bannerUrl: string }) => {
@@ -173,7 +173,7 @@ export class Bot {
                 const guildDoc = await GuildDbUtils.getGuildById(guild.id);
                 if (!guildDoc) return;
                 // scrape invites and announcement channels
-                await GuildDbUtils.updateGuild(guild);
+                await GuildDbUtils.createGuild(guild);
                 await this.updateSystemMessage(guild);
             } catch (error) {
                 await Logger.error({
@@ -184,7 +184,7 @@ export class Bot {
         });
     }
 
-    private async updateAllGuilds(): Promise<void> {
+    private async dailyUpdateAllGuilds(): Promise<void> {
         if (!this.ready || debug.dummyMode.enabled) {
             return;
         }
@@ -193,7 +193,7 @@ export class Bot {
                 const guildDoc = await GuildDbUtils.getGuildById(guild.id);
                 if (!guildDoc) return;
                 await GuildDbUtils.updateGuild(guild);
-                await this.updateSystemMessage(guild);
+                // await this.updateSystemMessage(guild);
             } catch (error) {
                 await Logger.error({
                     message: `An error occurred while updating a guild.\n${error}`,
