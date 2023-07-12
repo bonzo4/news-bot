@@ -174,7 +174,7 @@ export class Bot {
                 if (!guildDoc) return;
                 // scrape invites and announcement channels
                 await GuildDbUtils.createGuild(guild);
-                await this.updateSystemMessage(guild);
+                // await this.updateSystemMessage(guild);
             } catch (error) {
                 await Logger.error({
                     message: `An error occurred while updating a guild.\n${error}`,

@@ -18,6 +18,7 @@ import { SetupMentionButtons } from './buttons/setup-button-5.js';
 import { SetupReferralButtons } from './buttons/setup-button-6.js';
 import { AmbassadorCommand } from './commands/ambassador-command.js';
 import { ChannelCommand } from './commands/guild/channels-command.js';
+import { MentionCommand } from './commands/guild/mention-command.js';
 import { ReferralCommand } from './commands/guild/referral-command.js';
 import { Command, SetupCommand } from './commands/index.js';
 import {
@@ -99,6 +100,7 @@ async function start(): Promise<void> {
         new TrialCommand(),
         new SetupCommand(),
         new ReferralCommand(),
+        new MentionCommand(),
     ];
 
     // Buttons

@@ -276,7 +276,8 @@ export class ScheduledNews extends CronJob {
             });
             return;
         }
-        const mention = await NewsUtils.getMention(settings);
+        const guild = this.client.guilds.cache.get(guildId);
+        const mention = await NewsUtils.getMention(settings, guild);
         const contentForGuild: SendContent = [];
         for (const { embed, interactions } of content) {
             const guildEmbed = await EmbedUtils.formatEmbedForGuild({

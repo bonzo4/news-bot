@@ -3,6 +3,7 @@ import {
     ButtonBuilder,
     Client,
     DMChannel,
+    Guild,
     GuildTextBasedChannel,
     roleMention,
     TextBasedChannel,
@@ -125,9 +126,17 @@ export class NewsUtils {
         return interactions;
     }
 
-    public static async getMention(guildSettings: GuildSettings): Promise<string> {
+    public static async getMention(guildSettings: GuildSettings, guild: Guild): Promise<string> {
         const mentions = await MentionDbUtils.getAllMentionRolesByGuild(guildSettings);
-        const mentionString = mentions.map(mention => roleMention(mention.id)).join(' ');
+        const mentionString = mentions
+            .map(mention => {
+                const role = guild.roles.cache.get(mention.id);
+                if (!role) return ' ';
+                if (!role.mentionable) return ' ';
+                if (role === guild.roles.everyone) return '@everyone';
+                return roleMention(mention.id);
+            })
+            .join(' ');
         return mentionString;
     }
 }
