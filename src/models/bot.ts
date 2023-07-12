@@ -438,6 +438,13 @@ export class Bot {
                 });
                 return;
             }
+            if (new Date(news.schedule) < new Date()) {
+                await Logger.error({
+                    message: `Failed to schedule news ${newsId}: schedule is in the past`,
+                });
+                return;
+            }
+            Logger.info({ message: `Scheduling news ${newsId} for ${news.schedule}` });
             new ScheduledNews({
                 newsId: newsId,
                 schedule: new Date(news.schedule),
