@@ -94,6 +94,6 @@ export const config = {
     imageUrl: 'https://wlgzgjuyqpkmnqflgkog.supabase.co/functions/v1/image',
     iconUrl:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',
-    supabaseUrl: 'https://wlgzgjuyqpkmnqflgkog.supabase.co',
+    supabaseUrl: 'https://api.syndicatenetwork.io',
     supabaseKey: process.env.SUPABASE_KEY || '',
 };
