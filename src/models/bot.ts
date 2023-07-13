@@ -110,6 +110,12 @@ export class Bot {
             }
         );
         this.options.client.on(
+            'newsReceived',
+            async ({ newsId, shard }: { newsId: number; shard: number }) => {
+                await this.onNewsReceived(newsId, shard);
+            }
+        );
+        this.options.client.on(
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
                 await this.broadcastStats(guildCount, memberCount);
@@ -453,6 +459,29 @@ export class Bot {
         } catch (error) {
             await Logger.error({
                 message: `Failed to schedule news ${newsId}`,
+                obj: error,
+            });
+        }
+    }
+
+    private async onNewsReceived(newsId: number, shard: number): Promise<void> {
+        try {
+            const syndicateGuild = this.options.client.guilds.cache.get(config.syndicateGuildId);
+            if (!syndicateGuild) return;
+            const news = await NewsDbUtils.getNews(newsId);
+            if (!news) {
+                return;
+            }
+            const adminChannel = syndicateGuild.channels.cache.get(
+                '988242915027460146'
+            ) as TextChannel;
+            if (!adminChannel) {
+                return;
+            }
+            await adminChannel.send(`Shard (${shard + 1}/${6}) starting news send ${newsId}`);
+        } catch (error) {
+            await Logger.error({
+                message: `Failed to send news received notification for news ${newsId}`,
                 obj: error,
             });
         }

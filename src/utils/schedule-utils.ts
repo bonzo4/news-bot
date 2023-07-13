@@ -64,13 +64,16 @@ export class ScheduledNews extends CronJob {
                         newsId,
                     });
                 });
-
         super(schedule, func, null, false, 'America/Chicago');
         this.client = client;
     }
 
     private async sendNews(newsId: number): Promise<void> {
         const shardId = this.client.guilds.cache.first()?.shardId;
+        const shard = this.client.guilds.cache.first().shardId;
+        await this.client.shard.broadcastEval(broadcastNewsReceived, {
+            context: { newsId, shard },
+        });
 
         const news = await NewsDbUtils.getNews(newsId);
         if (!news) {
@@ -357,6 +360,16 @@ export async function broadcastNewsSent(
     { newsId, shard }: { newsId: number; shard: number }
 ): Promise<void> {
     client.emit('newsSent', {
+        newsId,
+        shard,
+    });
+}
+
+export async function broadcastNewsReceived(
+    client: Client,
+    { newsId, shard }: { newsId: number; shard: number }
+): Promise<void> {
+    client.emit('NewsReceived', {
         newsId,
         shard,
     });
