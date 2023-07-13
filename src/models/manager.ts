@@ -43,8 +43,8 @@ export class Manager {
             return;
         }
 
-        startInsertNewsChannel(this.shardManager);
-        startUpdateNewsChannel(this.shardManager);
+        await startInsertNewsChannel(this.shardManager);
+        await startUpdateNewsChannel(this.shardManager);
 
         this.jobService.start();
     }

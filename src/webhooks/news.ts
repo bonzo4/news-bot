@@ -35,7 +35,9 @@ export async function startInsertNewsChannel(
     }
 }
 
-export function startUpdateNewsChannel(shardManager: ShardingManager): RealtimeChannel {
+export async function startUpdateNewsChannel(
+    shardManager: ShardingManager
+): Promise<RealtimeChannel> {
     try {
         return supabase
             .channel('news_update_changes')
@@ -55,7 +57,7 @@ export function startUpdateNewsChannel(shardManager: ShardingManager): RealtimeC
             )
             .subscribe();
     } catch (error) {
-        Logger.error(error);
+        await Logger.error(error);
     }
 }
 
