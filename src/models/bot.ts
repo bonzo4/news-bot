@@ -109,12 +109,12 @@ export class Bot {
                 await this.onNewsSent(newsId, shard);
             }
         );
-        this.options.client.on(
-            'newsReceived',
-            async ({ newsId, shard }: { newsId: number; shard: number }) => {
-                await this.onNewsReceived(newsId, shard);
-            }
-        );
+        // this.options.client.on(
+        //     'newsReceived',
+        //     async ({ newsId, shard }: { newsId: number; shard: number }) => {
+        //         await this.onNewsReceived(newsId, shard);
+        //     }
+        // );
         this.options.client.on(
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
