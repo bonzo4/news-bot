@@ -70,10 +70,10 @@ export class ScheduledNews extends CronJob {
 
     private async sendNews(newsId: number): Promise<void> {
         const shardId = this.client.guilds.cache.first()?.shardId;
-        const shard = this.client.guilds.cache.first().shardId;
-        await this.client.shard.broadcastEval(broadcastNewsReceived, {
-            context: { newsId, shard },
-        });
+        // const shard = this.client.guilds.cache.first().shardId;
+        // await this.client.shard.broadcastEval(broadcastNewsReceived, {
+        //     context: { newsId, shard },
+        // });
 
         const news = await NewsDbUtils.getNews(newsId);
         if (!news) {

@@ -118,11 +118,17 @@ export class QuizButtons implements Button {
             });
 
             const results = await this.getResults(quiz.id);
+
             const resultsMessage = `Thank you for voting.\n\n**⚫┃Results**\n\n❓┃*Question*: ${
                 quiz.question
             }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
 
             await InteractionUtils.success(intr, resultsMessage);
+            await InteractionDbUtils.createInteraction({
+                user_id: userData.id,
+                news_id: interactionDoc.news_id,
+                guild_id: intr.guild?.id,
+            });
         } catch (error) {
             await InteractionUtils.error(
                 intr,

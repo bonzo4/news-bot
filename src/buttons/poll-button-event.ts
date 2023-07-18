@@ -82,10 +82,16 @@ export class PollButtons implements Button {
                     return;
                 }
                 const results = await this.getResults(pollId);
+
                 const resultsMessage = `**Results**\n\n❓┃*Question*: ${
                     poll.question
                 }\n\n${this.formateResults(results)}`;
                 await InteractionUtils.success(intr, resultsMessage);
+                await InteractionDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: interactionDoc.news_id,
+                    guild_id: intr.guild?.id,
+                });
                 return;
             }
 
