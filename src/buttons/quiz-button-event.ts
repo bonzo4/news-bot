@@ -86,6 +86,12 @@ export class QuizButtons implements Button {
                     quiz.question
                 }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
                 await InteractionUtils.success(intr, resultsMessage);
+                await InteractionDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: interactionDoc.news_id,
+                    guild_id: intr.guild?.id,
+                    quiz_id: quizId,
+                });
                 return;
             }
 
@@ -124,11 +130,6 @@ export class QuizButtons implements Button {
             }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
 
             await InteractionUtils.success(intr, resultsMessage);
-            await InteractionDbUtils.createInteraction({
-                user_id: userData.id,
-                news_id: interactionDoc.news_id,
-                guild_id: intr.guild?.id,
-            });
         } catch (error) {
             await InteractionUtils.error(
                 intr,

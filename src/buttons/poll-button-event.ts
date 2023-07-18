@@ -91,6 +91,7 @@ export class PollButtons implements Button {
                     user_id: userData.id,
                     news_id: interactionDoc.news_id,
                     guild_id: intr.guild?.id,
+                    poll_id: pollId,
                 });
                 return;
             }
