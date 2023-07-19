@@ -60,8 +60,7 @@ export class ScheduledNews extends CronJob {
                 })
                 .catch(async error => {
                     await Logger.error({
-                        message: `Error sending news: ${error}`,
-                        newsId,
+                        message: `Error sending news: ${error} ${newsId}`,
                     });
                 });
         super(schedule, func, null, false, 'America/Chicago');
