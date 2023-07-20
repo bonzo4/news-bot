@@ -86,12 +86,12 @@ export class QuizButtons implements Button {
                     quiz.question
                 }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
                 await InteractionUtils.success(intr, resultsMessage);
-                await InteractionDbUtils.createInteraction({
-                    user_id: userData.id,
-                    news_id: interactionDoc.news_id,
-                    guild_id: intr.guild?.id,
-                    quiz_id: quizId,
-                });
+                // await InteractionDbUtils.createInteraction({
+                //     user_id: userData.id,
+                //     news_id: interactionDoc.news_id,
+                //     guild_id: intr.guild?.id,
+                //     quiz_id: quizId,
+                // });
                 return;
             }
 
@@ -113,12 +113,12 @@ export class QuizButtons implements Button {
             );
             if (interactionDoc) {
                 await InteractionUtils.warn(intr, 'You already voted.');
-                await InteractionDbUtils.createInteraction({
-                    user_id: userData.id,
-                    news_id: interactionDoc.news_id,
-                    guild_id: intr.guild?.id,
-                    quiz_id: quiz.id,
-                });
+                // await InteractionDbUtils.createInteraction({
+                //     user_id: userData.id,
+                //     news_id: interactionDoc.news_id,
+                //     guild_id: intr.guild?.id,
+                //     quiz_id: quiz.id,
+                // });
                 return;
             }
             await InteractionDbUtils.createInteraction({

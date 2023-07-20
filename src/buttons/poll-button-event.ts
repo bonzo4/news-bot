@@ -87,12 +87,12 @@ export class PollButtons implements Button {
                     poll.question
                 }\n\n${this.formateResults(results)}`;
                 await InteractionUtils.success(intr, resultsMessage);
-                await InteractionDbUtils.createInteraction({
-                    user_id: userData.id,
-                    news_id: interactionDoc.news_id,
-                    guild_id: intr.guild?.id,
-                    poll_id: pollId,
-                });
+                // await InteractionDbUtils.createInteraction({
+                //     user_id: userData.id,
+                //     news_id: interactionDoc.news_id,
+                //     guild_id: intr.guild?.id,
+                //     poll_id: pollId,
+                // });
                 return;
             }
 
@@ -114,12 +114,12 @@ export class PollButtons implements Button {
             );
             if (interactionDoc) {
                 await InteractionUtils.warn(intr, 'You already voted.');
-                await InteractionDbUtils.createInteraction({
-                    user_id: userData.id,
-                    news_id: interactionDoc.news_id,
-                    guild_id: intr.guild?.id,
-                    poll_id: poll.id,
-                });
+                // await InteractionDbUtils.createInteraction({
+                //     user_id: userData.id,
+                //     news_id: interactionDoc.news_id,
+                //     guild_id: intr.guild?.id,
+                //     poll_id: poll.id,
+                // });
                 return;
             }
 
