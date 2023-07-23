@@ -162,6 +162,7 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
@@ -185,6 +186,7 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
@@ -222,6 +224,7 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
@@ -255,6 +258,7 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
