@@ -2,6 +2,7 @@ import { Guild } from 'discord.js';
 
 import { supabase } from './index.js';
 import { UserDoc } from './user-db-utils.js';
+import { Logger } from '../../services/logger.js';
 import { Database } from '../../types/supabase.js';
 
 export type GuildReferral = Database['public']['Tables']['guild_referrals']['Row'];
@@ -31,7 +32,12 @@ export class ReferralDbUtils {
             .from('guild_referrals')
             .select('*')
             .eq('user_id', userId);
-        if (error) return null;
+        if (error) {
+            await Logger.error({
+                message: `Could not get guild referrals from database + ${error.message}`,
+            });
+            return [];
+        }
         return guildReferrals;
     }
 }
