@@ -43,6 +43,7 @@ export class ReferralDbUtils {
             });
             return [];
         }
+        console.log(guildReferrals);
         return guildReferrals.map(guildReferral => {
             return {
                 ...guildReferral,
