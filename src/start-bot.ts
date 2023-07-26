@@ -66,6 +66,7 @@ import {
     Logger,
 } from './services/index.js';
 import { Trigger } from './triggers/index.js';
+import { CodeModal } from './modals/code-modal-event.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
@@ -131,7 +132,7 @@ async function start(): Promise<void> {
         new SetupChainMenu(),
     ];
 
-    let modals: ModalSubmit[] = [new ReferralModal(), new InputModal()];
+    let modals: ModalSubmit[] = [new ReferralModal(), new InputModal(), new CodeModal()];
 
     // Reactions
     let reactions: Reaction[] = [
