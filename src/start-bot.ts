@@ -54,6 +54,7 @@ import { ChannelRemoveMenu } from './menus/channel-remove-menu-event.js';
 import { MentionAddMenu } from './menus/mention-add-menu-event.js';
 import { MentionRemoveMenu } from './menus/mention-remove-menu-event.js';
 import { Menu } from './menus/menu.js';
+import { CodeModal } from './modals/code-modal-event.js';
 import { InputModal } from './modals/input-modal-event.js';
 import { ModalSubmit } from './modals/modalSubmit.js';
 import { ReferralModal } from './modals/referral-modal-event.js';
@@ -66,7 +67,6 @@ import {
     Logger,
 } from './services/index.js';
 import { Trigger } from './triggers/index.js';
-import { CodeModal } from './modals/code-modal-event.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
