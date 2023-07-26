@@ -76,6 +76,7 @@ export class NewsUtils {
                 embeds: [embed],
                 components,
             });
+            await new Promise(resolve => setTimeout(resolve, 250));
         }
     }
 
@@ -86,6 +87,7 @@ export class NewsUtils {
                 embeds: [embed],
                 components,
             });
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 
