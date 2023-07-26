@@ -37,13 +37,13 @@ export class ReferralDbUtils {
             .from('guild_referrals')
             .select('*, guilds(*)')
             .eq('user_id', userId);
+        console.log(guildReferrals);
         if (error) {
             await Logger.error({
                 message: `Could not get guild referrals from database + ${error.message}`,
             });
             return [];
         }
-        console.log(guildReferrals);
         return guildReferrals.map(guildReferral => {
             return {
                 ...guildReferral,
