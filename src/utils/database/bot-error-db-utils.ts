@@ -8,7 +8,7 @@ export class BotErrorDbUtils {
     public static async createError(options: BotErrorOptions): Promise<void> {
         const guildDoc = await supabase.from('guilds').select('id').eq('id', options.guild_id);
         if (!guildDoc) options.guild_id = null;
-        const userDoc = await supabase.from('users').select('id').eq('id', options.user_id);
+        const userDoc = await supabase.from('discord_users').select('id').eq('id', options.user_id);
         if (!userDoc) options.user_id = null;
         const newsDoc = await supabase.from('news').select('id').eq('id', options.news_id);
         if (!newsDoc) options.news_id = null;

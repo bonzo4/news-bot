@@ -37,15 +37,15 @@ export class ReferralDbUtils {
             .from('guild_referrals')
             .select('*, guilds(*)')
             .eq('user_id', userId);
-        Logger.info({
-            message: guildReferrals.map(guildReferral => guildReferral.guilds[0].name).join(', '),
-        });
         if (error) {
             await Logger.error({
                 message: `Could not get guild referrals from database + ${error.message}`,
             });
             return [];
         }
+        await Logger.error({
+            message: `Guild referrals: ${JSON.stringify(guildReferrals)}`,
+        });
         return guildReferrals.map(guildReferral => {
             return {
                 ...guildReferral,

@@ -17,7 +17,8 @@ export class AmbassadorCommand implements Command {
             await intr.showModal(modal);
         }
 
-        const referrals = await ReferralDbUtils.getReferralsByUser(intr.user.id);
+        const referrals = await ReferralDbUtils.getReferralsByUser(data.userData.id);
+
         const referralString = `⚫┃Thank you for being ${
             data.userData.staff_role === 'TRIAL' ? 'a trial' : 'an'
         } Ambassador of the Syndicate Discord server!\n🔗┃Referral Code: **${
