@@ -33,7 +33,6 @@ export class CodeModal implements ModalSubmit {
     ids: string[] = ['code'];
     cooldown = new RateLimiter(1, 5000);
     deferType = ModalDeferType.REPLY;
-    requireSyndicatedGuild = true;
 
     async execute(intr: ModalSubmitInteraction, data: EventData): Promise<void> {
         const code = intr.fields.getTextInputValue('code');
