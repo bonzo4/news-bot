@@ -15,6 +15,7 @@ export class TrialCommand implements Command {
         if (!data.userData.referral_code) {
             const modal = codeModal(true);
             await intr.showModal(modal);
+            return;
         }
 
         const referrals = await ReferralDbUtils.getReferralsByUser(data.userData.user_id);
