@@ -4,7 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { Command, CommandDeferType } from './index.js';
 import { codeModal } from '../modals/code-modal-event.js';
 import { EventData } from '../models/internal-models.js';
-import { InteractionUtils, ReferralDbUtils } from '../utils/index.js';
+import { GuildDbUtils, InteractionUtils, ReferralDbUtils } from '../utils/index.js';
 
 export class AmbassadorCommand implements Command {
     names = ['ambassador'];
@@ -27,8 +27,8 @@ export class AmbassadorCommand implements Command {
         }**\n👥┃Referrals: ${referrals.length} Total`;
 
         const referralAllString = referrals
-            .map((referral, index) => {
-                const guild = referral.guild;
+            .map(async (referral, index) => {
+                const guild = await GuildDbUtils.getGuildById(referral.guild_id);
                 return `**${index + 1}.** ${guild.name} - ${new Date(
                     referral.created_at
                 ).toLocaleDateString()}`;

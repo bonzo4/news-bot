@@ -1,6 +1,5 @@
 import { Guild } from 'discord.js';
 
-import { GuildDoc } from './guild-db-utils.js';
 import { supabase } from './index.js';
 import { UserDoc } from './user-db-utils.js';
 import { Logger } from '../../services/logger.js';
@@ -8,15 +7,11 @@ import { Database } from '../../types/supabase.js';
 
 type GuildReferral = Database['public']['Tables']['guild_referrals']['Row'];
 
-export type GuildReferralWithGuild = {
-    guild: GuildDoc;
-} & GuildReferral;
-
 export class ReferralDbUtils {
     public static async getGuildReferralByGuild(guildId: string): Promise<GuildReferral | null> {
         const { data: guildReferral, error } = await supabase
             .from('guild_referrals')
-            .select('*, guilds(*)')
+            .select('*')
             .eq('guild_id', guildId)
             .single();
         if (error) return null;
@@ -32,10 +27,10 @@ export class ReferralDbUtils {
             throw new Error(`Could not create guild referral in database:\n${error.message}`);
     }
 
-    public static async getReferralsByUser(userId: string): Promise<GuildReferralWithGuild[]> {
+    public static async getReferralsByUser(userId: string): Promise<GuildReferral[]> {
         const { data: guildReferrals, error } = await supabase
             .from('guild_referrals')
-            .select('*, guilds(*)')
+            .select('*')
             .eq('user_id', userId);
         if (error) {
             await Logger.error({
@@ -43,14 +38,6 @@ export class ReferralDbUtils {
             });
             return [];
         }
-        await Logger.error({
-            message: `Guild referrals: ${JSON.stringify(guildReferrals)}`,
-        });
-        return guildReferrals.map(guildReferral => {
-            return {
-                ...guildReferral,
-                guild: guildReferral.guilds[0],
-            };
-        });
+        return guildReferrals;
     }
 }
