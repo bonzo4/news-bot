@@ -15,6 +15,7 @@ export class AmbassadorCommand implements Command {
         if (!data.userData.referral_code) {
             const modal = codeModal(false);
             await intr.showModal(modal);
+            return;
         }
 
         const referrals = await ReferralDbUtils.getReferralsByUser(data.userData.id);
