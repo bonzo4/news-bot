@@ -27,7 +27,7 @@ export class AmbassadorCommand implements Command {
         }**\n👥┃Referrals: ${referrals.length} Total`;
 
         const referralAllString = referrals
-            .map(async (referral, index) => {
+            .map((referral, index) => {
                 const guild = referral.guild;
                 return `**${index + 1}.** ${guild.name} - ${new Date(
                     referral.created_at
