@@ -25,14 +25,14 @@ export class TrialCommand implements Command {
             data.userData.referral_code
         }**\n👥┃Referrals: ${referrals.length} Total`;
 
-        const referralAllString = referrals
-            .map(async (referral, index) => {
-                const guild = await GuildDbUtils.getGuildById(referral.guild_id);
-                return `**${index + 1}.** ${guild.name} - ${new Date(
-                    referral.created_at
-                ).toLocaleDateString()}`;
-            })
-            .join('\n');
+        let referralAllString = '';
+        for (let i = 0; i < referrals.length; i++) {
+            const referral = referrals[i];
+            const guild = await GuildDbUtils.getGuildById(referral.guild_id);
+            referralAllString += `**${i + 1}.** ${guild.name} - ${new Date(
+                referral.created_at
+            ).toLocaleDateString()}\n`;
+        }
 
         await InteractionUtils.success(intr, `${referralString}\n\n${referralAllString}`);
     }
