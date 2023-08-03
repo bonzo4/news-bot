@@ -30,13 +30,13 @@ export function pollButtons(choices: PollChoice[]): ActionRowBuilder<ButtonBuild
     const randomChoices = choices.sort(() => Math.random() - 0.5);
     const pollStyle = pollStyler();
     randomChoices.forEach(choice => {
-        row.addComponents(
-            new ButtonBuilder()
-                .setCustomId(`poll_${choice.id}`)
-                .setLabel(choice.text)
-                .setStyle(pollStyle.next().value)
-                .setEmoji(choice.emoji)
-        );
+        const button = new ButtonBuilder()
+            .setCustomId(`poll_${choice.id}`)
+            .setLabel(choice.text)
+            .setStyle(pollStyle.next().value);
+
+        if (choice.emoji) button.setEmoji(choice.emoji);
+        row.addComponents(button);
     });
     if (row.components.length < 5) {
         row.addComponents(

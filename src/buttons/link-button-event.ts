@@ -20,13 +20,13 @@ type LinkButtonForDirectOptions = {
 } & LinkButtonOptions;
 
 export function linkButton(link: Link): ActionRowBuilder<ButtonBuilder> {
-    return new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-            .setLabel(link.text)
-            .setStyle(ButtonStyle.Link)
-            .setEmoji(link.emoji)
-            .setURL(link.url)
-    );
+    const button = new ButtonBuilder()
+        .setLabel(link.text)
+        .setStyle(ButtonStyle.Link)
+        .setURL(link.url);
+
+    if (link.emoji) button.setEmoji(link.emoji);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 }
 
 export async function linkButtonForGuild(
@@ -38,13 +38,13 @@ export async function linkButtonForGuild(
         url: link.url,
         guild_id: guildId,
     });
-    return new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-            .setLabel(link.text)
-            .setStyle(ButtonStyle.Link)
-            .setEmoji(link.emoji)
-            .setURL(`${config.redirectUri}/${redirect.id}`)
-    );
+    const button = new ButtonBuilder()
+        .setLabel(link.text)
+        .setStyle(ButtonStyle.Link)
+        .setURL(`${config.redirectUri}/${redirect.id}`);
+
+    if (link.emoji) button.setEmoji(link.emoji);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 }
 
 export async function linkButtonForDirect(
@@ -58,11 +58,11 @@ export async function linkButtonForDirect(
         user_id: userId,
     });
 
-    return new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-            .setLabel(link.text)
-            .setStyle(ButtonStyle.Link)
-            .setEmoji(link.emoji)
-            .setURL(`${config.redirectUri}/${redirect.id}`)
-    );
+    const button = new ButtonBuilder()
+        .setLabel(link.text)
+        .setStyle(ButtonStyle.Link)
+        .setURL(`${config.redirectUri}/${redirect.id}`);
+
+    if (link.emoji) button.setEmoji(link.emoji);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
 }

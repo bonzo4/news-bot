@@ -30,13 +30,13 @@ export function quizButtons(choices: QuizChoice[]): ActionRowBuilder<ButtonBuild
     const randomChoices = choices.sort(() => Math.random() - 0.5);
     const quizStyle = quizStyler();
     randomChoices.forEach(choice => {
-        row.addComponents(
-            new ButtonBuilder()
-                .setCustomId(`quiz_${choice.id}`)
-                .setLabel(choice.text)
-                .setStyle(quizStyle.next().value)
-                .setEmoji(choice.emoji)
-        );
+        const button = new ButtonBuilder()
+            .setCustomId(`quiz_${choice.id}`)
+            .setLabel(choice.text)
+            .setStyle(quizStyle.next().value);
+
+        if (choice.emoji) button.setEmoji(choice.emoji);
+        row.addComponents(button);
     });
     if (row.components.length < 5) {
         row.addComponents(
