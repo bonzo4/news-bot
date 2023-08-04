@@ -3,7 +3,7 @@ import {
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
-    channelMention,
+    roleMention,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
@@ -89,7 +89,7 @@ export class MentionButtons implements Button {
                         return;
                     }
                     const mentionString = mentionRoles
-                        .map(channel => channelMention(channel.id))
+                        .map(channel => roleMention(channel.id))
                         .join('\n📢 ');
                     await InteractionUtils.send(
                         intr,
