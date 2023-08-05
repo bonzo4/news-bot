@@ -67,7 +67,7 @@ async function start(): Promise<void> {
         respawn: true,
         totalShards: await ShardUtils.recommendedShardCount(
             config.client.token || process.env.TOKEN,
-            50
+            100
         ),
         shardList,
     });
