@@ -9,6 +9,7 @@ import { Job, UpdateServerCountJob } from './jobs/index.js';
 import { Api } from './models/api.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
+import { ShardUtils } from './utils/shard-utils.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
@@ -36,10 +37,10 @@ async function start(): Promise<void> {
     // );
     //         totalShards = Math.max(requiredShards, resBody.totalShards);
     //     } else {
-    //         let recommendedShards = await ShardUtils.recommendedShardCount(
-    //             config.client.token || process.env.TOKEN,
-    //             config.sharding.serversPerShard
-    //         );
+    // let recommendedShards = await ShardUtils.recommendedShardCount(
+    //     config.client.token || process.env.TOKEN,
+    //     config.sharding.serversPerShard
+    // );
     //         shardList = MathUtils.range(0, recommendedShards);
     //         totalShards = recommendedShards;
     //     }
@@ -64,7 +65,10 @@ async function start(): Promise<void> {
         token: config.client.token || process.env.TOKEN,
         mode: debug.override.shardMode.enabled ? 'worker' : 'process',
         respawn: true,
-        totalShards: 6,
+        totalShards: await ShardUtils.recommendedShardCount(
+            config.client.token || process.env.TOKEN,
+            50
+        ),
         shardList,
     });
 

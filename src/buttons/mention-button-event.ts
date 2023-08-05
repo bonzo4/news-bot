@@ -89,7 +89,12 @@ export class MentionButtons implements Button {
                         return;
                     }
                     const mentionString = mentionRoles
-                        .map(channel => roleMention(channel.id))
+                        .map(mentionRole => {
+                            const role = intr.guild.roles.cache.get(mentionRole.id);
+                            if (!role) return;
+                            if (role.name === '@everyone') return '@everyone';
+                            else roleMention(mentionRole.id);
+                        })
                         .join('\n📢 ');
                     await InteractionUtils.send(
                         intr,

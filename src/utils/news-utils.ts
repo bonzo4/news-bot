@@ -63,31 +63,60 @@ export class NewsUtils {
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
         const { channel, content, mention } = options;
         for (let index = 0; index < content.length; index++) {
-            await new Promise(resolve => setTimeout(resolve, 500));
             const { embed, components } = content[index];
             if (index === 0) {
-                await channel.send({
-                    content: mention || ' ',
-                    embeds: [embed],
-                    components,
-                });
+                await channel
+                    .send({
+                        content: mention || ' ',
+                        embeds: [embed],
+                        components,
+                    })
+                    .catch(async error => {
+                        if (error.code === 429) {
+                            await new Promise(resolve => setTimeout(resolve, error.retry_after));
+                            await channel.send({
+                                content: mention || ' ',
+                                embeds: [embed],
+                                components,
+                            });
+                        }
+                    });
                 continue;
             }
-            await channel.send({
-                embeds: [embed],
-                components,
-            });
+            await channel
+                .send({
+                    embeds: [embed],
+                    components,
+                })
+                .catch(async error => {
+                    if (error.code === 429) {
+                        await new Promise(resolve => setTimeout(resolve, error.retry_after));
+                        await channel.send({
+                            embeds: [embed],
+                            components,
+                        });
+                    }
+                });
         }
     }
 
     public static async sendToUser(options: UserSendOptions): Promise<void> {
         const { channel, content } = options;
         for (const { embed, components } of content) {
-            await channel.send({
-                embeds: [embed],
-                components,
-            });
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await channel
+                .send({
+                    embeds: [embed],
+                    components,
+                })
+                .catch(async error => {
+                    if (error.code === 429) {
+                        await new Promise(resolve => setTimeout(resolve, error.retry_after));
+                        await channel.send({
+                            embeds: [embed],
+                            components,
+                        });
+                    }
+                });
         }
     }
 
@@ -133,9 +162,8 @@ export class NewsUtils {
         const mentionString = mentions
             .map(mention => {
                 const role = guild.roles.cache.get(mention.id);
-                if (!role) return ' ';
-                if (!role.mentionable) return ' ';
-                if (role === guild.roles.everyone) return '@everyone';
+                if (!role) return '';
+                if (role.name === 'everyone') return '@everyone';
                 return roleMention(mention.id);
             })
             .join(' ');
