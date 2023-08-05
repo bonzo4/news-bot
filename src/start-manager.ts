@@ -9,7 +9,6 @@ import { Job, UpdateServerCountJob } from './jobs/index.js';
 import { Api } from './models/api.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
-import { ShardUtils } from './utils/shard-utils.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../lang/logs.json');
@@ -65,10 +64,7 @@ async function start(): Promise<void> {
         token: config.client.token || process.env.TOKEN,
         mode: debug.override.shardMode.enabled ? 'worker' : 'process',
         respawn: true,
-        totalShards: await ShardUtils.recommendedShardCount(
-            config.client.token || process.env.TOKEN,
-            100
-        ),
+        totalShards: 6,
         shardList,
     });
 
