@@ -61,6 +61,7 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
+        let resendError: any;
         const { channel, content, mention } = options;
         for (let index = 0; index < content.length; index++) {
             const { embed, components } = content[index];
@@ -71,16 +72,20 @@ export class NewsUtils {
                         embeds: [embed],
                         components,
                     })
+                    .then(() => (resendError = null))
                     .catch(async error => {
-                        if (error.code === 429) {
-                            await new Promise(resolve => setTimeout(resolve, error.retry_after));
-                            await channel.send({
-                                content: mention || ' ',
-                                embeds: [embed],
-                                components,
-                            });
-                        }
+                        resendError = error;
                     });
+                while (resendError && resendError.code === 429) {
+                    await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+                    await channel
+                        .send({
+                            embeds: [embed],
+                            components,
+                        })
+                        .then(() => (resendError = null))
+                        .catch(error => (resendError = error));
+                }
                 continue;
             }
             await channel
@@ -88,35 +93,46 @@ export class NewsUtils {
                     embeds: [embed],
                     components,
                 })
+                .then(() => (resendError = null))
                 .catch(async error => {
-                    if (error.code === 429) {
-                        await new Promise(resolve => setTimeout(resolve, error.retry_after));
-                        await channel.send({
-                            embeds: [embed],
-                            components,
-                        });
-                    }
+                    resendError = error;
                 });
+            while (resendError && resendError.code === 429) {
+                await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+                await channel
+                    .send({
+                        embeds: [embed],
+                        components,
+                    })
+                    .then(() => (resendError = null))
+                    .catch(error => (resendError = error));
+            }
         }
     }
 
     public static async sendToUser(options: UserSendOptions): Promise<void> {
         const { channel, content } = options;
         for (const { embed, components } of content) {
+            let resendError: any;
             await channel
                 .send({
                     embeds: [embed],
                     components,
                 })
+                .then(() => (resendError = null))
                 .catch(async error => {
-                    if (error.code === 429) {
-                        await new Promise(resolve => setTimeout(resolve, error.retry_after));
-                        await channel.send({
-                            embeds: [embed],
-                            components,
-                        });
-                    }
+                    resendError = error;
                 });
+            while (resendError && resendError.code === 429) {
+                await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+                await channel
+                    .send({
+                        embeds: [embed],
+                        components,
+                    })
+                    .then(() => (resendError = null))
+                    .catch(error => (resendError = error));
+            }
         }
     }
 
