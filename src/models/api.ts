@@ -23,7 +23,7 @@ export class Api {
     public async start(): Promise<void> {
         let listen = util.promisify(this.app.listen.bind(this.app));
         await listen(config.api.port);
-        await Logger.info({
+        Logger.info({
             message: Logs.info.apiStarted.replaceAll('{PORT}', config.api.port),
         });
     }

@@ -10,7 +10,7 @@ import { ShardUtils } from '../utils/index.js';
 
 export class UpdateServerCountJob implements Job {
     public name = 'Update Server Count';
-    public schedule = '0 0 * * *';
+    public schedule = '0 6 * * *';
     public log: boolean = config.jobs.updateServerCount.log;
 
     private botSites: BotSite[];
@@ -41,7 +41,6 @@ export class UpdateServerCountJob implements Job {
         await this.shardManager.broadcastEval(broadcastStats, {
             context: { guildCount, memberCount },
         });
-
         // for (let botSite of this.botSites) {
         //     try {
         //         let body = JSON.parse(

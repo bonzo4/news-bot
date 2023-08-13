@@ -3,7 +3,8 @@ import {
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
-    channelMention,
+    ChannelType,
+    GuildTextBasedChannel,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
@@ -58,7 +59,10 @@ export class ChannelButtons implements Button {
             }
             switch (intr.customId.split('_')[1]) {
                 case 'add': {
-                    const addMenu = addChannelMenu();
+                    const textChannels = intr.guild.channels.cache
+                        .filter(channel => channel.type === ChannelType.GuildText)
+                        .map(channel => channel as GuildTextBasedChannel);
+                    const addMenu = addChannelMenu(textChannels);
                     await InteractionUtils.success(
                         intr,
                         'Please select the channel you would like to add.',
@@ -67,7 +71,15 @@ export class ChannelButtons implements Button {
                     break;
                 }
                 case 'remove': {
-                    const removeMenu = removeChannelMenu();
+                    const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                    if (channels.length === 0) {
+                        await InteractionUtils.warn(
+                            intr,
+                            'No channels are currently receiving news.'
+                        );
+                        return;
+                    }
+                    const removeMenu = removeChannelMenu(intr.guild, channels);
                     await InteractionUtils.success(
                         intr,
                         'Please select the channel you would like to remove.',
@@ -85,7 +97,12 @@ export class ChannelButtons implements Button {
                         return;
                     }
                     const channelsString = channels
-                        .map(channel => channelMention(channel.id))
+                        .map(channelDoc => {
+                            const channel = intr.guild.channels.cache.get(channelDoc.id);
+                            if (channel) {
+                                return channel.toString();
+                            }
+                        })
                         .join('\n🔊 ');
                     await InteractionUtils.send(
                         intr,

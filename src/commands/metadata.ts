@@ -89,6 +89,14 @@ export const GuildCommandMetadata: {
         dm_permission: false,
         default_member_permissions: undefined,
     },
+    premium: {
+        type: ApplicationCommandType.ChatInput,
+        name: `premium`,
+        name_localizations: {},
+        description: 'Set up a premium subscription for your server.',
+        dm_permission: false,
+        default_member_permissions: undefined,
+    },
 };
 
 export const GeneralCommandMetadata: {

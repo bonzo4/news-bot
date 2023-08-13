@@ -2,7 +2,7 @@ import { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction 
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
-import { setupNewsChannelButtons } from '../buttons/setup-button-3.js';
+import { setupNewsChannelButtons } from '../buttons/setup/setup-button-4.js';
 import { SetupMessages } from '../messages/setup.js';
 import { TagDbUtils } from '../utils/database/tags-db.utils.js';
 import { InteractionUtils } from '../utils/index.js';
@@ -39,7 +39,7 @@ export async function setupChainMenu(): Promise<ActionRowBuilder<StringSelectMen
 export class SetupChainMenu implements Menu {
     public ids = ['chain'];
     public cooldown = new RateLimiter(1, 5000);
-    deferType = MenuDeferType.REPLY;
+    deferType = MenuDeferType.NONE;
     requireGuild = true;
     requireAdmin = true;
 
@@ -54,15 +54,22 @@ export class SetupChainMenu implements Menu {
         if (tags.length > 0) {
             await InteractionUtils.warn(
                 intr,
-                'You can only have one chain tag per guild. Please join the Syndicate Server to inquire about other chains.'
+                'You can only have one chain tag per guild. Please run **/premium** to learn more about getting news for all chains.'
             );
+            if (intr.message.deletable) await intr.message.delete();
+            await intr.channel.send({
+                embeds: [SetupMessages.newsChannel()],
+                components: [setupNewsChannelButtons()],
+            });
             return;
         }
 
         await TagDbUtils.addGuildTag(intr.guildId, tag);
 
-        await InteractionUtils.send(intr, SetupMessages.newsChannel(), true, [
-            setupNewsChannelButtons(),
-        ]);
+        if (intr.message.deletable) await intr.message.delete();
+        await intr.channel.send({
+            embeds: [SetupMessages.newsChannel()],
+            components: [setupNewsChannelButtons()],
+        });
     }
 }

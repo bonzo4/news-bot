@@ -38,6 +38,15 @@ export class TagDbUtils {
         return tags.map(t => t.tag);
     }
 
+    public static async getAllUserTags(userId: string): Promise<string[]> {
+        const { data: tags, error } = await supabase
+            .from('_user_tags')
+            .select('tag')
+            .eq('user_id', userId);
+        if (error) return [];
+        return tags.map(t => t.tag);
+    }
+
     public static async getGuildsWithTags(tags: Tag[], guildIds: string[]): Promise<string[]> {
         const guildsWithTags: string[] = [];
         for (const guildId of guildIds) {

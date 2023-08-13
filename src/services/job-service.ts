@@ -15,7 +15,7 @@ export class JobService {
             schedule.scheduleJob(job.schedule, async () => {
                 try {
                     if (job.log) {
-                        await Logger.info({
+                        Logger.info({
                             message: Logs.info.jobRun.replaceAll('{JOB}', job.name),
                         });
                     }
@@ -23,7 +23,7 @@ export class JobService {
                     await job.run();
 
                     if (job.log) {
-                        await Logger.info({
+                        Logger.info({
                             message: Logs.info.jobCompleted.replaceAll('{JOB}', job.name),
                         });
                     }
@@ -34,7 +34,7 @@ export class JobService {
                     });
                 }
             });
-            await Logger.info({
+            Logger.info({
                 message: Logs.info.jobScheduled
                     .replaceAll('{JOB}', job.name)
                     .replaceAll('{SCHEDULE}', job.schedule),

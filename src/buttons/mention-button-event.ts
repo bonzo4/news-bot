@@ -1,10 +1,4 @@
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonInteraction,
-    ButtonStyle,
-    roleMention,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
@@ -60,7 +54,7 @@ export class MentionButtons implements Button {
             }
             switch (intr.customId.split('_')[1]) {
                 case 'add': {
-                    const addMenu = addMentionMenu();
+                    const addMenu = addMentionMenu([...intr.guild.roles.cache.map(role => role)]);
                     await InteractionUtils.success(
                         intr,
                         'Please select the role you would like to add.',
@@ -69,7 +63,17 @@ export class MentionButtons implements Button {
                     break;
                 }
                 case 'remove': {
-                    const removeMenu = removeMentionMenu();
+                    const mentionRoles = await MentionDbUtils.getAllMentionRolesByGuild(
+                        guildSettings
+                    );
+                    if (mentionRoles.length === 0) {
+                        await InteractionUtils.warn(
+                            intr,
+                            'There are currently no roles to be mentioned.'
+                        );
+                        return;
+                    }
+                    const removeMenu = await removeMentionMenu(intr.guild, mentionRoles);
                     await InteractionUtils.success(
                         intr,
                         'Please select the role you would like to remove.',
@@ -92,8 +96,7 @@ export class MentionButtons implements Button {
                         .map(mentionRole => {
                             const role = intr.guild.roles.cache.get(mentionRole.id);
                             if (!role) return;
-                            if (role.name === '@everyone') return '@everyone';
-                            else roleMention(mentionRole.id);
+                            return role.toString();
                         })
                         .join('\n📢 ');
                     await InteractionUtils.send(

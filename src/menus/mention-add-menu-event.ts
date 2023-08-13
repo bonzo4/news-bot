@@ -1,20 +1,34 @@
 import {
     ActionRowBuilder,
-    roleMention,
-    RoleSelectMenuBuilder,
+    Role,
     RoleSelectMenuInteraction,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
 import { GuildSettingsDbUtils, InteractionUtils, MentionDbUtils } from '../utils/index.js';
 
-export function addMentionMenu(): ActionRowBuilder<RoleSelectMenuBuilder> {
-    const row = new ActionRowBuilder<RoleSelectMenuBuilder>();
-    const menu = new RoleSelectMenuBuilder()
-        .setCustomId(`mentionAdd`)
-        .setPlaceholder('Select a Role');
-    row.addComponents([menu]);
+export function addMentionMenu(roles: Role[]): ActionRowBuilder<StringSelectMenuBuilder> {
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+    const menu = new StringSelectMenuBuilder()
+        .setCustomId('mentionAdd')
+        .setPlaceholder('Select a role to mention.')
+        .setMinValues(1)
+        .setMaxValues(1);
+    roles
+        .sort((a, b) => b.members.size - a.members.size)
+        .slice(0, 25)
+        .forEach(role => {
+            menu.addOptions([
+                {
+                    label: role.name,
+                    value: role.id,
+                    emoji: role.iconURL() ? role.iconURL() : undefined,
+                },
+            ]);
+        });
+    row.addComponents(menu);
     return row;
 }
 
@@ -50,6 +64,6 @@ export class MentionAddMenu implements Menu {
             return;
         }
         await MentionDbUtils.createMentionRole(guildSettings, role);
-        await InteractionUtils.success(intr, `${roleMention(role.id)} mention added.`);
+        await InteractionUtils.success(intr, `${role.toString()} mention added.`);
     }
 }

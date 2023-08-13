@@ -6,6 +6,7 @@ import { config } from './config/config.js';
 import { debug } from './config/debug.js';
 import { GuildsController, RootController, ShardsController } from './controllers/index.js';
 import { Job, UpdateServerCountJob } from './jobs/index.js';
+import { RestartShardsJobs } from './jobs/restart-shard-job.js';
 import { Api } from './models/api.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
@@ -58,19 +59,22 @@ async function start(): Promise<void> {
     //     return;
     // }
 
-    const shardList = Array.from({ length: 6 }, (_, i) => i);
+    const shardCount = 6;
+
+    const shardList = Array.from({ length: shardCount }, (_, i) => i);
 
     let shardManager = new ShardingManager('dist/start-bot.js', {
         token: config.client.token || process.env.TOKEN,
         mode: debug.override.shardMode.enabled ? 'worker' : 'process',
         respawn: true,
-        totalShards: 6,
+        totalShards: shardCount,
         shardList,
     });
 
     // Jobs
     let jobs: Job[] = [
         config.clustering.enabled ? undefined : new UpdateServerCountJob(shardManager, httpService),
+        config.clustering.enabled ? undefined : new RestartShardsJobs(shardManager),
         // TODO: Add new jobs here
     ].filter(Boolean);
 

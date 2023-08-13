@@ -1,12 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { Button, ButtonDeferType } from './index.js';
-import { systemButtons, systemLinks } from './system.js';
-import { SetupMessages } from '../messages/setup.js';
-import { referralModal } from '../modals/referral-modal-event.js';
-import { Logger } from '../services/logger.js';
-import { InteractionUtils, ReferralDbUtils } from '../utils/index.js';
+import { SetupMessages } from '../../messages/setup.js';
+import { referralModal } from '../../modals/referral-modal-event.js';
+import { Logger } from '../../services/logger.js';
+import { InteractionUtils, ReferralDbUtils } from '../../utils/index.js';
+import { Button, ButtonDeferType } from '../button.js';
+import { systemButtons, systemLinks } from '../system.js';
 
 export function setupReferralButtons(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents([
@@ -41,7 +41,7 @@ export class SetupReferralButtons implements Button {
                     intr,
                     `You have already set up a referral for this server.`
                 );
-                await intr.channel.bulkDelete(100);
+                if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({
                     embeds: [SetupMessages.systemMessage()],
                     components: [systemLinks(), systemButtons()],
@@ -51,7 +51,7 @@ export class SetupReferralButtons implements Button {
             }
 
             if (intr.customId.split('_')[1] === 'skip') {
-                await intr.channel.bulkDelete(100);
+                if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({
                     embeds: [SetupMessages.systemMessage()],
                     components: [systemLinks(), systemButtons()],

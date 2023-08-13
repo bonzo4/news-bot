@@ -1,13 +1,12 @@
 import {
     CategoryChannel,
-    channelMention,
     CommandInteraction,
     GuildTextBasedChannel,
     PermissionsString,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { setupButtons } from '../../buttons/setup-button-1.js';
+import { setupButtons } from '../../buttons/setup/setup-button-1.js';
 import { SetupMessages } from '../../messages/setup.js';
 import { Logger } from '../../services/logger.js';
 import {
@@ -56,9 +55,7 @@ export class SetupCommand implements Command {
 
                 await InteractionUtils.success(
                     intr,
-                    `Setup has been completed. Please check ${channelMention(
-                        systemChannel.id
-                    )} for more information.`
+                    `Setup has been completed. Please check ${systemChannel.toString()} for more information.`
                 );
                 return;
             }
@@ -102,9 +99,7 @@ export class SetupCommand implements Command {
 
             await InteractionUtils.success(
                 intr,
-                `Setup has been completed. Please check ${channelMention(
-                    systemChannel.id
-                )} for more information.`
+                `Setup has been completed. Please check ${systemChannel.toString()} for more information.`
             );
         } catch (err) {
             await InteractionUtils.error(

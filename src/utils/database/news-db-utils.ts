@@ -15,6 +15,18 @@ export class NewsDbUtils {
         return news;
     }
 
+    public static async getScheduledNews(): Promise<DiscordNews[]> {
+        // get news that is scheduled for the next 24 hours
+        const { data: news, error } = await supabase
+            .from('discord_news')
+            .select('*')
+            .gte('schedule', new Date().toISOString())
+            .lte('schedule', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString())
+            .order('schedule', { ascending: true });
+        if (error) throw new Error(`Could not get news from database:\n${error.message}`);
+        return news;
+    }
+
     public static async getUnapprovedNews(): Promise<DiscordNews[]> {
         // get unapproved news from the last week
         const { data: news, error } = await supabase

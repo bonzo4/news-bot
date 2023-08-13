@@ -1,20 +1,43 @@
 import {
     ActionRowBuilder,
-    roleMention,
-    RoleSelectMenuBuilder,
+    Guild,
     RoleSelectMenuInteraction,
+    StringSelectMenuBuilder,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
+import { Database } from '../types/supabase.js';
 import { GuildSettingsDbUtils, InteractionUtils, MentionDbUtils } from '../utils/index.js';
 
-export function removeMentionMenu(): ActionRowBuilder<RoleSelectMenuBuilder> {
-    const row = new ActionRowBuilder<RoleSelectMenuBuilder>();
-    const menu = new RoleSelectMenuBuilder()
-        .setCustomId(`mentionRemove`)
-        .setPlaceholder('Select a Role');
-    row.addComponents([menu]);
+type RoleDoc = Database['public']['Tables']['mention_roles']['Row'];
+
+export async function removeMentionMenu(
+    guild: Guild,
+    roleDocs: RoleDoc[]
+): Promise<ActionRowBuilder<StringSelectMenuBuilder>> {
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+
+    const menu = new StringSelectMenuBuilder()
+        .setCustomId('mentionRemove')
+        .setPlaceholder('Select a role to remove mention.')
+        .setMinValues(1)
+        .setMaxValues(1);
+    for (const roleDoc of roleDocs) {
+        const role = guild.roles.cache.get(roleDoc.id);
+        if (role) {
+            menu.addOptions([
+                {
+                    label: role.name,
+                    value: role.id,
+                    emoji: role.iconURL() ? role.iconURL() : undefined,
+                },
+            ]);
+        } else {
+            await MentionDbUtils.deleteMentionRole(roleDoc.id).catch(err => console.error(err));
+        }
+    }
+    row.addComponents(menu);
     return row;
 }
 
@@ -49,7 +72,7 @@ export class MentionRemoveMenu implements Menu {
             await InteractionUtils.warn(intr, `Role is not being mentioned.`);
             return;
         }
-        await MentionDbUtils.deleteMentionRole(role);
-        await InteractionUtils.success(intr, `${roleMention(role.id)} mention deleted.`);
+        await MentionDbUtils.deleteMentionRole(role.id);
+        await InteractionUtils.success(intr, `${role.toString()} mention deleted.`);
     }
 }

@@ -27,12 +27,18 @@ export class AmbassadorCommand implements Command {
         }**\n👥┃Referrals: ${referrals.length} Total`;
 
         let referralAllString = '';
-        for (let i = 0; i < referrals.length; i++) {
+        let referralCount = 0;
+        for (let i = 0; i < 20; i++) {
             const referral = referrals[i];
+            if (!referral) continue;
             const guild = await GuildDbUtils.getGuildById(referral.guild_id);
             referralAllString += `**${i + 1}.** ${guild.name} - ${new Date(
                 referral.created_at
             ).toLocaleDateString()}\n`;
+            referralCount += 1;
+        }
+        if (referrals.length > 20) {
+            referralAllString += `**...** ${referrals.length - referralCount} more`;
         }
 
         await InteractionUtils.success(intr, `${referralString}\n\n${referralAllString}`);

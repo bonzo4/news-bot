@@ -31,7 +31,8 @@ export class ReferralDbUtils {
         const { data: guildReferrals, error } = await supabase
             .from('guild_referrals')
             .select('*')
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false });
         if (error) {
             await Logger.error({
                 message: `Could not get guild referrals from database + ${error.message}`,

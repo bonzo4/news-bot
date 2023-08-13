@@ -1,23 +1,39 @@
 import {
     ActionRowBuilder,
-    channelMention,
-    ChannelSelectMenuBuilder,
     ChannelSelectMenuInteraction,
-    ChannelType,
+    Guild,
+    StringSelectMenuBuilder,
     TextChannel,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
+import { Database } from '../types/supabase.js';
 import { ChannelDbUtils, GuildSettingsDbUtils, InteractionUtils } from '../utils/index.js';
 
-export function removeChannelMenu(): ActionRowBuilder<ChannelSelectMenuBuilder> {
-    const row = new ActionRowBuilder<ChannelSelectMenuBuilder>();
-    const menu = new ChannelSelectMenuBuilder()
-        .setCustomId(`channelRemove`)
-        .setPlaceholder('Select a channel')
-        .addChannelTypes(ChannelType.GuildText);
-    row.addComponents([menu]);
+type ChannelDoc = Database['public']['Tables']['news_channels']['Row'];
+
+export function removeChannelMenu(
+    guild: Guild,
+    channelDocs: ChannelDoc[]
+): ActionRowBuilder<StringSelectMenuBuilder> {
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+    const menu = new StringSelectMenuBuilder()
+        .setCustomId('channelRemove')
+        .setPlaceholder('Select a channel to remove.')
+        .setMinValues(1)
+        .setMaxValues(1);
+    channelDocs.forEach(channelDoc => {
+        const channel = guild.channels.cache.get(channelDoc.id);
+        if (!channel) return;
+        menu.addOptions([
+            {
+                label: channel.name,
+                value: channel.id,
+            },
+        ]);
+    });
+    row.addComponents(menu);
     return row;
 }
 
@@ -53,6 +69,6 @@ export class ChannelRemoveMenu implements Menu {
             return;
         }
         await ChannelDbUtils.createGuildChannel(guildSettings, channel as TextChannel);
-        await InteractionUtils.success(intr, `${channelMention(channel.id)} Channel removed.`);
+        await InteractionUtils.success(intr, `${channel.toString()} Channel removed.`);
     }
 }

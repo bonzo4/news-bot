@@ -10,15 +10,16 @@ import { InputButtons } from './buttons/input-button-event.js';
 import { MentionButtons } from './buttons/mention-button-event.js';
 import { PollButtons } from './buttons/poll-button-event.js';
 import { QuizButtons } from './buttons/quiz-button-event.js';
-import { SetupButtons } from './buttons/setup-button-1.js';
-import { SetupChainButtons } from './buttons/setup-button-2.js';
-import { SetupNewsChannelButtons } from './buttons/setup-button-3.js';
-import { OtherNewsChannelButtons } from './buttons/setup-button-4.js';
-import { SetupMentionButtons } from './buttons/setup-button-5.js';
-import { SetupReferralButtons } from './buttons/setup-button-6.js';
+import { SetupButtons } from './buttons/setup/setup-button-1.js';
+import { PreviewButtons } from './buttons/setup/setup-button-2.js';
+import { SetupChainButtons } from './buttons/setup/setup-button-3.js';
+import { SetupNewsChannelButtons } from './buttons/setup/setup-button-4.js';
+import { SetupMentionButtons } from './buttons/setup/setup-button-5.js';
+import { SetupReferralButtons } from './buttons/setup/setup-button-6.js';
 import { AmbassadorCommand } from './commands/ambassador-command.js';
 import { ChannelCommand } from './commands/guild/channels-command.js';
 import { MentionCommand } from './commands/guild/mention-command.js';
+import { PremiumCommand } from './commands/guild/premium-command.js';
 import { ReferralCommand } from './commands/guild/referral-command.js';
 import { Command, SetupCommand } from './commands/index.js';
 import {
@@ -92,6 +93,7 @@ async function start(): Promise<void> {
 
     // Commands
     let commands: Command[] = [
+        new PremiumCommand(),
         new DirectCommand(),
         new UnsubscribeCommand(),
         new NewsCommand(),
@@ -109,8 +111,8 @@ async function start(): Promise<void> {
         // TODO: Add new buttons here
         new SystemButtons(),
         new SetupButtons(),
+        new PreviewButtons(),
         new SetupNewsChannelButtons(),
-        new OtherNewsChannelButtons(),
         new SetupMentionButtons(),
         new SetupReferralButtons(),
         new ChannelButtons(),

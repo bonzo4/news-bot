@@ -7,19 +7,19 @@ import {
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { Button, ButtonDeferType } from './index.js';
 import { setupMentionButtons } from './setup-button-5.js';
-import { addMentionMenu } from '../menus/mention-add-menu-event.js';
-import { SetupMessages } from '../messages/setup.js';
-import { Logger } from '../services/logger.js';
-import { GuildSettings } from '../utils/database/guild-settings-db-utils.js';
+import { addMentionMenu } from '../../menus/mention-add-menu-event.js';
+import { SetupMessages } from '../../messages/setup.js';
+import { Logger } from '../../services/logger.js';
+import { GuildSettings } from '../../utils/database/guild-settings-db-utils.js';
 import {
     ChannelDbUtils,
     ChannelUtils,
     GuildSettingsDbUtils,
     InteractionUtils,
-} from '../utils/index.js';
-import { NewsChannelsUtils } from '../utils/news-channels-utils.js';
+} from '../../utils/index.js';
+import { NewsChannelsUtils } from '../../utils/news-channels-utils.js';
+import { Button, ButtonDeferType } from '../button.js';
 
 export function setupNewsChannelButtons(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents([
@@ -28,17 +28,12 @@ export function setupNewsChannelButtons(): ActionRowBuilder<ButtonBuilder> {
             .setLabel('Setup')
             .setStyle(ButtonStyle.Primary)
             .setEmoji('🛠️'),
-        new ButtonBuilder()
-            .setCustomId('setupNewsChannel_skip')
-            .setLabel('Skip')
-            .setStyle(ButtonStyle.Secondary)
-            .setEmoji('❌'),
     ]);
 }
 
 export class SetupNewsChannelButtons implements Button {
     ids: string[] = ['setupNewsChannel'];
-    deferType = ButtonDeferType.REPLY;
+    deferType = ButtonDeferType.NONE;
     requireGuild = true;
     cooldown = new RateLimiter(1, 5000);
     requireEmbedAuthorTag = false;
@@ -53,13 +48,6 @@ export class SetupNewsChannelButtons implements Button {
                     intr,
                     `Something went wrong with the setup. Please run **/setup** again.`
                 );
-                return;
-            }
-            if (intr.customId.split('_')[1] === 'skip') {
-                await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
-                    addMentionMenu(),
-                    setupMentionButtons(),
-                ]);
                 return;
             }
 
@@ -100,18 +88,26 @@ export class SetupNewsChannelButtons implements Button {
         }
         const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
         if (newsChannels.length >= 5) {
-            await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
-                addMentionMenu(),
-                setupMentionButtons(),
-            ]);
+            if (intr.message.deletable) await intr.message.delete();
+            await intr.channel.send({
+                embeds: [SetupMessages.pingRole()],
+                components: [
+                    addMentionMenu([...intr.guild.roles.cache.map(role => role)]),
+                    setupMentionButtons(),
+                ],
+            });
             return;
         }
         const newsChannel = await ChannelUtils.createNewsChannel(category);
         await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
-        await InteractionUtils.send(intr, SetupMessages.pingRole(), true, [
-            addMentionMenu(),
-            setupMentionButtons(),
-        ]);
+        if (intr.message.deletable) await intr.message.delete();
+        await intr.channel.send({
+            embeds: [SetupMessages.pingRole()],
+            components: [
+                addMentionMenu([...intr.guild.roles.cache.map(role => role)]),
+                setupMentionButtons(),
+            ],
+        });
         await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
     }
 }

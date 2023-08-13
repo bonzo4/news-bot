@@ -93,6 +93,7 @@ export class ApproveNewsMenu implements Menu {
         }
 
         await NewsUtils.sendToUser({
+            tags: [],
             channel,
             content: contentToSend,
         });

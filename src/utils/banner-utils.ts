@@ -53,14 +53,20 @@ export class BannerUtils {
             const backgroundImage = await Jimp.read('./public/background.jpg');
             const font = await Jimp.loadFont('./public/PoppinsBold.fnt');
             // regex for removing emojis from guild name
-            const name = guild.name;
-            const formattedName = name.length > 20 ? `${name.slice(0, 20)}...` : name;
-            const x = backgroundImage.getWidth() / 2 - Jimp.measureText(font, name) / 2;
+            const nameWithoutEmojis = guild.name.replace(
+                /(\p{Emoji}|\p{Emoji_Presentation}|\p{Emoji_Modifier_Base})/gu,
+                ''
+            );
+            const formattedName =
+                nameWithoutEmojis.length > 20
+                    ? `${nameWithoutEmojis.slice(0, 20)}...`
+                    : nameWithoutEmojis;
+            const x = backgroundImage.getWidth() / 2 - Jimp.measureText(font, formattedName) / 2;
             let finalImage = backgroundImage.print(font, x, 565, formattedName);
             const guildIconUrl = guild.iconURL({ size: 1024, extension: 'png' });
             if (guildIconUrl) {
                 const iconImage = await Jimp.read(guildIconUrl);
-                const newIconImage = iconImage.resize(344, 344).circle().background(0x00000000);
+                const newIconImage = iconImage.resize(344, 344).circle().background(0x000000);
                 const iconX = finalImage.getWidth() / 2 - newIconImage.getWidth() / 2;
                 finalImage = finalImage.composite(newIconImage, iconX, 91);
             }

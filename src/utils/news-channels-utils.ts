@@ -40,10 +40,12 @@ export class NewsChannelsUtils {
                 contentToSend.push({
                     embed: guildEmbed,
                     components,
+                    tag: embed.tag,
                 });
             }
 
             await NewsUtils.sendToGuild({
+                tags,
                 channel,
                 mention: ' ',
                 content: contentToSend,
@@ -82,10 +84,12 @@ export class NewsChannelsUtils {
                 contentToSend.push({
                     embed: formattedEmbed,
                     components,
+                    tag: embed.tag,
                 });
             }
 
             await NewsUtils.sendToUser({
+                tags: [],
                 channel,
                 content: contentToSend,
             });

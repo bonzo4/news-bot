@@ -39,8 +39,8 @@ export class MentionDbUtils {
         return mentionRoles;
     }
 
-    public static async deleteMentionRole(role: Role): Promise<void> {
-        const { error } = await supabase.from('mention_roles').delete().eq('id', role.id);
+    public static async deleteMentionRole(roleId: string): Promise<void> {
+        const { error } = await supabase.from('mention_roles').delete().eq('id', roleId);
         if (error)
             throw new Error(`Could not delete mention role from database:\n${error.message}`);
     }

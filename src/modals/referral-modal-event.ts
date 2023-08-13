@@ -61,11 +61,13 @@ export class ReferralModal implements ModalSubmit {
 
         await InteractionUtils.success(intr, 'Referral code used!');
 
-        if (setup)
+        if (setup) {
+            if (intr.message.deletable) await intr.message.delete();
             await intr.channel.send({
                 embeds: [SetupMessages.systemMessage()],
                 components: [systemLinks(), systemButtons()],
             });
+        }
 
         await intr.client.shard.broadcastEval(broadcastReferral, {
             context: { guildId: intr.guildId, userId: user.id },

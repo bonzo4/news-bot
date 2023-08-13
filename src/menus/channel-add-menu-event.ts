@@ -1,9 +1,8 @@
 import {
     ActionRowBuilder,
-    channelMention,
-    ChannelSelectMenuBuilder,
     ChannelSelectMenuInteraction,
-    ChannelType,
+    GuildTextBasedChannel,
+    StringSelectMenuBuilder,
     TextChannel,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
@@ -11,13 +10,24 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { Menu, MenuDeferType } from './menu.js';
 import { ChannelDbUtils, GuildSettingsDbUtils, InteractionUtils } from '../utils/index.js';
 
-export function addChannelMenu(): ActionRowBuilder<ChannelSelectMenuBuilder> {
-    const row = new ActionRowBuilder<ChannelSelectMenuBuilder>();
-    const menu = new ChannelSelectMenuBuilder()
-        .setCustomId(`channelAdd`)
-        .setPlaceholder('Select a channel')
-        .addChannelTypes(ChannelType.GuildText);
-    row.addComponents([menu]);
+export function addChannelMenu(
+    channels: GuildTextBasedChannel[]
+): ActionRowBuilder<StringSelectMenuBuilder> {
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+    const menu = new StringSelectMenuBuilder()
+        .setCustomId('channelAdd')
+        .setPlaceholder('Select a channel to add.')
+        .setMinValues(1)
+        .setMaxValues(1);
+    channels.splice(0, 25).forEach(channel => {
+        menu.addOptions([
+            {
+                label: channel.name,
+                value: channel.id,
+            },
+        ]);
+    });
+    row.addComponents(menu);
     return row;
 }
 
@@ -57,6 +67,6 @@ export class ChannelAddMenu implements Menu {
             return;
         }
         await ChannelDbUtils.createGuildChannel(guildSettings, channel as TextChannel);
-        await InteractionUtils.success(intr, `${channelMention(channel.id)} Channel added.`);
+        await InteractionUtils.success(intr, `${channel.toString()} Channel added.`);
     }
 }

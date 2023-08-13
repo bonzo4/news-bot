@@ -5,7 +5,6 @@ import {
     DMChannel,
     Guild,
     GuildTextBasedChannel,
-    roleMention,
     TextBasedChannel,
 } from 'discord.js';
 
@@ -26,9 +25,11 @@ export type InteractionType = Poll | Quiz | Input | Link | Direct | Promo;
 export type SendContent = {
     embed: any;
     components: ActionRowBuilder<ButtonBuilder>[];
+    tag: string | null;
 }[];
 
 type SendOptions = {
+    tags: string[];
     content: SendContent;
 };
 
@@ -62,20 +63,22 @@ export class NewsUtils {
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
         let resendError: any;
-        const { channel, content, mention } = options;
+        let sentFirstEmbed = false;
+        const { channel, content, mention, tags } = options;
         for (let index = 0; index < content.length; index++) {
-            const { embed, components } = content[index];
-            if (index === 0) {
-                await channel
-                    .send({
-                        content: mention || ' ',
-                        embeds: [embed],
-                        components,
-                    })
-                    .then(() => (resendError = null))
-                    .catch(async error => {
-                        resendError = error;
-                    });
+            const { embed, components, tag } = content[index];
+            if (!sentFirstEmbed) {
+                if (tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
+                    await channel
+                        .send({
+                            content: mention || ' ',
+                            embeds: [embed],
+                            components,
+                        })
+                        .then(() => (resendError = null))
+                        .catch(async error => {
+                            resendError = error;
+                        });
                 while (resendError && resendError.code === 429) {
                     await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
                     await channel
@@ -86,17 +89,19 @@ export class NewsUtils {
                         .then(() => (resendError = null))
                         .catch(error => (resendError = error));
                 }
+                sentFirstEmbed = true;
                 continue;
             }
-            await channel
-                .send({
-                    embeds: [embed],
-                    components,
-                })
-                .then(() => (resendError = null))
-                .catch(async error => {
-                    resendError = error;
-                });
+            if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
+                await channel
+                    .send({
+                        embeds: [embed],
+                        components,
+                    })
+                    .then(() => (resendError = null))
+                    .catch(async error => {
+                        resendError = error;
+                    });
             while (resendError && resendError.code === 429) {
                 await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
                 await channel
@@ -111,18 +116,19 @@ export class NewsUtils {
     }
 
     public static async sendToUser(options: UserSendOptions): Promise<void> {
-        const { channel, content } = options;
-        for (const { embed, components } of content) {
+        const { channel, content, tags } = options;
+        for (const { embed, components, tag } of content) {
             let resendError: any;
-            await channel
-                .send({
-                    embeds: [embed],
-                    components,
-                })
-                .then(() => (resendError = null))
-                .catch(async error => {
-                    resendError = error;
-                });
+            if (!tag || tag === 'all' || tag === 'direct' || tags.includes(tag))
+                await channel
+                    .send({
+                        embeds: [embed],
+                        components,
+                    })
+                    .then(() => (resendError = null))
+                    .catch(async error => {
+                        resendError = error;
+                    });
             while (resendError && resendError.code === 429) {
                 await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
                 await channel
@@ -179,8 +185,7 @@ export class NewsUtils {
             .map(mention => {
                 const role = guild.roles.cache.get(mention.id);
                 if (!role) return '';
-                if (role.name === 'everyone') return '@everyone';
-                return roleMention(mention.id);
+                return role.toString();
             })
             .join(' ');
         return mentionString;

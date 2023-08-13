@@ -1,25 +1,25 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { Button, ButtonDeferType } from './button.js';
-import { setupNewsChannelButtons } from './setup-button-3.js';
-import { SetupMessages } from '../messages/setup.js';
-import { Logger } from '../services/logger.js';
-import { InteractionUtils } from '../utils/index.js';
+import { previewButtons } from './setup-button-2.js';
+import { SetupMessages } from '../../messages/setup.js';
+import { Logger } from '../../services/logger.js';
+import { InteractionUtils } from '../../utils/index.js';
+import { Button, ButtonDeferType } from '../button.js';
 
-export function setupChainButtons(): ActionRowBuilder<ButtonBuilder> {
+export function setupButtons(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents([
         new ButtonBuilder()
-            .setCustomId('setupChain_skip')
-            .setLabel('Next')
-            .setStyle(ButtonStyle.Secondary)
-            .setEmoji('➡️'),
+            .setCustomId('setup')
+            .setLabel('Setup')
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji('🛠️'),
     ]);
 }
 
-export class SetupChainButtons implements Button {
-    ids: string[] = ['setupChain'];
-    deferType = ButtonDeferType.REPLY;
+export class SetupButtons implements Button {
+    ids: string[] = ['setup'];
+    deferType = ButtonDeferType.NONE;
     cooldown = new RateLimiter(1, 5000);
     requireGuild = true;
     requireEmbedAuthorTag = false;
@@ -28,10 +28,11 @@ export class SetupChainButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
-            if (intr.customId.split('_')[1] === 'skip')
-                await InteractionUtils.send(intr, SetupMessages.newsChannel(), true, [
-                    setupNewsChannelButtons(),
-                ]);
+            if (intr.message.deletable) await intr.message.delete();
+            await intr.channel.send({
+                embeds: [SetupMessages.newsPreview()],
+                components: [previewButtons()],
+            });
         } catch (error) {
             await InteractionUtils.error(
                 intr,

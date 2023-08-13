@@ -69,10 +69,6 @@ export class ScheduledNews extends CronJob {
 
     private async sendNews(newsId: number): Promise<void> {
         const shardId = this.client.guilds.cache.first()?.shardId;
-        // const shard = this.client.guilds.cache.first().shardId;
-        // await this.client.shard.broadcastEval(broadcastNewsReceived, {
-        //     context: { newsId, shard },
-        // });
 
         const news = await NewsDbUtils.getNews(newsId);
         if (!news) {
@@ -294,8 +290,11 @@ export class ScheduledNews extends CronJob {
             contentForGuild.push({
                 embed: guildEmbed,
                 components,
+                tag: embed.tag,
             });
         }
+
+        const guildTags = await TagDbUtils.getAllGuildTags(guildId);
 
         for (const channelDoc of channels) {
             const channel = (await this.client.channels.fetch(
@@ -303,6 +302,7 @@ export class ScheduledNews extends CronJob {
             )) as GuildTextBasedChannel;
             try {
                 await NewsUtils.sendToGuild({
+                    tags: guildTags,
                     channel,
                     mention,
                     content: contentForGuild,
@@ -334,10 +334,15 @@ export class ScheduledNews extends CronJob {
             contentForDirect.push({
                 embed: directEmbed,
                 components,
+                tag: embed.tag,
             });
         }
+
+        const userTags = await TagDbUtils.getAllUserTags(userId);
+
         try {
             await NewsUtils.sendToUser({
+                tags: userTags,
                 channel: dmChannel,
                 content: contentForDirect,
             });

@@ -1,7 +1,7 @@
 import { CategoryChannel, Client, Guild, GuildTextBasedChannel } from 'discord.js';
 
 import { EventHandler } from './index.js';
-import { setupButtons } from '../buttons/setup-button-1.js';
+import { setupButtons } from '../buttons/setup/setup-button-1.js';
 import { SetupMessages } from '../messages/setup.js';
 import { Logger } from '../services/index.js';
 import {

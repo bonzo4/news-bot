@@ -75,6 +75,8 @@ export class Bot {
     public async start(): Promise<void> {
         this.registerListeners();
         await this.login(this.options.token);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        await this.getNews();
     }
 
     private registerListeners(): void {
@@ -207,6 +209,22 @@ export class Bot {
                 });
             }
         });
+    }
+
+    private async getNews(): Promise<void> {
+        if (!this.ready || debug.dummyMode.enabled) {
+            return;
+        }
+        try {
+            const news = await NewsDbUtils.getScheduledNews();
+            for (const n of news) {
+                await this.scheduleNews(n.id);
+            }
+        } catch (error) {
+            await Logger.error({
+                message: `An error occurred while getting news.\n${error}`,
+            });
+        }
     }
 
     private async updateSystemMessage(guild: Guild): Promise<void> {
