@@ -49,7 +49,7 @@ export class SetupMessages {
     public static newsChannel(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')
-            .setDescription(`📰┃Create a Syndicate News Channel?`)
+            .setDescription(`📰┃Create a Syndicate News Channel.`)
             .setColor('NotQuiteBlack')
             .setFooter({
                 text: 'Powered by Syndicate',

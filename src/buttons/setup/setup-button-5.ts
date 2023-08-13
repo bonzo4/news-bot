@@ -32,16 +32,18 @@ export class SetupMentionButtons implements Button {
             if (intr.customId.split('_')[1] === 'next') {
                 const referral = await ReferralDbUtils.getGuildReferralByGuild(intr.guildId);
                 if (referral.user_id) {
-                    await intr.channel.bulkDelete(100);
+                    if (intr.message.deletable) await intr.message.delete();
                     await intr.channel.send({
                         embeds: [SetupMessages.systemMessage()],
                         components: [systemLinks(), systemButtons()],
                     });
                     return;
                 }
-                await InteractionUtils.send(intr, SetupMessages.referral(), true, [
-                    setupReferralButtons(),
-                ]);
+                if (intr.message.deletable) await intr.message.delete();
+                await intr.channel.send({
+                    embeds: [SetupMessages.referral()],
+                    components: [setupReferralButtons()],
+                });
                 return;
             }
         } catch (error) {

@@ -17,7 +17,6 @@ export async function setupChainMenu(): Promise<ActionRowBuilder<StringSelectMen
                 tag.name !== 'guild' &&
                 tag.name !== 'direct' &&
                 tag.name !== 'test' &&
-                tag.name !== 'Crypto' &&
                 tag.name !== 'solana test' &&
                 tag.name !== 'ethereum test'
         )
@@ -29,7 +28,7 @@ export async function setupChainMenu(): Promise<ActionRowBuilder<StringSelectMen
             .setPlaceholder('Select a tag')
             .addOptions(
                 tagNames.map(tagName => ({
-                    label: tagName,
+                    label: tagName + ' NFT',
                     value: tagName,
                 }))
             ),

@@ -5,7 +5,7 @@ import { config } from '../config/config.js';
 import { CustomClient } from '../extensions/index.js';
 
 export class RestartShardsJobs implements Job {
-    public name = 'Update Server Count';
+    public name = 'Restart Shards';
     public schedule = '50 5 * * *';
     public log: boolean = config.jobs.updateServerCount.log;
 
