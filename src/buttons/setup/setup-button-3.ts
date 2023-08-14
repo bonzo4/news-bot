@@ -29,7 +29,7 @@ export function setupChainButtons(): ActionRowBuilder<ButtonBuilder> {
             .setEmoji('🔗'),
         new ButtonBuilder()
             .setCustomId('setupChain _skip')
-            .setLabel('Setup Chain')
+            .setLabel('Skip')
             .setStyle(ButtonStyle.Primary)
             .setEmoji('➡'),
     ]);
@@ -46,7 +46,7 @@ export class SetupChainButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
-            if (intr.customId === 'setupChain _skip') {
+            if (intr.customId === 'setupChain_skip') {
                 if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({
                     embeds: [SetupMessages.newsChannel()],

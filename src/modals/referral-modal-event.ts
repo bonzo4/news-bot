@@ -37,7 +37,7 @@ export function referralModal(setup: boolean): ModalBuilder {
 export class ReferralModal implements ModalSubmit {
     ids = ['referralCode'];
     cooldown = new RateLimiter(1, 5000);
-    deferType = ModalDeferType.REPLY;
+    deferType = ModalDeferType.NONE;
     requireGuild = true;
     requireAdmin = true;
 
