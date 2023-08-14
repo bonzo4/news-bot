@@ -10,6 +10,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { channelButtons } from './channel-button-event.js';
 import { Button, ButtonDeferType } from './index.js';
 import { mentionButtons } from './mention-button-event.js';
+import { premiumEmbed } from '../commands/guild/premium-command.js';
 import {
     ChannelDbUtils,
     ChannelUtils,
@@ -120,10 +121,11 @@ export class SystemButtons implements Button {
                 break;
             }
             case 'moreNews': {
-                await InteractionUtils.success(
-                    intr,
-                    'Please open a ticket here: **https://discord.gg/syndicatenetwork** to inquire about more news.'
-                );
+                await InteractionUtils.send(intr,
+                    {
+                        embeds: premiumEmbed
+                    },
+                    true);
             }
         }
     }
