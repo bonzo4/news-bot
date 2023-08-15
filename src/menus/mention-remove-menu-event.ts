@@ -30,7 +30,6 @@ export async function removeMentionMenu(
                 {
                     label: role.name,
                     value: role.id,
-                    emoji: role.iconURL() ? role.iconURL() : undefined,
                 },
             ]);
         } else {

@@ -24,7 +24,6 @@ export function addMentionMenu(roles: Role[]): ActionRowBuilder<StringSelectMenu
                 {
                     label: role.name,
                     value: role.id,
-                    emoji: role.iconURL() ? role.iconURL() : undefined,
                 },
             ]);
         });
