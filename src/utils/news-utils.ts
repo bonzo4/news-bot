@@ -68,7 +68,7 @@ export class NewsUtils {
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag } = content[index];
             if (!sentFirstEmbed) {
-                if (tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
+                if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
                     await channel
                         .send({
                             content: mention || ' ',
