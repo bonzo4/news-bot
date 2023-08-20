@@ -75,8 +75,6 @@ export class Bot {
     public async start(): Promise<void> {
         this.registerListeners();
         await this.login(this.options.token);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        await this.getNews();
     }
 
     private registerListeners(): void {
@@ -164,6 +162,7 @@ export class Bot {
                 message: Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag),
             });
             await this.updateAllGuildInvitesAndAnnouncementChannels();
+            await this.getNews();
         } catch (error) {
             await Logger.error({
                 message: `An error occurred while starting the bot.\n${error}`,

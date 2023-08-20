@@ -17,11 +17,17 @@ export class NewsDbUtils {
 
     public static async getScheduledNews(): Promise<DiscordNews[]> {
         // get news that is scheduled for the next 24 hours
+        const now = new Date();
+        // get the date so that it to the next day at 12:50 am
+        const resetDate = new Date()
+        resetDate.setDate(resetDate.getDate() + 1);
+        resetDate.setHours(0, 50, 0, 0);
+
         const { data: news, error } = await supabase
             .from('discord_news')
             .select('*')
-            .gte('schedule', new Date().toISOString())
-            .lte('schedule', new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString())
+            .gte('schedule', now.toISOString())
+            .lte('schedule', resetDate.toISOString())
             .order('schedule', { ascending: true });
         if (error) throw new Error(`Could not get news from database:\n${error.message}`);
         return news;
