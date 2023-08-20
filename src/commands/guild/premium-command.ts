@@ -13,11 +13,7 @@ export const premiumEmbed = [
         .addFields([
             {
                 name: '📰┃Premium News',
-                value: `• Full NFT news coverage
-                            • Advanced NFT market stats
-                            • Additional custom Web3 content
-                            • Exclusive access to Syndicate merch and airdrops
-                            • Exclusive access to whitelists and presales`,
+                value: `• Full NFT news coverage\n• Advanced NFT market stats\n• Additional custom Web3 content\n• Exclusive access to Syndicate merch and airdrops\n• Exclusive access to whitelists and presales`,
             },
             {
                 name: '**Pay using Card**',

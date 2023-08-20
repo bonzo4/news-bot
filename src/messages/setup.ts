@@ -31,12 +31,16 @@ export class SetupMessages {
     public static newsChain(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')
-            .setDescription(`📰┃What chain would you like to receive news on?`)
+            .setDescription(`📰┃What chain would you like to receive free NFT news on? (Solana or Ethereum)`)
             .setFields([
                 {
                     name: '❓┃Info',
-                    value: 'You may only select one chain. If you would like to receive news on all chains, please run **/premium** after you have finished setting up the bot.',
+                    value: 'You get FREE NFT news on only ONE chain. You can not reverse this decision. Choose carefully on which NFT news you would like your community to receive. If you would like to receive NFT news on all chains, please run /premium after you have finished the setup process.',
                 },
+                {
+                    name: 'ℹ┃Previews',
+                    value: 'Press "Solana NFT Preview" to preview **Solana NFT** news.\nPress "Ethereum NFT Preview" to preview **Ethereum NFT** news.'
+                }
             ])
             .setColor('NotQuiteBlack')
             .setFooter({

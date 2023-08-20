@@ -39,11 +39,11 @@ export class NewsDbUtils {
         return news;
     }
 
-    public static async getLastThreeGuildApprovedNews(tag: string | null): Promise<DiscordNews[]> {
-        const { data: tags, error: tagError } = await supabase
+    public static async getLastThreeGuildApprovedNews(tags: string[]): Promise<DiscordNews[]> {
+        const { data: tagDocs, error: tagError } = await supabase
             .from('_news_tags')
             .select('news_id')
-            .in('tag', ['guild', 'all', tag ?? 'all'])
+            .in('tag', ['guild', 'all', tags.map(tag => tag)])
             .order('created_at', { ascending: false })
             .limit(3);
         if (tagError) return [];
@@ -53,7 +53,7 @@ export class NewsDbUtils {
             .eq('approved', true)
             .in(
                 'id',
-                tags.map(tag => tag.news_id)
+                tagDocs.map(tag => tag.news_id)
             );
         if (newsError) return [];
         return news;
