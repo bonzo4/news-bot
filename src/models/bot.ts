@@ -122,8 +122,8 @@ export class Bot {
                 await this.dailyUpdateAllGuilds();
             }
         );
-        this.options.client.on('guildBanner', async ({ bannerUrl }: { bannerUrl: string }) => {
-            await this.guildBanner(bannerUrl, this.options.client);
+        this.options.client.on('guildBanner', async ({ bannerUrl, guildId }: { bannerUrl: string, guildId: string }) => {
+            await this.guildBanner(bannerUrl, guildId, this.options.client);
         });
         this.options.client.on(
             'guildReferral',
@@ -553,13 +553,13 @@ export class Bot {
         }
     }
 
-    private async guildBanner(bannerUrl: string, client: Client): Promise<void> {
+    private async guildBanner(bannerUrl: string, guildId: string, client: Client): Promise<void> {
         const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
         if (!syndicateGuild) return;
         const guildJoinChannel = syndicateGuild.channels.cache.get(
             config.syndicateChannels.guildJoined
         ) as GuildTextBasedChannel;
-
+        const guildDoc = await GuildDbUtils.getGuildById(guildId);
         const embed = new EmbedBuilder()
             .setTitle(`Welcome to the Syndicate Network`)
             .setImage(bannerUrl)
@@ -567,6 +567,7 @@ export class Bot {
                 text: 'Syndicate Network',
                 iconURL: config.syndicateIcon,
             });
+        if (guildDoc.invite) embed.setURL(guildDoc.invite);
 
         await guildJoinChannel.send({ embeds: [embed] });
     }
@@ -596,6 +597,8 @@ export class Bot {
                 iconURL: config.syndicateIcon,
             })
             .setTimestamp();
+        
+        if (guildDoc.invite) embed.setURL(guildDoc.invite);
 
         await guildReferralChannel.send({ embeds: [embed] });
     }

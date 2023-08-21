@@ -23,7 +23,7 @@ export class GuildJoinHandler implements EventHandler {
             // check if guild is new
             if (createdAt.getTime() > Date.now() - 1000 * 60 * 60) {
                 await guild.client.shard.broadcastEval(broadcastBanner, {
-                    context: { bannerUrl: banner },
+                    context: { bannerUrl: banner, guildId: guild.id },
                 });
             }
             // check if guild settings exist in db & if channels exists
@@ -86,9 +86,10 @@ export class GuildJoinHandler implements EventHandler {
 
 export async function broadcastBanner(
     client: Client,
-    { bannerUrl }: { bannerUrl: string }
+    { bannerUrl, guildId }: { bannerUrl: string, guildId: string }
 ): Promise<void> {
     client.emit('guildBanner', {
         bannerUrl,
+        guildId,
     });
 }
