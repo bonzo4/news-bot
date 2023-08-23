@@ -6,7 +6,6 @@ import { config } from './config/config.js';
 import { debug } from './config/debug.js';
 import { GuildsController, RootController, ShardsController } from './controllers/index.js';
 import { Job, UpdateServerCountJob } from './jobs/index.js';
-import { RestartShardsJobs } from './jobs/restart-shard-job.js';
 import { Api } from './models/api.js';
 import { Manager } from './models/manager.js';
 import { HttpService, JobService, Logger, MasterApiService } from './services/index.js';
@@ -59,7 +58,7 @@ async function start(): Promise<void> {
     //     return;
     // }
 
-    const shardCount = 6;
+    const shardCount = 7;
 
     const shardList = Array.from({ length: shardCount }, (_, i) => i);
 
@@ -74,7 +73,7 @@ async function start(): Promise<void> {
     // Jobs
     let jobs: Job[] = [
         config.clustering.enabled ? undefined : new UpdateServerCountJob(shardManager, httpService),
-        config.clustering.enabled ? undefined : new RestartShardsJobs(shardManager),
+        // config.clustering.enabled ? undefined : new RestartShardsJobs(shardManager),
         // TODO: Add new jobs here
     ].filter(Boolean);
 

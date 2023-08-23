@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { config } from '../config/config.js';
 import { debug } from '../config/debug.js';
 import { JobService, Logger } from '../services/index.js';
-import { startInsertNewsChannel, startUpdateNewsChannel } from '../webhooks/news.js';
+import { startNewsChannel } from '../webhooks/news.js';
 
 const require = createRequire(import.meta.url);
 let Logs = require('../../lang/logs.json');
@@ -43,8 +43,7 @@ export class Manager {
             return;
         }
 
-        await startInsertNewsChannel(this.shardManager);
-        await startUpdateNewsChannel(this.shardManager);
+        await startNewsChannel(this.shardManager);
 
         this.jobService.start();
     }
