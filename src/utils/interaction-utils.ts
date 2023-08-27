@@ -221,10 +221,9 @@ export class InteractionUtils {
         if (event.cooldown) {
             let limited = event.cooldown.take(intr.user.id);
             if (limited) {
-                const cooldownSeconds = event.cooldown.amount.toFixed(1);
                 await this.warn(
                     intr,
-                    `You are on cooldown for this. Please wait ${cooldownSeconds} before trying again.`
+                    `You are on cooldown for this. Please wait before trying again.`
                 );
                 return false;
             }

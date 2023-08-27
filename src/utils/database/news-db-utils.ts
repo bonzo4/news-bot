@@ -21,7 +21,6 @@ export class NewsDbUtils {
         // get the date so that it to the next day at 12:50 am
         const resetDate = new Date()
         resetDate.setDate(resetDate.getDate() + 1);
-        resetDate.setHours(0, 50, 0, 0);
 
         const { data: news, error } = await supabase
             .from('discord_news')

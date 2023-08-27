@@ -10,7 +10,7 @@ import { ShardUtils } from '../utils/index.js';
 
 export class UpdateServerCountJob implements Job {
     public name = 'Update Server Count';
-    public schedule = '0 6 * * *';
+    public schedule = '0 0 * * SUN';
     public log: boolean = config.jobs.updateServerCount.log;
 
     private botSites: BotSite[];

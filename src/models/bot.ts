@@ -119,7 +119,7 @@ export class Bot {
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
                 await this.broadcastStats(guildCount, memberCount);
-                await this.dailyUpdateAllGuilds();
+                await this.updateAllGuildInvitesAndAnnouncementChannels();
             }
         );
         this.options.client.on('guildBanner', async ({ bannerUrl, guildId }: { bannerUrl: string, guildId: string }) => {
@@ -161,7 +161,6 @@ export class Bot {
             Logger.info({
                 message: Logs.info.clientLogin.replaceAll('{USER_TAG}', userTag),
             });
-            await this.updateAllGuildInvitesAndAnnouncementChannels();
             await this.getNews();
         } catch (error) {
             await Logger.error({
@@ -518,7 +517,7 @@ export class Bot {
             if (!adminChannel) {
                 return;
             }
-            await adminChannel.send(`Shard (${shard + 1}/${6}) finished sending news ${newsId}`);
+            await adminChannel.send(`Shard (${shard + 1}/${7}) finished sending news ${newsId}`);
         } catch (error) {
             await Logger.error({
                 message: `Failed to send news sent notification for news ${newsId}`,

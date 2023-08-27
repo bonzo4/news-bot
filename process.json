@@ -5,7 +5,7 @@
             "script": "dist/start-manager.js",
             "node_args": ["--enable-source-maps"],
             "restart_delay": 10000,
-            "cron_restart": "50 5 * * *"
+            "cron_restart": "0 */12 * * *"
         }
     ]
 }
