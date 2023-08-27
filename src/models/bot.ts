@@ -119,9 +119,13 @@ export class Bot {
             'botStats',
             async ({ guildCount, memberCount }: { guildCount: number; memberCount: number }) => {
                 await this.broadcastStats(guildCount, memberCount);
-                await this.updateAllGuildInvitesAndAnnouncementChannels();
+                // await this.updateAllGuildInvitesAndAnnouncementChannels();
             }
         );
+        this.options.client.on(
+            'weeklyUpdate',
+            async () => await this.updateAllGuildInvitesAndAnnouncementChannels()
+        )
         this.options.client.on('guildBanner', async ({ bannerUrl, guildId }: { bannerUrl: string, guildId: string }) => {
             await this.guildBanner(bannerUrl, guildId, this.options.client);
         });
