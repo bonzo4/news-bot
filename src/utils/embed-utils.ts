@@ -181,7 +181,7 @@ export class EmbedUtils {
                 content.forEach(item => traverse(item));
             } else if (typeof content === 'object' && content !== null) {
                 for (const key in content) {
-                    if (key !== 'image' && key !== 'footer') {
+                    if (key !== 'image' && key !== 'footer' && key !== 'thumbnail') {
                         traverse(content[key]);
                     }
                 }
