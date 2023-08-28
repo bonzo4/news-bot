@@ -199,6 +199,6 @@ export class EmbedUtils {
         traverse(content);
 
         //filter our links so it doesn't have discord links
-        return links.filter(link => !link.includes('https://discord'));
+        return links
     }
 }
