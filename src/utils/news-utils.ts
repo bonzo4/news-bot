@@ -62,43 +62,55 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
-        let resendError: any;
-        let sentFirstEmbed = false;
+        let resendError: any = null;
+        // let sentFirstEmbed = false;
         const { channel, content, mention, tags } = options;
+        if (mention && mention !== '') await channel.send({
+            content: mention
+        })
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag } = content[index];
-            if (!sentFirstEmbed) {
-                if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
-                    await channel
-                        .send({
-                            content: mention || ' ',
-                            embeds: [embed],
-                            components,
-                        })
-                        .then(() => (resendError = null))
-                        .catch(async error => {
-                            resendError = error;
-                        });
-                while (resendError && resendError.code === 429) {
-                    await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
-                    await channel
-                        .send({
-                            embeds: [embed],
-                            components,
-                        })
-                        .then(() => (resendError = null))
-                        .catch(error => (resendError = error));
-                }
-                sentFirstEmbed = true;
-                continue;
-            }
+            // if (!sentFirstEmbed) {
+            //     if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
+            //         await channel
+            //             .send({
+            //                 embeds: [embed],
+            //                 components,
+            //             })
+            //             .then(async (message) => {
+            //                 await message.startThread({
+            //                     name: ''
+            //                 }).catch(() => null)
+            //             })
+            //             .catch(async error => {
+            //                 resendError = error;
+            //             });
+            //     }
+                     
+            //     while (resendError && resendError.code === 429) {
+            //         await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+            //         await channel
+            //             .send({
+            //                 embeds: [embed],
+            //                 components,
+            //             })
+            //             .then(async (message) => {
+            //                 await message.startThread({
+            //                     name: ''
+            //                 }).catch(() => null)
+            //                 resendError = null;
+            //             })
+            //             .catch(error => (resendError = error));
+            //     }
+            //     sentFirstEmbed = true;
+            //     continue;
+            // }
             if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag))
                 await channel
                     .send({
                         embeds: [embed],
                         components,
                     })
-                    .then(() => (resendError = null))
                     .catch(async error => {
                         resendError = error;
                     });
