@@ -123,18 +123,24 @@ export class NewsUtils {
 
     private static async sendContent(content: MessageCreateOptions, channel: TextBasedChannel): Promise<Message> {
         let resendError: any = null;
-        const message =await channel.send(content)
+        let message: Message<boolean>
+        await channel.send(content)
+            .then((msg: Message<boolean>) => {
+                message = msg;
+            })
             .catch(error => {
                 resendError = error;
             });
-        if (message && !resendError) return message;
         while (!message && resendError && resendError.code === 429) {
             await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
-            const message = await channel.send(content)
+            await channel.send(content)
+                .then((msg: Message<boolean>) => {
+                    message = msg;
+                })
                 .catch(error => (resendError = error));
-            
-            if (message && !resendError) return message;
         }
+
+        return message;
     }
 
     public static async getInteractions(embeds: EmbedDoc): Promise<InteractionType[]> {
