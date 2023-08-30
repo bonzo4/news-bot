@@ -47,6 +47,11 @@ type UserSendOptions = {
     channel: DMChannel;
 } & SendOptions;
 
+type SendContentOptions = {
+    content: MessageCreateOptions;
+    channel: GuildTextBasedChannel | DMChannel;
+}
+
 export class NewsUtils {
     public static async getNewsChannels(
         guildId: string,
@@ -69,18 +74,25 @@ export class NewsUtils {
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
         let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
-        if (hasMention && mention && mention !== '') await this.sendContent({
-            content: mention,
-        }, channel)
+        if (hasMention && mention && mention !== '' && mention !== ' ') {
+            await this.sendContent({
+                content: {
+                    content: mention,
+                },
+                channel,
+            });
+        }
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
             if (!sentFirstEmbed) {
                 if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
                     const message = await this.sendContent({
-                        embeds: [embed],
-                        components,
-                    }, channel);
-
+                        content: {
+                            embeds: [embed],
+                            components,
+                        },
+                        channel,
+                    });
                     if (message && hasThread) await message.startThread({
                         name: ''
                     }).catch(() => null)
@@ -95,10 +107,13 @@ export class NewsUtils {
                 continue;
             }
             if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
-                const message = await this.sendContent({
-                    embeds: [embed],
-                    components,
-                }, channel);
+               const message = await this.sendContent({
+                        content: {
+                            embeds: [embed],
+                            components,
+                        },
+                        channel,
+                    });
                 
                 if (message && reactions) {
                     for (const reaction of reactions) {
@@ -114,21 +129,26 @@ export class NewsUtils {
         for (const { embed, components, tag } of content) {
             if (!tag || tag === 'all' || tag === 'direct' || tags.includes(tag)) {
                 await this.sendContent({
-                    embeds: [embed],
-                    components,
-                }, channel)
+                    content: {
+                        embeds: [embed],
+                        components,
+                    },
+                    channel,
+                })
             }
         }
     }
 
-    private static async sendContent(content: MessageCreateOptions, channel: TextBasedChannel): Promise<Message> {
+    private static async sendContent(options: SendContentOptions): Promise<Message> {
+        const { content, channel } = options;
         let resendError: any = null;
         let message: Message<boolean>
         await channel.send(content)
             .then((msg: Message<boolean>) => {
                 message = msg;
             })
-            .catch(error => {
+            .catch(async error => {
+                if (error.code !== 429) throw new Error(error.message ? error.message : error);
                 resendError = error;
             });
         while (!message && resendError && resendError.code === 429) {
@@ -137,7 +157,10 @@ export class NewsUtils {
                 .then((msg: Message<boolean>) => {
                     message = msg;
                 })
-                .catch(error => (resendError = error));
+                .catch(async error => {
+                    if (error.code !== 429) throw new Error(error.message ? error.message : error);
+                    resendError = error;
+                });
         }
 
         return message;
