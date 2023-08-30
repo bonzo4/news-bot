@@ -81,11 +81,11 @@ export class NewsUtils {
                         components,
                     }, channel);
 
-                    if (hasThread) await message.startThread({
+                    if (message && hasThread) await message.startThread({
                         name: ''
                     }).catch(() => null)
 
-                    if (reactions) {
+                    if (message && reactions) {
                         for (const reaction of reactions) {
                             await message.react(reaction).catch(() => null);
                         }
@@ -100,7 +100,7 @@ export class NewsUtils {
                     components,
                 }, channel);
                 
-                if (reactions) {
+                if (message && reactions) {
                     for (const reaction of reactions) {
                         await message.react(reaction).catch(() => null);
                     }
