@@ -3,7 +3,9 @@ import { ActionRowBuilder, ButtonBuilder } from 'discord.js';
 import { EmbedDoc } from './database/embed-db-utils.js';
 import { LinkDbUtils } from './database/link-db-utils.js';
 import { PollChoicesDbUtils } from './database/poll-choice-db-utils.js';
+import { Poll } from './database/poll-db-utils.js';
 import { QuizChoicesDbUtils } from './database/quiz-choice-db-utils.js';
+import { Quiz } from './database/quiz-db-utils.js';
 import { InteractionType } from './news-utils.js';
 import { directButtons } from '../buttons/direct-button-event.js';
 import { inputButton } from '../buttons/input-button-event.js';
@@ -42,13 +44,15 @@ export class ComponentUtils {
 
             switch (interactionType) {
                 case 'POLL': {
-                    const choices = await PollChoicesDbUtils.getChoicesByPollId(interaction.id);
-                    component = pollButtons(choices);
+                    const poll = interaction as Poll;
+                    const choices = await PollChoicesDbUtils.getChoicesByPollId(poll.id);
+                    component = pollButtons(choices, poll.randomized);
                     break;
                 }
                 case 'QUIZ': {
-                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(interaction.id);
-                    component = quizButtons(choices);
+                    const quiz = interaction as Quiz;
+                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(quiz.id);
+                    component = quizButtons(choices, quiz.randomized);
                     break;
                 }
                 case 'INPUT':
@@ -88,13 +92,15 @@ export class ComponentUtils {
 
             switch (interactionType) {
                 case 'POLL': {
-                    const choices = await PollChoicesDbUtils.getChoicesByPollId(interaction.id);
-                    component = pollButtons(choices);
+                    const poll = interaction as Poll;
+                    const choices = await PollChoicesDbUtils.getChoicesByPollId(poll.id);
+                    component = pollButtons(choices, poll.randomized);
                     break;
                 }
                 case 'QUIZ': {
-                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(interaction.id);
-                    component = quizButtons(choices);
+                    const quiz = interaction as Quiz;
+                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(quiz.id);
+                    component = quizButtons(choices, quiz.randomized);
                     break;
                 }
                 case 'INPUT':
@@ -142,13 +148,15 @@ export class ComponentUtils {
 
             switch (interactionType) {
                 case 'POLL': {
-                    const choices = await PollChoicesDbUtils.getChoicesByPollId(interaction.id);
-                    component = pollButtons(choices);
+                    const poll = interaction as Poll;
+                    const choices = await PollChoicesDbUtils.getChoicesByPollId(poll.id);
+                    component = pollButtons(choices, poll.randomized);
                     break;
                 }
                 case 'QUIZ': {
-                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(interaction.id);
-                    component = quizButtons(choices);
+                    const quiz = interaction as Quiz;
+                    const choices = await QuizChoicesDbUtils.getChoicesByQuizId(quiz.id);
+                    component = quizButtons(choices, quiz.randomized);
                     break;
                 }
                 case 'INPUT':

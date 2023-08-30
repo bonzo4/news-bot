@@ -11,6 +11,7 @@ import { QuizDbUtils } from '../utils/database/quiz-db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
 type Result = {
+    id: number;
     text: string;
     votes: number;
     emoji: string;
@@ -24,10 +25,12 @@ function* quizStyler(): Generator<ButtonStyle> {
     }
 }
 
-export function quizButtons(choices: QuizChoice[]): ActionRowBuilder<ButtonBuilder>[] {
+export function quizButtons(choices: QuizChoice[], randomized: boolean): ActionRowBuilder<ButtonBuilder>[] {
     if (choices.length < 0) return [];
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const randomChoices = choices.sort(() => Math.random() - 0.5);
+    const randomChoices = randomized
+        ? choices.sort(() => Math.random() - 0.5)
+        : choices;
     const quizStyle = quizStyler();
     randomChoices.forEach(choice => {
         const button = new ButtonBuilder()
@@ -59,7 +62,7 @@ export function quizButtons(choices: QuizChoice[]): ActionRowBuilder<ButtonBuild
 
 export class QuizButtons implements Button {
     ids: string[] = ['quiz'];
-    deferType = ButtonDeferType.REPLY;
+    deferType = ButtonDeferType.NONE;
     cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
@@ -78,13 +81,20 @@ export class QuizButtons implements Button {
                     quizId
                 );
                 if (!interactionDoc) {
-                    await InteractionUtils.warn(intr, 'Please vote to view the results.');
+                    const embeds = intr.message.embeds
+                    const components = intr.message.components
+                    await intr.reply({
+                        content: '⚠┃You have not answered yet.',
+                        embeds,
+                        components,
+                        ephemeral: true
+                    })
                     return;
                 }
                 const results = await this.getResults(quizId);
                 const resultsMessage = `**Results**\n\n*Question*: ${
                     quiz.question
-                }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
+                    }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.quiz_choice_id))}`;
                 await InteractionUtils.success(intr, resultsMessage);
                 // await InteractionDbUtils.createInteraction({
                 //     user_id: userData.id,
@@ -112,7 +122,10 @@ export class QuizButtons implements Button {
                 quiz.id
             );
             if (interactionDoc) {
-                await InteractionUtils.warn(intr, 'You already voted.');
+                const results = await this.getResults(quiz.id);
+                const resultsMessage = `**Results**\n\n*Question*: ${quiz.question
+                    }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.quiz_choice_id))}`;
+                await InteractionUtils.success(intr, resultsMessage);
                 // await InteractionDbUtils.createInteraction({
                 //     user_id: userData.id,
                 //     news_id: interactionDoc.news_id,
@@ -133,7 +146,7 @@ export class QuizButtons implements Button {
 
             const resultsMessage = `Thank you for voting.\n\n**⚫┃Results**\n\n❓┃*Question*: ${
                 quiz.question
-            }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results)}`;
+            }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === choice.id))}`;
 
             await InteractionUtils.success(intr, resultsMessage);
         } catch (error) {
@@ -154,6 +167,7 @@ export class QuizButtons implements Button {
         return choices
             .map(choice => {
                 return {
+                    id: choice.id,
                     text: choice.text,
                     votes: choice.votes,
                     emoji: choice.emoji,
@@ -162,11 +176,15 @@ export class QuizButtons implements Button {
             .sort((a, b) => b.votes - a.votes);
     }
 
-    private formateResults(results: Result[]): string {
+    private formateResults(results: Result[], vote: Result): string {
+        const totalVotes = results.reduce((a, b) => a + b.votes, 0);
         let text = '';
-        results.forEach(result => {
-            text += `${result.emoji}┃${result.text}: ${result.votes}\n`;
+        results.forEach((result, index) => {
+            const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
+            text += vote === result
+                ? `${index}. ${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n` 
+                : `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n`;
         });
-        return text;
+        return text + `\nTotal votes: ${totalVotes}`;
     }
 }

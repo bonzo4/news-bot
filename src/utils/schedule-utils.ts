@@ -291,6 +291,7 @@ export class ScheduledNews extends CronJob {
                 embed: guildEmbed,
                 components,
                 tag: embed.tag,
+                reactions: embed.reactions,
             });
         }
 
@@ -305,6 +306,8 @@ export class ScheduledNews extends CronJob {
                     tags: guildTags,
                     channel,
                     mention,
+                    hasMention: news.has_mention,
+                    hasThread: news.has_thread,
                     content: contentForGuild,
                 });
             } catch (err) {
@@ -335,6 +338,7 @@ export class ScheduledNews extends CronJob {
                 embed: directEmbed,
                 components,
                 tag: embed.tag,
+                reactions: embed.reactions,
             });
         }
 

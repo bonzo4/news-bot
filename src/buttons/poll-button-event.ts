@@ -11,6 +11,7 @@ import { PollDbUtils } from '../utils/database/poll-db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
 type Result = {
+    id: number;
     text: string;
     votes: number;
     emoji: string;
@@ -24,10 +25,12 @@ function* pollStyler(): Generator<ButtonStyle> {
     }
 }
 
-export function pollButtons(choices: PollChoice[]): ActionRowBuilder<ButtonBuilder>[] {
+export function pollButtons(choices: PollChoice[], randomized: boolean): ActionRowBuilder<ButtonBuilder>[] {
     if (choices.length < 0) return [];
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const randomChoices = choices.sort(() => Math.random() - 0.5);
+    const randomChoices = randomized ?
+        choices.sort(() => Math.random() - 0.5) :
+        choices;
     const pollStyle = pollStyler();
     randomChoices.forEach(choice => {
         const button = new ButtonBuilder()
@@ -59,7 +62,7 @@ export function pollButtons(choices: PollChoice[]): ActionRowBuilder<ButtonBuild
 
 export class PollButtons implements Button {
     ids: string[] = ['poll'];
-    deferType = ButtonDeferType.REPLY;
+    deferType = ButtonDeferType.NONE;
     cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
@@ -78,14 +81,21 @@ export class PollButtons implements Button {
                     pollId
                 );
                 if (!interactionDoc) {
-                    await InteractionUtils.warn(intr, 'Please vote to view the results.');
+                    const embeds = intr.message.embeds
+                    const components = intr.message.components
+                    await intr.reply({
+                        content: '⚠┃You have not voted yet.',
+                        embeds,
+                        components,
+                        ephemeral: true
+                    })
                     return;
                 }
                 const results = await this.getResults(pollId);
 
                 const resultsMessage = `**Results**\n\n❓┃*Question*: ${
                     poll.question
-                }\n\n${this.formateResults(results)}`;
+                }\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.poll_choice_id))}`;
                 await InteractionUtils.success(intr, resultsMessage);
                 // await InteractionDbUtils.createInteraction({
                 //     user_id: userData.id,
@@ -113,7 +123,11 @@ export class PollButtons implements Button {
                 poll.id
             );
             if (interactionDoc) {
-                await InteractionUtils.warn(intr, 'You already voted.');
+                const results = await this.getResults(poll.id);
+                const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
+                    poll.question
+                }\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.poll_choice_id))}`;
+                await InteractionUtils.success(intr, resultsMessage);
                 // await InteractionDbUtils.createInteraction({
                 //     user_id: userData.id,
                 //     news_id: interactionDoc.news_id,
@@ -134,7 +148,7 @@ export class PollButtons implements Button {
             const results = await this.getResults(poll.id);
             const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
                 poll.question
-            }\n\n${this.formateResults(results)}`;
+            }\n\n${this.formateResults(results, results.find(result => result.id === choice.id))}`;
 
             await InteractionUtils.success(intr, resultsMessage);
         } catch (error) {
@@ -156,6 +170,7 @@ export class PollButtons implements Button {
         return choices
             .map(choice => {
                 return {
+                    id: choice.id,
                     text: choice.text,
                     votes: choice.votes,
                     emoji: choice.emoji,
@@ -164,12 +179,14 @@ export class PollButtons implements Button {
             .sort((a, b) => b.votes - a.votes);
     }
 
-    private formateResults(results: Result[]): string {
+    private formateResults(results: Result[], vote: Result): string {
         const totalVotes = results.reduce((a, b) => a + b.votes, 0);
         let text = '';
-        results.forEach(result => {
+        results.forEach((result, index) => {
             const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
-            text += `${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
+            text += vote === result
+                ? `${index}. ${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n` 
+                : `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n`;
         });
         return text + `\nTotal votes: ${totalVotes}`;
     }

@@ -49,6 +49,8 @@ export class NewsChannelsUtils {
                 channel,
                 mention: ' ',
                 content: contentToSend,
+                hasMention: false,
+                hasThread: false,
             });
         }
     }
