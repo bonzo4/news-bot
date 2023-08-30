@@ -93,7 +93,8 @@ export class NewsUtils {
                         },
                         channel,
                     });
-                    if (message && hasThread) await message.startThread({
+                    const guildId = channel.guildId;
+                    if (guildId == '970903470842458132' && message && hasThread) await message.startThread({
                         name: message.embeds[0].title,
                     }).catch(() => null)
 

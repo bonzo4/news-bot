@@ -52,6 +52,8 @@ export class ReactionHandler implements EventHandler {
             guild: msg.guild,
         });
 
+        
+
         // Execute the reaction
         await reaction.execute(msgReaction, msg, reactor, data);
     }
