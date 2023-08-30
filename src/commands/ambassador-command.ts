@@ -28,7 +28,7 @@ export class AmbassadorCommand implements Command {
 
         let referralAllString = '';
         let referralCount = 0;
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 10; i++) {
             const referral = referrals[i];
             if (!referral) continue;
             const guild = await GuildDbUtils.getGuildById(referral.guild_id);
@@ -37,7 +37,7 @@ export class AmbassadorCommand implements Command {
             ).toLocaleDateString()}\n`;
             referralCount += 1;
         }
-        if (referrals.length > 20) {
+        if (referrals.length > 10) {
             referralAllString += `**...** ${referrals.length - referralCount} more`;
         }
 
