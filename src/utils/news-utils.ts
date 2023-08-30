@@ -94,7 +94,7 @@ export class NewsUtils {
                         channel,
                     });
                     if (message && hasThread) await message.startThread({
-                        name: ''
+                        name: message.embeds[0].title,
                     }).catch(() => null)
 
                     if (message && reactions) {
