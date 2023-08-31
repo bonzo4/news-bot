@@ -182,7 +182,7 @@ export class QuizButtons implements Button {
         results.forEach((result, index) => {
             const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
             text += vote === result
-                ? `✅┃${index}. ${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n` 
+                ? `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n` 
                 : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
         });
         return text + `\nTotal votes: ${totalVotes}`;
