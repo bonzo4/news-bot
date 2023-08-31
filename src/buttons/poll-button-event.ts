@@ -185,19 +185,19 @@ export class PollButtons implements Button {
         results.forEach((result, index) => {
             const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
             text += vote === result
-                ? `✅┃${index}. ${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n` 
-                : `${this.getNumberEmoji(index)}┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n`;
+                ? `✅┃${index}. ${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n` 
+                : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
         });
         return text + `\nTotal votes: ${totalVotes}`;
     }
 
     private getNumberEmoji(number: number): string {
         switch (number) {
-            case 1: return '1️⃣';
-            case 2: return '2️⃣';
-            case 3: return '3️⃣';
-            case 4: return '4️⃣';
-            case 5: return '5️⃣';
+            case 0: return '1️⃣';
+            case 1: return '2️⃣';
+            case 2: return '3️⃣';
+            case 3: return '4️⃣';
+            case 4: return '5️⃣';
         }
     }
 }
