@@ -81,40 +81,20 @@ export class NewsUtils {
                 },
                 channel,
             });
+            await new Promise(resolve => setTimeout(resolve, 5000));
         }
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
-            // if (!sentFirstEmbed) {
-            //     if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
-            //         const message = await this.sendContent({
-            //             content: {
-            //                 embeds: [embed],
-            //                 components,
-            //             },
-            //             channel,
-            //         });
-            //         const guildId = channel.guildId;
-            //         if ( message && hasThread) await message.startThread({
-            //             name: message.embeds[0].title,
-            //         }).catch(() => null)
-
-            //         if (message && reactions) {
-            //             for (const reaction of reactions) {
-            //                 await message.react(reaction).catch(() => null);
-            //             }
-            //         }
-            //         sentFirstEmbed = true;
-            //     }
-            //     continue;
-            // }
             if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
-               const message = await this.sendContent({
-                        content: {
-                            embeds: [embed],
-                            components,
-                        },
-                        channel,
-                    });
+                const message = await this.sendContent({
+                    content: {
+                        embeds: [embed],
+                        components,
+                    },
+                    channel,
+                });
+                
+                if (index === 0) await new Promise(resolve => setTimeout(resolve, 5000));
                 
                 if (message && reactions) {
                     for (const reaction of reactions) {
@@ -122,7 +102,7 @@ export class NewsUtils {
                     }
                 }
 
-                if (index == content.length - 1 && hasThread) await message.startThread({
+                if (index === content.length - 1 && hasThread) await message.startThread({
                     name: 'Syndicate Network Discussion',
                 }).catch(() => null)
             }
