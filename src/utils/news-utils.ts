@@ -3,6 +3,7 @@ import {
     ButtonBuilder,
     Client,
     DMChannel,
+    EmbedBuilder,
     Guild,
     GuildTextBasedChannel,
     Message,
@@ -72,9 +73,18 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 10000));
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
+
+        const message = await this.sendContent({
+            content: {
+                embeds: [new EmbedBuilder().setTitle('Syndicate')],
+            },
+            channel
+        })
+
+        await message.delete().catch(() => null);
+
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({
                 content: {
