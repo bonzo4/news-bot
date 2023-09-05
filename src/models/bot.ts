@@ -510,7 +510,9 @@ export class Bot {
     private async onNewsSent(newsId: number, shard: number): Promise<void> {
         try {
             const syndicateGuild = this.options.client.guilds.cache.get(config.syndicateGuildId);
-            if (!syndicateGuild) return;
+            if (!syndicateGuild) {
+                process.exit();
+            }
             const news = await NewsDbUtils.getNews(newsId);
             if (!news) {
                 return;
@@ -523,7 +525,7 @@ export class Bot {
             }
             await adminChannel.send(`Shard (${shard + 1}/${7}) finished sending news ${newsId}, now restarting...`);
 
-            process.exit(0);
+             process.exit();
         } catch (error) {
             await Logger.error({
                 message: `Failed to send news sent notification for news ${newsId}`,
