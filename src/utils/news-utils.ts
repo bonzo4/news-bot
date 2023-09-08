@@ -73,6 +73,7 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
@@ -84,8 +85,6 @@ export class NewsUtils {
         }).then(async message => {
                 await message.delete().catch(() => null);
         });
-
-        await new Promise(resolve => setTimeout(resolve, 10000));
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({

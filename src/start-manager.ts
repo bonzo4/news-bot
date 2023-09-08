@@ -58,7 +58,7 @@ async function start(): Promise<void> {
     //     return;
     // }
 
-    const shardCount = 7;
+    const shardCount = 8;
 
     const shardList = Array.from({ length: shardCount }, (_, i) => i);
 
