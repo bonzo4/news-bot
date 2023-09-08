@@ -76,14 +76,16 @@ export class NewsUtils {
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
-        const message = await this.sendContent({
+        await this.sendContent({
             content: {
                 embeds: [new EmbedBuilder().setTitle('Syndicate')],
             },
             channel
-        })
+        }).then(async message => {
+                await message.delete().catch(() => null);
+        });
 
-        await message.delete().catch(() => null);
+        await new Promise(resolve => setTimeout(resolve, 10000));
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({
@@ -91,7 +93,7 @@ export class NewsUtils {
                     content: mention,
                 },
                 channel,
-            });
+            })
         }
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
