@@ -48,7 +48,7 @@ export class NewsDbUtils {
             .from('_news_tags')
             .select('news_id')
             .in('tag', ['news'])
-            .order('created_at', { ascending: false })
+            .order('news_id', { ascending: false })
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
@@ -68,7 +68,7 @@ export class NewsDbUtils {
             .from('_news_tags')
             .select('news_id')
             .in('tag', ['news'])
-            .order('created_at', { ascending: false })
+            .order('news_id', { ascending: false })
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
