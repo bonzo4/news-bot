@@ -12,7 +12,7 @@ export class NewsChannelsUtils {
     public static async sendLastThreeForGuild(channel: GuildTextBasedChannel): Promise<void> {
         const tags = await TagDbUtils.getAllGuildTags(channel.guildId);
 
-        const lastThreeNews = await NewsDbUtils.getLastThreeGuildApprovedNews(tags);
+        const lastThreeNews = await NewsDbUtils.getLastThreeGuildApprovedNews();
 
         for (const news of lastThreeNews) {
             const embeds = await EmbedDbUtils.getEmbedsByNewsId(news.id);

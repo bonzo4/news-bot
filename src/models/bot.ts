@@ -125,10 +125,13 @@ export class Bot {
         this.options.client.on(
             'weeklyUpdate',
             async () => await this.updateAllGuildInvitesAndAnnouncementChannels()
-        )
-        this.options.client.on('guildBanner', async ({ bannerUrl, guildId }: { bannerUrl: string, guildId: string }) => {
-            await this.guildBanner(bannerUrl, guildId, this.options.client);
-        });
+        );
+        this.options.client.on(
+            'guildBanner',
+            async ({ bannerUrl, guildId }: { bannerUrl: string; guildId: string }) => {
+                await this.guildBanner(bannerUrl, guildId, this.options.client);
+            }
+        );
         this.options.client.on(
             'guildReferral',
             async ({ guildId, userId }: { guildId: string; userId: string }) => {
@@ -521,9 +524,9 @@ export class Bot {
             if (!adminChannel) {
                 return;
             }
-            await adminChannel.send(`Shard (${shard + 1}/${7}) finished sending news ${newsId}, now restarting...`);
-
-            
+            await adminChannel.send(
+                `Shard (${shard + 1}/${8}) finished sending news ${newsId}, now restarting...`
+            );
         } catch (error) {
             await Logger.error({
                 message: `Failed to send news sent notification for news ${newsId}`,
@@ -602,7 +605,7 @@ export class Bot {
                 iconURL: config.syndicateIcon,
             })
             .setTimestamp();
-        
+
         if (guildDoc.invite) embed.setURL(guildDoc.invite);
 
         await guildReferralChannel.send({ embeds: [embed] });
