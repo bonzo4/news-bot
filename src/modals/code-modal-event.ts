@@ -10,10 +10,18 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
 import { EventData } from '../models/internal-models.js';
 import { UserDbUtils } from '../utils/database/user-db-utils.js';
+import { UserReferralDbUtils } from '../utils/database/user-referrals-db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
 export function codeModal(trial: boolean): ModalBuilder {
     const modal = new ModalBuilder().setTitle('Syndicate News').setCustomId(`code_${trial}`);
+
+    const referrer = new TextInputBuilder()
+        .setCustomId('referrer')
+        .setLabel('Did someone recruit you?(optional)')
+        .setPlaceholder('Enter recruitment code')
+        .setStyle(TextInputStyle.Short)
+        .setRequired(false);
 
     const referral = new TextInputBuilder()
         .setCustomId('code')
@@ -22,7 +30,7 @@ export function codeModal(trial: boolean): ModalBuilder {
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
-    const row = new ActionRowBuilder<TextInputBuilder>().addComponents([referral]);
+    const row = new ActionRowBuilder<TextInputBuilder>().addComponents([referrer, referral]);
 
     modal.addComponents([row]);
 
@@ -35,6 +43,7 @@ export class CodeModal implements ModalSubmit {
     deferType = ModalDeferType.REPLY;
 
     async execute(intr: ModalSubmitInteraction, data: EventData): Promise<void> {
+        const referrerCode = intr.fields.getTextInputValue('referrer');
         const code = intr.fields.getTextInputValue('code');
 
         if (!code) {
@@ -54,6 +63,15 @@ export class CodeModal implements ModalSubmit {
         }
 
         const trial = intr.customId.split('_')[1] === 'true';
+
+        if (referrerCode && referrerCode !== code && referrerCode !== '') {
+            const referrer = await UserDbUtils.getUserByReferralCode(referrerCode);
+            if (!referrer) {
+                await InteractionUtils.warn(intr, 'That referral code is invalid.');
+                return;
+            }
+            await UserReferralDbUtils.createReferral(data.userData.id, referrer.id);
+        }
 
         await UserDbUtils.updateUser(data.userData.id, {
             referral_code: code,
