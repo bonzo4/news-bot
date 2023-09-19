@@ -18,7 +18,7 @@ export function codeModal(trial: boolean): ModalBuilder {
 
     const referrer = new TextInputBuilder()
         .setCustomId('referrer')
-        .setLabel('Did you get recruited?')
+        .setLabel('Did someone recruit you?(optional)')
         .setPlaceholder('Enter recruitment code')
         .setStyle(TextInputStyle.Short)
         .setRequired(false);
@@ -30,9 +30,11 @@ export function codeModal(trial: boolean): ModalBuilder {
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
 
-    const row = new ActionRowBuilder<TextInputBuilder>().addComponents([referrer, referral]);
+    const referrerRow = new ActionRowBuilder<TextInputBuilder>().addComponents([referrer]);
 
-    modal.addComponents([row]);
+    const referralRow = new ActionRowBuilder<TextInputBuilder>().addComponents([referral]);
+
+    modal.addComponents([referrerRow, referralRow]);
 
     return modal;
 }
