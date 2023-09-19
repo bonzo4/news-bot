@@ -1,4 +1,4 @@
-import { supabase } from '.';
+import { supabase } from './index.js';
 
 export class UserReferralDbUtils {
     public static async createReferral(userId: string, referralId: string): Promise<void> {
