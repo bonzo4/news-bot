@@ -18,7 +18,7 @@ export function codeModal(trial: boolean): ModalBuilder {
 
     const referrer = new TextInputBuilder()
         .setCustomId('referrer')
-        .setLabel('Did someone recruit you?(optional)')
+        .setLabel('Did get recruited?(optional)')
         .setPlaceholder('Enter recruitment code')
         .setStyle(TextInputStyle.Short)
         .setRequired(false);
