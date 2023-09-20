@@ -112,16 +112,6 @@ export const GeneralCommandMetadata: {
         default_member_permissions: undefined,
         options: [],
     },
-    trial: {
-        type: ApplicationCommandType.ChatInput,
-        name: `trial`,
-        name_localizations: {},
-        description: 'Become a trial member of the Syndicate Network.',
-        description_localizations: {},
-        dm_permission: true,
-        default_member_permissions: undefined,
-        options: [],
-    },
 };
 
 // export const ChatCommandMetadata: {

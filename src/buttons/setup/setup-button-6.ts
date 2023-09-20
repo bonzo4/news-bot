@@ -36,7 +36,7 @@ export class SetupReferralButtons implements Button {
         try {
             const referral = await ReferralDbUtils.getGuildReferralByGuild(intr.guildId);
 
-            if (referral.user_id) {
+            if (referral.discord_user_id) {
                 await InteractionUtils.warn(
                     intr,
                     `You have already set up a referral for this server.`

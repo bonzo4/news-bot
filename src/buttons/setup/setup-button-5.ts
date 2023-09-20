@@ -31,7 +31,7 @@ export class SetupMentionButtons implements Button {
         try {
             if (intr.customId.split('_')[1] === 'next') {
                 const referral = await ReferralDbUtils.getGuildReferralByGuild(intr.guildId);
-                if (referral.user_id) {
+                if (referral.discord_user_id) {
                     if (intr.message.deletable) await intr.message.delete();
                     await intr.channel.send({
                         embeds: [SetupMessages.systemMessage()],

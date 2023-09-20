@@ -31,7 +31,6 @@ import { ApproveCommand } from './commands/news/approve-command.js';
 import { DirectCommand } from './commands/news/direct-command.js';
 import { NewsCommand } from './commands/news/news-command.js';
 import { UnsubscribeCommand } from './commands/news/unsubscribe-command.js';
-import { TrialCommand } from './commands/trial-command.js';
 import { config } from './config/config.js';
 import { ChannelDeleteHandler } from './events/channel-delete-handler.js';
 import {
@@ -100,7 +99,6 @@ async function start(): Promise<void> {
         new ChannelCommand(),
         new ApproveCommand(),
         new AmbassadorCommand(),
-        new TrialCommand(),
         new SetupCommand(),
         new ReferralCommand(),
         new MentionCommand(),

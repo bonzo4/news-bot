@@ -9,12 +9,12 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
 import { EventData } from '../models/internal-models.js';
-import { UserDbUtils } from '../utils/database/user-db-utils.js';
+import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
 import { UserReferralDbUtils } from '../utils/database/user-referrals-db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
-export function codeModal(trial: boolean): ModalBuilder {
-    const modal = new ModalBuilder().setTitle('Syndicate News').setCustomId(`code_${trial}`);
+export function codeModal(): ModalBuilder {
+    const modal = new ModalBuilder().setTitle('Syndicate News').setCustomId(`code`);
 
     const referrer = new TextInputBuilder()
         .setCustomId('referrer')
@@ -53,33 +53,30 @@ export class CodeModal implements ModalSubmit {
             return;
         }
 
-        if (data.userData.referral_code) {
+        let referralCode = await AmbassadorCodeDbUtils.getCodeByDiscordId(data.userData.id);
+
+        if (referralCode) {
             await InteractionUtils.warn(intr, 'You already have a referral code set.');
             return;
         }
 
-        const user = await UserDbUtils.getUserByReferralCode(code);
-        if (user) {
+        referralCode = await AmbassadorCodeDbUtils.getCodeByCode(code);
+
+        if (referralCode) {
             await InteractionUtils.warn(intr, 'That referral code is already in use.');
             return;
         }
 
-        const trial = intr.customId.split('_')[1] === 'true';
-
         if (referrerCode && referrerCode !== code && referrerCode !== '') {
-            const referrer = await UserDbUtils.getUserByReferralCode(referrerCode);
+            const referrer = await AmbassadorCodeDbUtils.getCodeByCode(code);
             if (!referrer) {
-                await InteractionUtils.warn(intr, 'That referral code is invalid.');
+                await InteractionUtils.warn(intr, 'That recruitment code is invalid.');
                 return;
             }
-            await UserReferralDbUtils.createReferral(data.userData.id, referrer.id);
+            await UserReferralDbUtils.createReferral(data.userData.id, referrer.discord_id);
         }
 
-        await UserDbUtils.updateUser(data.userData.id, {
-            referral_code: code,
-            user_role: 'STAFF',
-            staff_role: trial ? 'TRIAL' : 'AMBASSADOR',
-        });
+        await AmbassadorCodeDbUtils.createCode(data.userData.id, code);
 
         await InteractionUtils.success(intr, 'Thank you for becoming a Syndicate Ambassador!');
     }

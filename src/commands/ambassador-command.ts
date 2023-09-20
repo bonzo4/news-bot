@@ -4,6 +4,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 import { Command, CommandDeferType } from './index.js';
 import { codeModal } from '../modals/code-modal-event.js';
 import { EventData } from '../models/internal-models.js';
+import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
 import { GuildDbUtils, InteractionUtils, ReferralDbUtils } from '../utils/index.js';
 
 export class AmbassadorCommand implements Command {
@@ -12,18 +13,20 @@ export class AmbassadorCommand implements Command {
     deferType = CommandDeferType.NONE;
 
     async execute(intr: CommandInteraction, data: EventData): Promise<void> {
-        if (!data.userData.referral_code) {
-            const modal = codeModal(false);
+        const referralCode = await AmbassadorCodeDbUtils.getCodeByDiscordId(data.userData.id);
+
+        if (!referralCode) {
+            const modal = codeModal();
             await intr.showModal(modal);
             return;
         }
 
-        const referrals = await ReferralDbUtils.getReferralsByUser(data.userData.id);
+        const referrals = await ReferralDbUtils.getReferralsByUserId(data.userData.id);
 
         const referralString = `⚫┃Thank you for being ${
             data.userData.staff_role === 'TRIAL' ? 'a trial' : 'an'
         } Ambassador of the Syndicate Discord server!\n🔗┃Referral Code: **${
-            data.userData.referral_code
+            referralCode.code
         }**\n👥┃Referrals: ${referrals.length} Total`;
 
         let referralAllString = '';
