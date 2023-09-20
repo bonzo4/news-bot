@@ -68,7 +68,7 @@ export class CodeModal implements ModalSubmit {
         }
 
         if (referrerCode && referrerCode !== code && referrerCode !== '') {
-            const referrer = await AmbassadorCodeDbUtils.getCodeByCode(code);
+            const referrer = await AmbassadorCodeDbUtils.getCodeByCode(referrerCode);
             if (!referrer) {
                 await InteractionUtils.warn(intr, 'That recruitment code is invalid.');
                 return;
