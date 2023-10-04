@@ -2,6 +2,7 @@ import { REST } from '@discordjs/rest';
 import { Options, Partials } from 'discord.js';
 import { createRequire } from 'node:module';
 
+import { AmbassadorButtons } from './buttons/ambassador-button-event.js';
 import { ApproveNewsButtons } from './buttons/approve-button-event.js';
 import { ChannelButtons } from './buttons/channel-button-event.js';
 import { DirectButtons } from './buttons/direct-button-event.js';
@@ -125,6 +126,7 @@ async function start(): Promise<void> {
         new ApproveNewsButtons(),
         new SetupChainButtons(),
         new ProfileButtons(),
+        new AmbassadorButtons(),
     ];
 
     let menus: Menu[] = [

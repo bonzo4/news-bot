@@ -43,7 +43,7 @@ export function ambassadorButtons(page: number = 0): ActionRowBuilder<ButtonBuil
     ]);
 }
 
-export class ProfileButtons implements Button {
+export class AmbassadorButtons implements Button {
     ids: string[] = ['ambassador'];
     deferType = ButtonDeferType.REPLY;
     cooldown = new RateLimiter(1, 5000);
