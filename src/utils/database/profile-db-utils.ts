@@ -17,13 +17,14 @@ export default class ProfileDbUtils {
         return data;
     }
 
-    public static async createProfile(discordUser: UserDoc): Promise<Profile> {
+    public static async createProfile(discordUser: UserDoc, points: number = 0): Promise<Profile> {
         const { data, error } = await supabase
             .from('profiles')
             .insert({
                 icon: discordUser.icon,
                 name: discordUser.name,
                 discord_id: discordUser.id,
+                points,
             })
             .select('*')
             .single();

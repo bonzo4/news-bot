@@ -46,7 +46,8 @@ export class ProfileButtons implements Button {
             let profile = await ProfileDbUtils.getProfileByDiscordId(data.userData.id);
 
             if (!profile) {
-                profile = await ProfileDbUtils.createProfile(data.userData);
+                const points = await DiscordActionDbUtils.getPointsByUserId(data.userData.id);
+                profile = await ProfileDbUtils.createProfile(data.userData, points);
                 if (!profile) {
                     await InteractionUtils.error(
                         intr,
