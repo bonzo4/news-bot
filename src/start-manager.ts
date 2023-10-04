@@ -61,7 +61,7 @@ async function start(): Promise<void> {
     // }
 
     // get total guilds
-    let totalShards = 9;
+    let totalShards = 10;
 
     let shardList = MathUtils.range(0, totalShards);
 

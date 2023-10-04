@@ -44,8 +44,12 @@ export class CommandHandler implements EventHandler {
                 : [intr.commandName];
         let commandName = commandParts.join(' ');
 
+        console.log(commandParts);
+        console.log(commandName);
+
         // Try to find the command the user wants
         let command = CommandUtils.findCommand(this.commands, commandParts);
+        console.log(command);
         if (!command) {
             await Logger.error({
                 message: Logs.error.commandNotFound
