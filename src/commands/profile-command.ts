@@ -16,7 +16,7 @@ import { GuildDbUtils, InteractionUtils } from '../utils/index.js';
 export class ProfileCommand implements Command {
     names = ['profile'];
     cooldown = new RateLimiter(1, 5000);
-    deferType = CommandDeferType.NONE;
+    deferType = CommandDeferType.HIDDEN;
 
     async execute(intr: CommandInteraction, data: EventData): Promise<void> {
         try {
