@@ -1,10 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { setupReferralButtons } from './setup-button-6.js';
 import { SetupMessages } from '../../messages/setup.js';
 import { Logger } from '../../services/logger.js';
-import { InteractionUtils, ReferralDbUtils } from '../../utils/index.js';
+import { InteractionUtils } from '../../utils/index.js';
 import { Button, ButtonDeferType } from '../button.js';
 import { systemButtons, systemLinks } from '../system.js';
 
@@ -12,7 +11,7 @@ export function setupMentionButtons(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents([
         new ButtonBuilder()
             .setCustomId('setupPingRole_next')
-            .setLabel('Next')
+            .setLabel('Finish')
             .setStyle(ButtonStyle.Secondary)
             .setEmoji('➡️'),
     ]);
@@ -29,20 +28,12 @@ export class SetupMentionButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
+            // 1. If they press Finish, finish the setup
             if (intr.customId.split('_')[1] === 'next') {
-                const referral = await ReferralDbUtils.getGuildReferralByGuild(intr.guildId);
-                if (referral.discord_user_id) {
-                    if (intr.message.deletable) await intr.message.delete();
-                    await intr.channel.send({
-                        embeds: [SetupMessages.systemMessage()],
-                        components: [systemLinks(), systemButtons()],
-                    });
-                    return;
-                }
                 if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({
-                    embeds: [SetupMessages.referral()],
-                    components: [setupReferralButtons()],
+                    embeds: [SetupMessages.systemMessage()],
+                    components: [systemLinks(), systemButtons()],
                 });
                 return;
             }

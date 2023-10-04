@@ -7,7 +7,7 @@ import { Poll } from './database/poll-db-utils.js';
 import { QuizChoicesDbUtils } from './database/quiz-choice-db-utils.js';
 import { Quiz } from './database/quiz-db-utils.js';
 import { InteractionType } from './news-utils.js';
-import { directButtons } from '../buttons/direct-button-event.js';
+import { directButtons, unsubscribeButtons } from '../buttons/direct-button-event.js';
 import { inputButton } from '../buttons/input-button-event.js';
 import {
     linkButton,
@@ -15,6 +15,7 @@ import {
     linkButtonForGuild,
 } from '../buttons/link-button-event.js';
 import { pollButtons } from '../buttons/poll-button-event.js';
+import { profileButtons } from '../buttons/profile-button-event.js';
 import { quizButtons } from '../buttons/quiz-button-event.js';
 
 type GetComponentsOptions = {
@@ -65,6 +66,9 @@ export class ComponentUtils {
                 }
                 case 'DIRECT':
                     component = [directButtons(interaction.id)];
+                    break;
+                case 'PROFILE':
+                    component = [profileButtons(interaction.id)];
                     break;
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');
@@ -122,6 +126,9 @@ export class ComponentUtils {
                 case 'DIRECT':
                     component = [directButtons(interaction.id)];
                     break;
+                case 'PROFILE':
+                    component = [profileButtons(interaction.id)];
+                    break;
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');
                 // component = getPromoComponents(interaction as Promo);
@@ -176,7 +183,10 @@ export class ComponentUtils {
                     break;
                 }
                 case 'DIRECT':
-                    component = [directButtons(interaction.id)];
+                    component = [unsubscribeButtons(interaction.id)];
+                    break;
+                case 'PROFILE':
+                    component = [profileButtons(interaction.id)];
                     break;
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');

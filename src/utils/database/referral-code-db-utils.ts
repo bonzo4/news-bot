@@ -1,16 +1,14 @@
 import { supabase } from './index.js';
 import { Database } from '../../types/supabase.js';
 
-export type AmbassadorCode = Database['public']['Tables']['ambassador_codes']['Row'];
+export type ReferralCode = Database['public']['Tables']['referral_codes']['Row'];
 
-export class AmbassadorCodeDbUtils {
-    public static async getCodes(): Promise<AmbassadorCode[]> {
+export default class ReferralCodeDbUtils {
+    public static async getCodes(): Promise<ReferralCode[]> {
         const { data, error } = await supabase
             .from('ambassador_codes')
             .select()
             .order('last_accessed', { ascending: false })
-            .neq('last_accessed', null)
-            .neq('last_accessed', null)
             .limit(25);
 
         if (error || !data) return [];
@@ -18,9 +16,9 @@ export class AmbassadorCodeDbUtils {
         return data;
     }
 
-    public static async getCodeByDiscordId(discordId: string): Promise<AmbassadorCode | null> {
+    public static async getCodeByDiscordId(discordId: string): Promise<ReferralCode | null> {
         const { data, error } = await supabase
-            .from('ambassador_codes')
+            .from('referral_codes')
             .select()
             .eq('discord_id', discordId)
             .single();
@@ -30,9 +28,9 @@ export class AmbassadorCodeDbUtils {
         return data;
     }
 
-    public static async getCodeByCode(code: string): Promise<AmbassadorCode | null> {
+    public static async getCodeByCode(code: string): Promise<ReferralCode | null> {
         const { data, error } = await supabase
-            .from('ambassador_codes')
+            .from('referral_codes')
             .select()
             .eq('code', code)
             .single();
@@ -42,12 +40,17 @@ export class AmbassadorCodeDbUtils {
         return data;
     }
 
-    public static async createCode(discordId: string, code: string): Promise<void> {
-        await supabase.from('ambassador_codes').insert([
-            {
+    public static async createCode(discordId: string): Promise<ReferralCode> {
+        const { data, error } = await supabase
+            .from('referral_codes')
+            .insert({
                 discord_id: discordId,
-                code,
-            },
-        ]);
+            })
+            .select()
+            .single();
+
+        if (error || !data) return null;
+
+        return data;
     }
 }

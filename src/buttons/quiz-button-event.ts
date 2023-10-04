@@ -2,12 +2,14 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
+import { profileButtons } from './profile-button-event.js';
 import { EventData } from '../models/internal-models.js';
 import { Logger } from '../services/logger.js';
 import { EmbedDbUtils } from '../utils/database/embed-db-utils.js';
-import { InteractionDbUtils } from '../utils/database/interaction-db-utils.js';
+import { PointsDbUtils } from '../utils/database/points-db-utils.js';
 import { QuizChoice, QuizChoicesDbUtils } from '../utils/database/quiz-choice-db-utils.js';
 import { QuizDbUtils } from '../utils/database/quiz-db-utils.js';
+import { QuizInteractionsDbUtils } from '../utils/database/quiz-interactions.db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
 type Result = {
@@ -25,12 +27,13 @@ function* quizStyler(): Generator<ButtonStyle> {
     }
 }
 
-export function quizButtons(choices: QuizChoice[], randomized: boolean): ActionRowBuilder<ButtonBuilder>[] {
+export function quizButtons(
+    choices: QuizChoice[],
+    randomized: boolean
+): ActionRowBuilder<ButtonBuilder>[] {
     if (choices.length < 0) return [];
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const randomChoices = randomized
-        ? choices.sort(() => Math.random() - 0.5)
-        : choices;
+    const randomChoices = randomized ? choices.sort(() => Math.random() - 0.5) : choices;
     const quizStyle = quizStyler();
     randomChoices.forEach(choice => {
         const button = new ButtonBuilder()
@@ -76,32 +79,50 @@ export class QuizButtons implements Button {
                     await InteractionUtils.warn(intr, 'Invalid quiz.');
                     return;
                 }
-                const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndQuizId(
-                    userData.id,
-                    quizId
+                const quizInteractions =
+                    await QuizInteractionsDbUtils.getInteractionsByUserIdAndQuizId(
+                        userData.id,
+                        quizId
+                    );
+
+                const quizChoiceIds = quizInteractions.map(
+                    interaction => interaction.quiz_choice_id
                 );
-                if (!interactionDoc) {
-                    const embeds = intr.message.embeds
-                    const components = intr.message.components
+
+                if (quizChoiceIds.length > 0) {
+                    const embeds = intr.message.embeds;
+                    const components = intr.message.components;
                     await intr.reply({
                         content: '⚠┃You have not answered yet.',
                         embeds,
                         components,
-                        ephemeral: true
-                    })
+                        ephemeral: true,
+                    });
+                    await QuizInteractionsDbUtils.createInteraction({
+                        user_id: userData.id,
+                        news_id: quizInteractions[0].news_id,
+                        guild_id: intr.guildId,
+                        quiz_id: quizId,
+                    });
                     return;
                 }
+
                 const results = await this.getResults(quizId);
                 const resultsMessage = `**Results**\n\n*Question*: ${
                     quiz.question
-                    }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.quiz_choice_id))}`;
+                }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(
+                    results,
+                    results.find(result => result.id === quizInteractions[0].quiz_choice_id)
+                )}`;
                 await InteractionUtils.success(intr, resultsMessage);
-                // await InteractionDbUtils.createInteraction({
-                //     user_id: userData.id,
-                //     news_id: interactionDoc.news_id,
-                //     guild_id: intr.guild?.id,
-                //     quiz_id: quizId,
-                // });
+
+                await QuizInteractionsDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: quizInteractions[0].news_id,
+                    guild_id: intr.guildId,
+                    quiz_id: quizId,
+                });
+
                 return;
             }
 
@@ -117,24 +138,34 @@ export class QuizButtons implements Button {
                 return;
             }
             const embed = await EmbedDbUtils.getEmbedById(quiz.embed_id);
-            const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndQuizId(
+
+            const quizInteractions = await QuizInteractionsDbUtils.getInteractionsByUserIdAndQuizId(
                 userData.id,
                 quiz.id
             );
-            if (interactionDoc) {
+
+            const quizChoices = quizInteractions.filter(interaction => interaction.quiz_choice_id);
+
+            if (quizChoices.length > 0) {
                 const results = await this.getResults(quiz.id);
-                const resultsMessage = `**Results**\n\n*Question*: ${quiz.question
-                    }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.quiz_choice_id))}`;
+                const resultsMessage = `Thank you for answering\n\n**Results**\n\n*Question*: ${
+                    quiz.question
+                }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(
+                    results,
+                    results.find(result => result.id === quizInteractions[0].quiz_choice_id)
+                )}`;
                 await InteractionUtils.success(intr, resultsMessage);
-                // await InteractionDbUtils.createInteraction({
-                //     user_id: userData.id,
-                //     news_id: interactionDoc.news_id,
-                //     guild_id: intr.guild?.id,
-                //     quiz_id: quiz.id,
-                // });
+                await QuizInteractionsDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: embed.news_id,
+                    guild_id: intr.guildId,
+                    quiz_id: quiz.id,
+                });
+
                 return;
             }
-            await InteractionDbUtils.createInteraction({
+
+            const quizInteractionDoc = await QuizInteractionsDbUtils.createInteraction({
                 user_id: userData.id,
                 news_id: embed.news_id,
                 quiz_choice_id: choice.id,
@@ -144,11 +175,19 @@ export class QuizButtons implements Button {
 
             const results = await this.getResults(quiz.id);
 
-            const resultsMessage = `Thank you for voting.\n\n**⚫┃Results**\n\n❓┃*Question*: ${
+            let resultsMessage = `Thank you for answering\n\n**Results**\n\n*Question*: ${
                 quiz.question
-            }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(results, results.find(result => result.id === choice.id))}`;
+            }\n\n💡┃*Answer*: ${quiz.answer}\n\n${this.formateResults(
+                results,
+                results.find(result => result.id === choice.id)
+            )}`;
 
-            await InteractionUtils.success(intr, resultsMessage);
+            const points = await PointsDbUtils.giveQuizPoints(quizInteractionDoc);
+
+            if (points > 0)
+                resultsMessage += `\n\n🏆┃You have received **${points}** points for your answer.`;
+
+            await InteractionUtils.success(intr, resultsMessage, [profileButtons()]);
         } catch (error) {
             await InteractionUtils.error(
                 intr,
@@ -181,20 +220,28 @@ export class QuizButtons implements Button {
         let text = '';
         results.forEach((result, index) => {
             const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
-            text += vote === result
-                ? `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n` 
-                : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
+            text +=
+                vote === result
+                    ? `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n`
+                    : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${
+                          result.votes
+                      } (${percentageString})\n`;
         });
         return text + `\nTotal votes: ${totalVotes}`;
     }
 
     private getNumberEmoji(number: number): string {
         switch (number) {
-            case 0: return '1️⃣';
-            case 1: return '2️⃣';
-            case 2: return '3️⃣';
-            case 3: return '4️⃣';
-            case 4: return '5️⃣';
+            case 0:
+                return '1️⃣';
+            case 1:
+                return '2️⃣';
+            case 2:
+                return '3️⃣';
+            case 3:
+                return '4️⃣';
+            case 4:
+                return '5️⃣';
         }
     }
 }

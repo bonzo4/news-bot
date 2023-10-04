@@ -31,7 +31,9 @@ export class SetupMessages {
     public static newsChain(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')
-            .setDescription(`📰┃What chain would you like to receive free NFT news on? (Solana or Ethereum)`)
+            .setDescription(
+                `📰┃What chain would you like to receive free NFT news on? (Solana or Ethereum)`
+            )
             .setFields([
                 {
                     name: '❓┃Info',
@@ -39,8 +41,8 @@ export class SetupMessages {
                 },
                 {
                     name: 'ℹ┃Previews',
-                    value: 'Press "Solana NFT Preview" to preview **Solana NFT** news.\nPress "Ethereum NFT Preview" to preview **Ethereum NFT** news.'
-                }
+                    value: 'Press "Solana NFT Preview" to preview **Solana NFT** news.\nPress "Ethereum NFT Preview" to preview **Ethereum NFT** news.',
+                },
             ])
             .setColor('NotQuiteBlack')
             .setFooter({
@@ -92,7 +94,7 @@ export class SetupMessages {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')
             .setDescription(
-                `⭐┃Did a Syndicate Ambassador refer you this this bot? If so please enter the referral code below.`
+                `⭐┃Did a get a referral code when you heard about this this this bot? If so please enter the referral code below.`
             )
             .setColor('NotQuiteBlack')
             .setFooter({

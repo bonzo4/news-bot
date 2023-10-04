@@ -112,6 +112,16 @@ export const GeneralCommandMetadata: {
         default_member_permissions: undefined,
         options: [],
     },
+    profile: {
+        type: ApplicationCommandType.ChatInput,
+        name: `profile`,
+        name_localizations: {},
+        description: 'View your Syndicate profile.',
+        description_localizations: {},
+        dm_permission: true,
+        default_member_permissions: undefined,
+        options: [],
+    },
 };
 
 // export const ChatCommandMetadata: {

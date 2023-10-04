@@ -1,5 +1,6 @@
 import { Locale } from 'discord.js';
 
+import { StaffUser } from '../utils/database/staff-user-db-utils.js';
 import { UserDoc } from '../utils/database/user-db-utils.js';
 
 // This class is used to store and pass data along in events
@@ -11,6 +12,8 @@ export class EventData {
         // Guild language
         public langGuild: Locale,
         // User document
-        public userData?: UserDoc | null
+        public userData?: UserDoc | null,
+        // Staff document
+        public staffRole?: StaffUser | null
     ) {}
 }

@@ -2,7 +2,8 @@ import { CommandInteraction, PermissionsString } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { referralModal } from '../../modals/referral-modal-event.js';
-import { GuildDbUtils, InteractionUtils, ReferralDbUtils } from '../../utils/index.js';
+import { GuildReferralDbUtils } from '../../utils/database/referral-db-utils.js';
+import { GuildDbUtils, InteractionUtils } from '../../utils/index.js';
 import { Command, CommandDeferType } from '../command.js';
 
 export class ReferralCommand implements Command {
@@ -24,7 +25,7 @@ export class ReferralCommand implements Command {
             return;
         }
 
-        const referral = await ReferralDbUtils.getGuildReferralByGuild(intr.guildId);
+        const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guildId);
 
         if (referral.discord_user_id) {
             await InteractionUtils.warn(

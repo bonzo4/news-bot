@@ -5,8 +5,8 @@ import { Button, ButtonDeferType } from './button.js';
 import { EventData } from '../models/internal-models.js';
 import { Logger } from '../services/logger.js';
 import { DirectDbUtils } from '../utils/database/direct-db-utils.js';
+import { DirectInteractionDbUtils } from '../utils/database/direct-interaction-db-utils.js';
 import { EmbedDbUtils } from '../utils/database/embed-db-utils.js';
-import { InteractionDbUtils } from '../utils/database/interaction-db-utils.js';
 import { ChannelDbUtils, ChannelUtils, InteractionUtils } from '../utils/index.js';
 import { NewsChannelsUtils } from '../utils/news-channels-utils.js';
 
@@ -20,6 +20,16 @@ export function directButtons(directId: number): ActionRowBuilder<ButtonBuilder>
     ]);
 }
 
+export function unsubscribeButtons(directId: number): ActionRowBuilder<ButtonBuilder> {
+    return new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder()
+            .setCustomId(`direct_unsubscribe_${directId}`)
+            .setLabel('Unsubscribe')
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji('🚫'),
+    ]);
+}
+
 export class DirectButtons implements Button {
     ids: string[] = ['direct'];
     deferType = ButtonDeferType.REPLY;
@@ -27,9 +37,44 @@ export class DirectButtons implements Button {
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
         try {
+            const { userData } = data;
+
             const directId = intr.customId.split('_')[1];
 
-            const newsChannel = await ChannelDbUtils.getDirectNewsChannel(data.userData.id);
+            if ('unsubscribe' === directId) {
+                const directId = intr.customId.split('_')[2];
+
+                const direct = await DirectDbUtils.getDirectById(parseInt(directId));
+
+                const embed = await EmbedDbUtils.getEmbedById(direct.embed_id);
+
+                await DirectInteractionDbUtils.createInteraction({
+                    user_id: intr.user.id,
+                    guild_id: intr.guildId,
+                    news_id: embed.news_id,
+                    direct_id: direct.id,
+                });
+
+                let dmChannel = await ChannelDbUtils.getDirectNewsChannel(data.userData.id);
+
+                if (!dmChannel) {
+                    await InteractionUtils.warn(
+                        intr,
+                        `You are not signed up for Syndicate Direct. To subscribe, use **/direct**.`
+                    );
+                    return;
+                }
+                const channel = await intr.client.channels.fetch(dmChannel.id);
+                if (channel) await channel.delete();
+                await ChannelDbUtils.deleteDirectChannel(dmChannel);
+                await InteractionUtils.success(
+                    intr,
+                    `You have been unsubscribed from Syndicate Direct. To resubscribe, use **/direct**.`
+                );
+            }
+
+            const newsChannel = await ChannelDbUtils.getDirectNewsChannel(userData.id);
+
             if (newsChannel) {
                 await InteractionUtils.warn(
                     intr,
@@ -39,7 +84,7 @@ export class DirectButtons implements Button {
             }
 
             const dmChannel = await ChannelUtils.createDirectChannel(intr.user);
-            await ChannelDbUtils.createDirectChannel(data.userData.id, dmChannel);
+            await ChannelDbUtils.createDirectChannel(userData.id, dmChannel);
 
             await NewsChannelsUtils.sendLastThreeForDirect(dmChannel);
 
@@ -47,7 +92,7 @@ export class DirectButtons implements Button {
 
             const embed = await EmbedDbUtils.getEmbedById(direct.embed_id);
 
-            await InteractionDbUtils.createInteraction({
+            await DirectInteractionDbUtils.createInteraction({
                 user_id: intr.user.id,
                 guild_id: intr.guildId,
                 news_id: embed.news_id,

@@ -9,10 +9,11 @@ import {
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
-import { systemButtons, systemLinks } from '../buttons/system.js';
+import { previewButtons } from '../buttons/setup/setup-button-2.js';
 import { SetupMessages } from '../messages/setup.js';
 import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
-import { ReferralDbUtils } from '../utils/index.js';
+import ReferralCodeDbUtils from '../utils/database/referral-code-db-utils.js';
+import { GuildReferralDbUtils } from '../utils/database/referral-db-utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 
 export function referralModal(setup: boolean): ModalBuilder {
@@ -42,15 +43,17 @@ export class ReferralModal implements ModalSubmit {
     requireAdmin = true;
 
     async execute(intr: ModalSubmitInteraction): Promise<void> {
-        const setup = intr.customId.endsWith('true');
+        const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guildId);
 
-        if (setup) {
-            if (intr.message.deletable) await intr.message.delete();
-            await intr.channel.send({
-                embeds: [SetupMessages.systemMessage()],
-                components: [systemLinks(), systemButtons()],
-            });
+        if (referral.discord_user_id) {
+            await InteractionUtils.warn(
+                intr,
+                `You have already set up a referral for this server.`
+            );
+            return;
         }
+
+        const setup = intr.customId.endsWith('true');
 
         const code = intr.fields.getTextInputValue('referralCode');
         if (!code) {
@@ -60,18 +63,35 @@ export class ReferralModal implements ModalSubmit {
 
         let referralCode = await AmbassadorCodeDbUtils.getCodeByCode(code);
 
-        if (!referralCode) {
-            await InteractionUtils.warn(intr, 'Invalid referral code');
-            return;
+        if (referralCode) {
+            await GuildReferralDbUtils.createAmbassadorReferral(
+                intr.guild.id,
+                referralCode.discord_id
+            );
+
+            await InteractionUtils.success(intr, 'Referral code used!');
         }
 
-        await ReferralDbUtils.createGuildReferral(intr.guild.id, referralCode.discord_id);
+        referralCode = await ReferralCodeDbUtils.getCodeByCode(code);
 
-        await InteractionUtils.success(intr, 'Referral code used!');
+        if (referralCode) {
+            await GuildReferralDbUtils.createProfileReferral(
+                intr.guild.id,
+                referralCode.discord_id
+            );
 
-        await intr.client.shard.broadcastEval(broadcastReferral, {
-            context: { guildId: intr.guildId, userId: referralCode.discord_id },
-        });
+            await InteractionUtils.success(intr, 'Referral code used!');
+        }
+
+        if (setup) {
+            if (intr.message.deletable) await intr.message.delete();
+            await intr.channel.send({
+                embeds: [SetupMessages.newsPreview()],
+                components: [previewButtons()],
+            });
+            return;
+        }
+        await InteractionUtils.warn(intr, 'Invalid referral code');
     }
 }
 

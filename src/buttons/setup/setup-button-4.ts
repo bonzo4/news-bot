@@ -42,7 +42,10 @@ export class SetupNewsChannelButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
+            // 1. fetch guild settings
             const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+
+            // 2. if there are no guild settings, something went wrong with the setup
             if (!guildSettings) {
                 await InteractionUtils.warn(
                     intr,
@@ -51,7 +54,18 @@ export class SetupNewsChannelButtons implements Button {
                 return;
             }
 
+            // 3. create the news channel
             await this.createNewsChannel(intr, guildSettings);
+
+            // 4. go to the next step
+            if (intr.message.deletable) await intr.message.delete();
+            await intr.channel.send({
+                embeds: [SetupMessages.pingRole()],
+                components: [
+                    addMentionMenu([...intr.guild.roles.cache.map(role => role)]),
+                    setupMentionButtons(),
+                ],
+            });
         } catch (error) {
             await InteractionUtils.warn(
                 intr,
@@ -100,14 +114,7 @@ export class SetupNewsChannelButtons implements Button {
         }
         const newsChannel = await ChannelUtils.createNewsChannel(category);
         await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
-        if (intr.message.deletable) await intr.message.delete();
-        await intr.channel.send({
-            embeds: [SetupMessages.pingRole()],
-            components: [
-                addMentionMenu([...intr.guild.roles.cache.map(role => role)]),
-                setupMentionButtons(),
-            ],
-        });
+
         await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
     }
 }

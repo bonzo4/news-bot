@@ -19,4 +19,3 @@ export { ChannelUtils } from './channel-utils.js';
 export { ChannelDbUtils } from './database/channel-db-utils.js';
 export { GuildDbUtils } from './database/guild-db-utils.js';
 export { GuildSettingsDbUtils } from './database/guild-settings-db-utils.js';
-export { ReferralDbUtils } from './database/referral-db-utils.js';

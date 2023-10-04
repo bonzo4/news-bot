@@ -2,12 +2,14 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Button, ButtonDeferType } from './button.js';
+import { profileButtons } from './profile-button-event.js';
 import { EventData } from '../models/internal-models.js';
 import { Logger } from '../services/logger.js';
 import { EmbedDbUtils } from '../utils/database/embed-db-utils.js';
-import { InteractionDbUtils } from '../utils/database/interaction-db-utils.js';
+import { PointsDbUtils } from '../utils/database/points-db-utils.js';
 import { PollChoice, PollChoicesDbUtils } from '../utils/database/poll-choice-db-utils.js';
 import { PollDbUtils } from '../utils/database/poll-db-utils.js';
+import { PollInteractionDbUtils } from '../utils/database/poll-interaction-db-utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
 type Result = {
@@ -25,12 +27,13 @@ function* pollStyler(): Generator<ButtonStyle> {
     }
 }
 
-export function pollButtons(choices: PollChoice[], randomized: boolean): ActionRowBuilder<ButtonBuilder>[] {
+export function pollButtons(
+    choices: PollChoice[],
+    randomized: boolean
+): ActionRowBuilder<ButtonBuilder>[] {
     if (choices.length < 0) return [];
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const randomChoices = randomized ?
-        choices.sort(() => Math.random() - 0.5) :
-        choices;
+    const randomChoices = randomized ? choices.sort(() => Math.random() - 0.5) : choices;
     const pollStyle = pollStyler();
     randomChoices.forEach(choice => {
         const button = new ButtonBuilder()
@@ -76,33 +79,48 @@ export class PollButtons implements Button {
                     await InteractionUtils.warn(intr, 'Invalid poll.');
                     return;
                 }
-                const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndPollId(
-                    userData.id,
-                    pollId
+                const pollInteractions =
+                    await PollInteractionDbUtils.getInteractionsByUserIdAndPollId(
+                        userData.id,
+                        pollId
+                    );
+                const pollChoices = pollInteractions.filter(
+                    interaction => interaction.poll_choice_id
                 );
-                if (!interactionDoc) {
-                    const embeds = intr.message.embeds
-                    const components = intr.message.components
+                if (pollChoices.length === 0) {
+                    const embeds = intr.message.embeds;
+                    const components = intr.message.components;
                     await intr.reply({
                         content: '⚠┃You have not voted yet.',
                         embeds,
                         components,
-                        ephemeral: true
-                    })
+                        ephemeral: true,
+                    });
+                    await PollInteractionDbUtils.createInteraction({
+                        user_id: userData.id,
+                        news_id: pollInteractions[0].news_id,
+                        guild_id: intr.guildId,
+                        poll_id: pollId,
+                    });
                     return;
                 }
+
                 const results = await this.getResults(pollId);
 
                 const resultsMessage = `**Results**\n\n❓┃*Question*: ${
                     poll.question
-                }\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.poll_choice_id))}`;
+                }\n\n${this.formateResults(
+                    results,
+                    results.find(result => result.id === pollInteractions[0].poll_choice_id)
+                )}`;
                 await InteractionUtils.success(intr, resultsMessage);
-                // await InteractionDbUtils.createInteraction({
-                //     user_id: userData.id,
-                //     news_id: interactionDoc.news_id,
-                //     guild_id: intr.guild?.id,
-                //     poll_id: pollId,
-                // });
+
+                await PollInteractionDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: pollInteractions[0].news_id,
+                    guild_id: intr.guildId,
+                    poll_id: pollId,
+                });
                 return;
             }
 
@@ -118,26 +136,32 @@ export class PollButtons implements Button {
                 return;
             }
             const embed = await EmbedDbUtils.getEmbedById(poll.embed_id);
-            const interactionDoc = await InteractionDbUtils.getInteractionByUserIdAndPollId(
+
+            const pollInteractions = await PollInteractionDbUtils.getInteractionsByUserIdAndPollId(
                 userData.id,
                 poll.id
             );
-            if (interactionDoc) {
+            const pollChoices = pollInteractions.filter(interaction => interaction.poll_choice_id);
+
+            if (pollChoices.length > 0) {
                 const results = await this.getResults(poll.id);
                 const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
                     poll.question
-                }\n\n${this.formateResults(results, results.find(result => result.id === interactionDoc.poll_choice_id))}`;
-                await InteractionUtils.success(intr, resultsMessage);
-                // await InteractionDbUtils.createInteraction({
-                //     user_id: userData.id,
-                //     news_id: interactionDoc.news_id,
-                //     guild_id: intr.guild?.id,
-                //     poll_id: poll.id,
-                // });
+                }\n\n${this.formateResults(
+                    results,
+                    results.find(result => result.id === pollInteractions[0].poll_choice_id)
+                )}`;
+                await InteractionUtils.success(intr, resultsMessage, [profileButtons()]);
+                await PollInteractionDbUtils.createInteraction({
+                    user_id: userData.id,
+                    news_id: embed.news_id,
+                    guild_id: intr.guildId,
+                    poll_id: poll.id,
+                });
                 return;
             }
 
-            await InteractionDbUtils.createInteraction({
+            const pollInteractionDoc = await PollInteractionDbUtils.createInteraction({
                 user_id: userData.id,
                 news_id: embed.news_id,
                 poll_choice_id: choice.id,
@@ -146,11 +170,19 @@ export class PollButtons implements Button {
             });
 
             const results = await this.getResults(poll.id);
-            const resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
+            let resultsMessage = `Thank you for voting.\n\n⚫┃**Results**\n\n❓┃*Question*: ${
                 poll.question
-            }\n\n${this.formateResults(results, results.find(result => result.id === choice.id))}`;
+            }\n\n${this.formateResults(
+                results,
+                results.find(result => result.id === choice.id)
+            )}`;
 
-            await InteractionUtils.success(intr, resultsMessage);
+            const points = await PointsDbUtils.givePollPoints(pollInteractionDoc);
+
+            if (points > 0)
+                resultsMessage += `\n\n🏆┃You have received **${points}** points for your answer.`;
+
+            await InteractionUtils.success(intr, resultsMessage, [profileButtons()]);
         } catch (error) {
             await InteractionUtils.error(
                 intr,
@@ -184,20 +216,28 @@ export class PollButtons implements Button {
         let text = '';
         results.forEach((result, index) => {
             const percentageString = `${(result.votes / totalVotes) * 100}`.split('.')[0] + '%';
-            text += vote === result
-                ? `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n` 
-                : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${result.votes} (${percentageString})\n`;
+            text +=
+                vote === result
+                    ? `✅┃${result.emoji}┃**${result.text}: ${result.votes} (${percentageString})**\n`
+                    : `${this.getNumberEmoji(index)}┃${result.emoji}┃${result.text}: ${
+                          result.votes
+                      } (${percentageString})\n`;
         });
         return text + `\nTotal votes: ${totalVotes}`;
     }
 
     private getNumberEmoji(number: number): string {
         switch (number) {
-            case 0: return '1️⃣';
-            case 1: return '2️⃣';
-            case 2: return '3️⃣';
-            case 3: return '4️⃣';
-            case 4: return '5️⃣';
+            case 0:
+                return '1️⃣';
+            case 1:
+                return '2️⃣';
+            case 2:
+                return '3️⃣';
+            case 3:
+                return '4️⃣';
+            case 4:
+                return '5️⃣';
         }
     }
 }

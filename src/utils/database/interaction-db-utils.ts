@@ -57,4 +57,12 @@ export class InteractionDbUtils {
         if (error) throw error.message;
         return interaction;
     }
+
+    public static async getVoteCountByDiscordId(discordId: string): Promise<number> {
+        const { data, error } = await supabase.rpc('get_poll_vote_count', {
+            discord_user_id: discordId,
+        });
+        if (error || data) return 0;
+        return data;
+    }
 }

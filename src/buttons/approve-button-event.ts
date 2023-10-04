@@ -24,7 +24,7 @@ export class ApproveNewsButtons implements Button {
 
     async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
         try {
-            if (data.userData.staff_role !== 'ADMIN') {
+            if (data.staffRole?.staff_role !== 'ADMIN') {
                 await InteractionUtils.warn(intr, 'You do not have permission to use this');
                 return;
             }

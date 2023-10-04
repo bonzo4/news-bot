@@ -46,6 +46,7 @@ export class SetupChainButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
+            // 1. If they press skip, skip the chain setup
             if (intr.customId === 'setupChain_skip') {
                 if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({
@@ -53,6 +54,8 @@ export class SetupChainButtons implements Button {
                     components: [setupNewsChannelButtons()],
                 });
             }
+
+            // 2. show the solana preview
             if (intr.customId === 'setupChain_solana') {
                 intr.reply({
                     embeds: [new EmbedBuilder().setTitle('**Preview Only**'), ...solanaPreview],
@@ -61,6 +64,7 @@ export class SetupChainButtons implements Button {
                 return;
             }
 
+            // 3. show the ethereum preview
             if (intr.customId === 'setupChain_ethereum') {
                 intr.reply({
                     embeds: [new EmbedBuilder().setTitle('**Preview Only**'), ...ethereumPreview],

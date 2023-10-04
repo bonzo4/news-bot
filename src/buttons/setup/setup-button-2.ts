@@ -41,6 +41,7 @@ export class PreviewButtons implements Button {
 
     async execute(intr: ButtonInteraction): Promise<void> {
         try {
+            // 1. If they press preview, show the preview
             if (intr.customId === 'crypto_preview') {
                 intr.reply({
                     embeds: [new EmbedBuilder().setTitle('**Preview Only**'), ...generaPreview],
@@ -49,6 +50,7 @@ export class PreviewButtons implements Button {
                 return;
             }
 
+            // 2. else go to the next step
             if (intr.customId === 'crypto_next') {
                 if (intr.message.deletable) await intr.message.delete();
                 await intr.channel.send({

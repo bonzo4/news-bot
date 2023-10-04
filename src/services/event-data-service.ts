@@ -8,6 +8,7 @@ import {
 
 import { Language } from '../models/enum-helpers/language.js';
 import { EventData } from '../models/internal-models.js';
+import { StaffUserDbUtils } from '../utils/database/staff-user-db-utils.js';
 import { UserDbUtils } from '../utils/database/user-db-utils.js';
 
 export class EventDataService {
@@ -37,7 +38,8 @@ export class EventDataService {
         if (options.user) {
             let userData = await UserDbUtils.getUserById(options.user.id);
             if (!userData) userData = await UserDbUtils.createUser(options.user);
-            return new EventData(lang, langGuild, userData);
+            const staffRole = await StaffUserDbUtils.getStaffRoleByUserId(userData.user_id);
+            return new EventData(lang, langGuild, userData, staffRole);
         }
         return new EventData(lang, langGuild);
     }

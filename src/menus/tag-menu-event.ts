@@ -33,7 +33,7 @@ export class TagMenu implements Menu {
     cooldown = new RateLimiter(1, 5000);
 
     async execute(intr: StringSelectMenuInteraction, data: EventData): Promise<void> {
-        if (data.userData.staff_role !== 'ADMIN') {
+        if (data.staffRole?.staff_role !== 'ADMIN') {
             await InteractionUtils.warn(intr, 'You do not have permission to use this command.');
             return;
         }

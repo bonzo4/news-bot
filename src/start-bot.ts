@@ -9,13 +9,14 @@ import { Button, SystemButtons } from './buttons/index.js';
 import { InputButtons } from './buttons/input-button-event.js';
 import { MentionButtons } from './buttons/mention-button-event.js';
 import { PollButtons } from './buttons/poll-button-event.js';
+import { ProfileButtons } from './buttons/profile-button-event.js';
 import { QuizButtons } from './buttons/quiz-button-event.js';
 import { SetupButtons } from './buttons/setup/setup-button-1.js';
+import { SetupReferralButtons } from './buttons/setup/setup-button-1a.js';
 import { PreviewButtons } from './buttons/setup/setup-button-2.js';
 import { SetupChainButtons } from './buttons/setup/setup-button-3.js';
 import { SetupNewsChannelButtons } from './buttons/setup/setup-button-4.js';
 import { SetupMentionButtons } from './buttons/setup/setup-button-5.js';
-import { SetupReferralButtons } from './buttons/setup/setup-button-6.js';
 import { AmbassadorCommand } from './commands/ambassador-command.js';
 import { ChannelCommand } from './commands/guild/channels-command.js';
 import { MentionCommand } from './commands/guild/mention-command.js';
@@ -31,6 +32,7 @@ import { ApproveCommand } from './commands/news/approve-command.js';
 import { DirectCommand } from './commands/news/direct-command.js';
 import { NewsCommand } from './commands/news/news-command.js';
 import { UnsubscribeCommand } from './commands/news/unsubscribe-command.js';
+import { ProfileCommand } from './commands/profile-command.js';
 import { config } from './config/config.js';
 import { ChannelDeleteHandler } from './events/channel-delete-handler.js';
 import {
@@ -99,6 +101,7 @@ async function start(): Promise<void> {
         new ChannelCommand(),
         new ApproveCommand(),
         new AmbassadorCommand(),
+        new ProfileCommand(),
         new SetupCommand(),
         new ReferralCommand(),
         new MentionCommand(),
@@ -121,6 +124,7 @@ async function start(): Promise<void> {
         new DirectButtons(),
         new ApproveNewsButtons(),
         new SetupChainButtons(),
+        new ProfileButtons(),
     ];
 
     let menus: Menu[] = [
