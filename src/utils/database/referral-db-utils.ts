@@ -60,6 +60,22 @@ export class GuildReferralDbUtils {
         return data;
     }
 
+    public static async getProfileReferralCountByUserId(userId: string): Promise<number> {
+        const { count, error } = await supabase
+            .from('guild_referrals')
+            .select('*', { count: 'exact', head: true })
+            .eq('discord_user_id', userId)
+            .eq('type', 'PROFILE');
+
+        if (error) {
+            await Logger.error({
+                message: `Could not get guild referrals from database + ${error.message}`,
+            });
+            return 0;
+        }
+        return count;
+    }
+
     public static async getAmbassadorReferralsByUserId(
         userId: string,
         page: number = 1, // default to page 1 if no page is provided
@@ -83,5 +99,21 @@ export class GuildReferralDbUtils {
             return [];
         }
         return data;
+    }
+
+    public static async getAmbassadorReferralCountByUserId(userId: string): Promise<number> {
+        const { count, error } = await supabase
+            .from('guild_referrals')
+            .select('*', { count: 'exact', head: true })
+            .eq('discord_user_id', userId)
+            .eq('type', 'AMBASSADOR');
+
+        if (error) {
+            await Logger.error({
+                message: `Could not get guild referrals from database + ${error.message}`,
+            });
+            return 0;
+        }
+        return count;
     }
 }

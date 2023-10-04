@@ -1,8 +1,7 @@
-import { CommandInteraction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { Command, CommandDeferType } from './index.js';
-import { ambassadorButtons } from '../buttons/ambassador-button-event.js';
+import { Button, ButtonDeferType } from './button.js';
 import { codeModal } from '../modals/code-modal-event.js';
 import { EventData } from '../models/internal-models.js';
 import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
@@ -11,12 +10,47 @@ import { UserDbUtils } from '../utils/database/user-db-utils.js';
 import { UserReferralDbUtils } from '../utils/database/user-referrals-db-utils.js';
 import { GuildDbUtils, InteractionUtils } from '../utils/index.js';
 
-export class AmbassadorCommand implements Command {
-    names = ['ambassador'];
-    cooldown = new RateLimiter(1, 5000);
-    deferType = CommandDeferType.NONE;
+export function ambassadorButtons(page: number = 0): ActionRowBuilder<ButtonBuilder> {
+    if (page < 0) {
+        return new ActionRowBuilder<ButtonBuilder>().addComponents([
+            new ButtonBuilder()
+                .setCustomId(`ambassador_${page - 1}`)
+                .setLabel('Previous Page')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('⚪'),
+        ]);
+    }
+    if (page === 0) {
+        return new ActionRowBuilder<ButtonBuilder>().addComponents([
+            new ButtonBuilder()
+                .setCustomId(`ambassador_${page + 1}`)
+                .setLabel('Next Page')
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji('⚪'),
+        ]);
+    }
+    return new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder()
+            .setCustomId(`ambassador_${page - 1}`)
+            .setLabel('Previous Page')
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji('⚪'),
+        new ButtonBuilder()
+            .setCustomId(`ambassador_${page + 1}`)
+            .setLabel('Next Page')
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji('⚪'),
+    ]);
+}
 
-    async execute(intr: CommandInteraction, data: EventData): Promise<void> {
+export class ProfileButtons implements Button {
+    ids: string[] = ['ambassador'];
+    deferType = ButtonDeferType.REPLY;
+    cooldown = new RateLimiter(1, 5000);
+
+    async execute(intr: ButtonInteraction, data: EventData): Promise<void> {
+        let page = parseInt(intr.customId.split('_')[1]);
+
         const referralCode = await AmbassadorCodeDbUtils.getCodeByDiscordId(data.userData.id);
 
         if (!referralCode) {
@@ -25,25 +59,11 @@ export class AmbassadorCommand implements Command {
             return;
         }
 
-        const totalGuildReferrals = await GuildReferralDbUtils.getAmbassadorReferralCountByUserId(
-            data.userData.id
-        );
         const guildReferrals = await GuildReferralDbUtils.getAmbassadorReferralsByUserId(
             data.userData.id
         );
 
-        const totalUserReferrals = await UserReferralDbUtils.getReferralCountByReferrerId(
-            data.userData.id
-        );
         const userReferrals = await UserReferralDbUtils.getReferralsByReferrerId(data.userData.id);
-
-        const referralString = `⚫┃Thank you for being ${
-            data.staffRole?.staff_role === 'TRIAL' ? 'a trial' : 'an'
-        } Ambassador of the Syndicate Discord server!\n🔗┃Referral Code: **${
-            referralCode.code
-        }**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
-            referralCode.code
-        }\n👥┃Guild Referrals: ${totalGuildReferrals}\n👤┃User Referrals: ${totalUserReferrals}`;
 
         let referralGuildString = '**👥┃Guild Referrals**\n';
         for (let i = 0; i < 5; i++) {
@@ -66,16 +86,13 @@ export class AmbassadorCommand implements Command {
         }
 
         if (guildReferrals.length < 5 && userReferrals.length < 5) {
-            await InteractionUtils.success(
-                intr,
-                `${referralString}\n\n${referralGuildString}\n${referralUserString}`
-            );
-            return;
+            await InteractionUtils.success(intr, `${referralGuildString}\n${referralUserString}`, [
+                ambassadorButtons(-1),
+            ]);
         }
-        await InteractionUtils.success(
-            intr,
-            `${referralString}\n\n${referralGuildString}\n${referralUserString}`,
-            [ambassadorButtons(0)]
-        );
+
+        await InteractionUtils.success(intr, `${referralGuildString}\n${referralUserString}`, [
+            ambassadorButtons(page),
+        ]);
     }
 }
