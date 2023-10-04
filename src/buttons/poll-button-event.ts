@@ -113,7 +113,7 @@ export class PollButtons implements Button {
                     results,
                     results.find(result => result.id === pollInteractions[0].poll_choice_id)
                 )}`;
-                await InteractionUtils.success(intr, resultsMessage);
+                await InteractionUtils.success(intr, resultsMessage, [profileButtons()]);
 
                 await PollInteractionDbUtils.createInteraction({
                     user_id: userData.id,
