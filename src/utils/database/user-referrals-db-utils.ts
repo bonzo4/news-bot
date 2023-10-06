@@ -6,7 +6,7 @@ export type UserReferral = Database['public']['Tables']['user_referrals']['Row']
 export class UserReferralDbUtils {
     public static async getReferralsByReferrerId(
         userId: string,
-        page: number = 0,
+        page: number = 1,
         itemsPerPage: number = 5
     ): Promise<UserReferral[]> {
         const start = (page - 1) * itemsPerPage;
@@ -20,6 +20,7 @@ export class UserReferralDbUtils {
             .range(start, end);
 
         if (error) {
+            console.log(error);
             return [];
         }
 

@@ -12,7 +12,7 @@ export const config = {
     syndicateIcon:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',
     client: {
-        id: '1061682756209344634',
+        id: '1053779815418843166',
         token: process.env.TOKEN || '',
         intents: [
             'Guilds',
