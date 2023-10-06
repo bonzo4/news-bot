@@ -14,7 +14,7 @@ import { GuildDbUtils, InteractionUtils } from '../utils/index.js';
 export class AmbassadorCommand implements Command {
     names = ['ambassador'];
     cooldown = new RateLimiter(1, 5000);
-    deferType = CommandDeferType.NONE;
+    deferType = CommandDeferType.HIDDEN;
 
     async execute(intr: CommandInteraction, data: EventData): Promise<void> {
         const referralCode = await AmbassadorCodeDbUtils.getCodeByDiscordId(data.userData.id);
@@ -24,6 +24,8 @@ export class AmbassadorCommand implements Command {
             await intr.showModal(modal);
             return;
         }
+
+        await intr.deferReply({ ephemeral: true });
 
         const totalGuildReferrals = await GuildReferralDbUtils.getAmbassadorReferralCountByUserId(
             data.userData.id

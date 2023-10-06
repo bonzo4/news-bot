@@ -138,6 +138,12 @@ export class Bot {
                 await this.guildReferral(guildId, userId, this.options.client);
             }
         );
+        this.options.client.on(
+            'userReferral',
+            async ({ referrerId, userId }: { referrerId: string; userId: string }) => {
+                await this.userReferral(referrerId, userId, this.options.client);
+            }
+        );
         this.options.client.rest.on(
             RESTEvents.RateLimited,
             async (rateLimitData: RateLimitData) => await this.onRateLimit(rateLimitData)
@@ -609,5 +615,36 @@ export class Bot {
         if (guildDoc.invite) embed.setURL(guildDoc.invite);
 
         await guildReferralChannel.send({ embeds: [embed] });
+    }
+
+    private async userReferral(referrerId: string, userId: string, client: Client): Promise<void> {
+        const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
+        if (!syndicateGuild) return;
+        const userReferralChannel = syndicateGuild.channels.cache.get(
+            config.syndicateChannels.ambassadorJoined
+        ) as GuildTextBasedChannel;
+
+        const referrer = await client.users.fetch(referrerId);
+        const user = await client.users.fetch(userId);
+
+        const embed = new EmbedBuilder()
+            .setTitle(`Ambassador Referral: ${user.tag}`)
+            .setAuthor({
+                name: referrer.tag,
+                iconURL: referrer.avatarURL() ?? undefined,
+            })
+            .setThumbnail(user.avatarURL() ?? undefined)
+            .setDescription(
+                `Thank you for joining the Syndicate Network.\n\nReferred by ${userMention(
+                    referrer.id
+                )}.`
+            )
+            .setFooter({
+                text: 'Syndicate Network',
+                iconURL: config.syndicateIcon,
+            })
+            .setTimestamp();
+
+        await userReferralChannel.send({ embeds: [embed] });
     }
 }

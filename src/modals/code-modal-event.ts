@@ -1,5 +1,6 @@
 import {
     ActionRowBuilder,
+    Client,
     ModalBuilder,
     ModalSubmitInteraction,
     TextInputBuilder,
@@ -74,10 +75,21 @@ export class CodeModal implements ModalSubmit {
                 return;
             }
             await UserReferralDbUtils.createReferral(data.userData.id, referrer.discord_id);
+            await broadcastUserReferral(intr.client, {
+                referrerId: referralCode.discord_id,
+                userId: data.userData.id,
+            });
         }
 
         await AmbassadorCodeDbUtils.createCode(data.userData.id, code);
 
         await InteractionUtils.success(intr, 'Thank you for becoming a Syndicate Ambassador!');
     }
+}
+
+export async function broadcastUserReferral(
+    client: Client,
+    { referrerId, userId }: { referrerId: string; userId: string }
+): Promise<void> {
+    client.emit('userReferral', { referrerId, userId });
 }

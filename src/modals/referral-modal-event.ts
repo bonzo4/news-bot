@@ -70,6 +70,10 @@ export class ReferralModal implements ModalSubmit {
             );
 
             await InteractionUtils.success(intr, 'Referral code used!');
+            await broadcastReferral(intr.client, {
+                guildId: intr.guild.id,
+                userId: referralCode.discord_id,
+            });
         }
 
         referralCode = await ReferralCodeDbUtils.getCodeByCode(code);
@@ -81,6 +85,10 @@ export class ReferralModal implements ModalSubmit {
             );
 
             await InteractionUtils.success(intr, 'Referral code used!');
+            await broadcastReferral(intr.client, {
+                guildId: intr.guild.id,
+                userId: referralCode.discord_id,
+            });
         }
 
         if (setup) {
