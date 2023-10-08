@@ -79,6 +79,8 @@ export class PollButtons implements Button {
                     await InteractionUtils.warn(intr, 'Invalid poll.');
                     return;
                 }
+
+                const embed = await EmbedDbUtils.getEmbedById(poll.embed_id);
                 const pollInteractions =
                     await PollInteractionDbUtils.getInteractionsByUserIdAndPollId(
                         userData.id,
@@ -98,7 +100,7 @@ export class PollButtons implements Button {
                     });
                     await PollInteractionDbUtils.createInteraction({
                         user_id: userData.id,
-                        news_id: pollInteractions[0].news_id,
+                        news_id: embed.news_id,
                         guild_id: intr.guildId,
                         poll_id: pollId,
                     });
@@ -117,7 +119,7 @@ export class PollButtons implements Button {
 
                 await PollInteractionDbUtils.createInteraction({
                     user_id: userData.id,
-                    news_id: pollInteractions[0].news_id,
+                    news_id: embed.news_id,
                     guild_id: intr.guildId,
                     poll_id: pollId,
                 });
@@ -189,7 +191,7 @@ export class PollButtons implements Button {
                 `There was an error using this poll. Please contact a staff member or try again later.`
             );
             await Logger.error({
-                message: `Error using quiz: ${error.message ? error.message : error}`,
+                message: `Error using poll: ${error.message ? error.message : error}`,
 
                 guildId: intr.guild ? intr.guild.id : null,
                 userId: intr.user.id,
