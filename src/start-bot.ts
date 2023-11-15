@@ -18,6 +18,7 @@ import { PreviewButtons } from './buttons/setup/setup-button-2.js';
 import { SetupChainButtons } from './buttons/setup/setup-button-3.js';
 import { SetupNewsChannelButtons } from './buttons/setup/setup-button-4.js';
 import { SetupMentionButtons } from './buttons/setup/setup-button-5.js';
+import { WalletButtons } from './buttons/wallet-button-event.js';
 import { AmbassadorCommand } from './commands/ambassador-command.js';
 import { ChannelCommand } from './commands/guild/channels-command.js';
 import { MentionCommand } from './commands/guild/mention-command.js';
@@ -61,6 +62,7 @@ import { CodeModal } from './modals/code-modal-event.js';
 import { InputModal } from './modals/input-modal-event.js';
 import { ModalSubmit } from './modals/modalSubmit.js';
 import { ReferralModal } from './modals/referral-modal-event.js';
+import { WalletModal } from './modals/wallet-modal-event.js';
 import { Bot } from './models/bot.js';
 import { Reaction } from './reactions/index.js';
 import {
@@ -127,6 +129,7 @@ async function start(): Promise<void> {
         new SetupChainButtons(),
         new ProfileButtons(),
         new AmbassadorButtons(),
+        new WalletButtons(),
     ];
 
     let menus: Menu[] = [
@@ -138,7 +141,12 @@ async function start(): Promise<void> {
         new SetupChainMenu(),
     ];
 
-    let modals: ModalSubmit[] = [new ReferralModal(), new InputModal(), new CodeModal()];
+    let modals: ModalSubmit[] = [
+        new ReferralModal(),
+        new InputModal(),
+        new CodeModal(),
+        new WalletModal(),
+    ];
 
     // Reactions
     let reactions: Reaction[] = [

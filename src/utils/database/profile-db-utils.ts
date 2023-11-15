@@ -33,4 +33,22 @@ export default class ProfileDbUtils {
 
         return data;
     }
+
+    public static async updateSolWallet(profileId: string, solWallet: string): Promise<void> {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ sol_wallet: solWallet })
+            .eq('id', profileId);
+
+        if (error) throw error;
+    }
+
+    public static async updateEthWallet(profileId: string, ethWallet: string): Promise<void> {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ eth_wallet: ethWallet })
+            .eq('id', profileId);
+
+        if (error) throw error;
+    }
 }

@@ -18,10 +18,8 @@ export class GuildJoinHandler implements EventHandler {
             // check if guild exists in db & create banner
             const guildDoc = await GuildDbUtils.createGuild(guild);
             let banner = guildDoc.banner;
-            if (!banner) banner = await BannerUtils.createBanner(guild);
-            const createdAt = new Date(guildDoc.created_at);
-            // check if guild is new
-            if (createdAt.getTime() > Date.now() - 1000 * 60 * 60) {
+            if (!banner) {
+                banner = await BannerUtils.createBanner(guild);
                 await guild.client.shard.broadcastEval(broadcastBanner, {
                     context: { bannerUrl: banner, guildId: guild.id },
                 });
@@ -86,7 +84,7 @@ export class GuildJoinHandler implements EventHandler {
 
 export async function broadcastBanner(
     client: Client,
-    { bannerUrl, guildId }: { bannerUrl: string, guildId: string }
+    { bannerUrl, guildId }: { bannerUrl: string; guildId: string }
 ): Promise<void> {
     client.emit('guildBanner', {
         bannerUrl,

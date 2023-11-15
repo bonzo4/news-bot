@@ -6,6 +6,7 @@ import { PollChoicesDbUtils } from './database/poll-choice-db-utils.js';
 import { Poll } from './database/poll-db-utils.js';
 import { QuizChoicesDbUtils } from './database/quiz-choice-db-utils.js';
 import { Quiz } from './database/quiz-db-utils.js';
+import { WalletButtonDbUtils } from './database/wallet-button-db-utils.js';
 import { InteractionType } from './news-utils.js';
 import { directButtons, unsubscribeButtons } from '../buttons/direct-button-event.js';
 import { inputButton } from '../buttons/input-button-event.js';
@@ -17,6 +18,7 @@ import {
 import { pollButtons } from '../buttons/poll-button-event.js';
 import { profileButtons } from '../buttons/profile-button-event.js';
 import { quizButtons } from '../buttons/quiz-button-event.js';
+import { walletButtons } from '../buttons/wallet-button-event.js';
 
 type GetComponentsOptions = {
     embed: EmbedDoc;
@@ -70,6 +72,11 @@ export class ComponentUtils {
                 case 'PROFILE':
                     component = [profileButtons(interaction.id)];
                     break;
+                case 'WALLET': {
+                    const wallet = await WalletButtonDbUtils.getWalletButtonById(interaction.id);
+                    component = [walletButtons(wallet)];
+                    break;
+                }
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');
                 // component = getPromoComponents(interaction as Promo);
@@ -129,6 +136,11 @@ export class ComponentUtils {
                 case 'PROFILE':
                     component = [profileButtons(interaction.id)];
                     break;
+                case 'WALLET': {
+                    const wallet = await WalletButtonDbUtils.getWalletButtonById(interaction.id);
+                    component = [walletButtons(wallet)];
+                    break;
+                }
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');
                 // component = getPromoComponents(interaction as Promo);
@@ -188,6 +200,11 @@ export class ComponentUtils {
                 case 'PROFILE':
                     component = [profileButtons(interaction.id)];
                     break;
+                case 'WALLET': {
+                    const wallet = await WalletButtonDbUtils.getWalletButtonById(interaction.id);
+                    component = [walletButtons(wallet)];
+                    break;
+                }
                 case 'PROMO':
                     throw new Error('Promo not implemented yet.');
                 // component = getPromoComponents(interaction as Promo);
