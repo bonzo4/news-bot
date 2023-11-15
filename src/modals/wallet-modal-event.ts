@@ -87,6 +87,9 @@ export class WalletModal implements ModalSubmit {
                 return;
             }
             await ProfileDbUtils.updateSolWallet(profile.id, solWallet);
+            await InteractionUtils.success(intr, 'SOL Wallet updated successfully.', [
+                profileButtons(),
+            ]);
         }
 
         if (walletType === 'eth') {
@@ -96,6 +99,9 @@ export class WalletModal implements ModalSubmit {
                 return;
             }
             await ProfileDbUtils.updateEthWallet(profile.id, ethWallet);
+            await InteractionUtils.success(intr, 'ETH Wallet updated successfully.', [
+                profileButtons(),
+            ]);
         }
 
         if (walletButtonId) {
@@ -115,7 +121,5 @@ export class WalletModal implements ModalSubmit {
                 guild_id: intr.guildId,
             });
         }
-
-        await InteractionUtils.success(intr, 'Wallet updated successfully.', [profileButtons()]);
     }
 }

@@ -98,8 +98,10 @@ export class ProfileCommand implements Command {
             }
 
             if (profile.eth_wallet && profile.eth_wallet !== '') {
-                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet}\n\n`;
+                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet}\n`;
             }
+
+            messageBody += '\n';
 
             if (referrals.length > 0) {
                 const referralSpliced = referrals.splice(0, 5);
