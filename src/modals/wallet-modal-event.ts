@@ -82,11 +82,19 @@ export class WalletModal implements ModalSubmit {
 
         if (walletType === 'sol') {
             const solWallet = intr.fields.getTextInputValue('solWallet');
+            if (solWallet.length < 40) {
+                await InteractionUtils.warn(intr, 'Please enter a valid SOL wallet.');
+                return;
+            }
             await ProfileDbUtils.updateSolWallet(profile.id, solWallet);
         }
 
         if (walletType === 'eth') {
             const ethWallet = intr.fields.getTextInputValue('ethWallet');
+            if (ethWallet.length < 40) {
+                await InteractionUtils.warn(intr, 'Please enter a valid ETH wallet.');
+                return;
+            }
             await ProfileDbUtils.updateEthWallet(profile.id, ethWallet);
         }
 
