@@ -21,7 +21,7 @@ import { InteractionUtils } from '../utils/interaction-utils.js';
 export function walletModal(type: 'sol' | 'eth', walletButtonId: number): ModalBuilder {
     const modal = new ModalBuilder()
         .setTitle('Syndicate News')
-        .setCustomId(walletButtonId ? `wallet_${walletButtonId}` : 'wallet');
+        .setCustomId(walletButtonId ? `wallet_${type}_${walletButtonId}` : `wallet_${type}`);
 
     if (type === 'sol') {
         const solWallet = new TextInputBuilder()
@@ -56,10 +56,9 @@ export class WalletModal implements ModalSubmit {
     deferType = ModalDeferType.REPLY;
 
     async execute(intr: ModalSubmitInteraction, data: EventData): Promise<void> {
-        const walletButtonId = parseInt(intr.customId.split('_')[1]);
+        const walletButtonId = parseInt(intr.customId.split('_')[2]);
 
-        const solWallet = intr.fields.getTextInputValue('solWallet');
-        const ethWallet = intr.fields.getTextInputValue('ethWallet');
+        const walletType = intr.customId.split('_')[1];
 
         let profile = await ProfileDbUtils.getProfileByDiscordId(data.userData.id);
 
@@ -81,11 +80,13 @@ export class WalletModal implements ModalSubmit {
             }
         }
 
-        if (solWallet && solWallet !== '') {
+        if (walletType === 'sol') {
+            const solWallet = intr.fields.getTextInputValue('solWallet');
             await ProfileDbUtils.updateSolWallet(profile.id, solWallet);
         }
 
-        if (ethWallet && ethWallet !== '') {
+        if (walletType === 'eth') {
+            const ethWallet = intr.fields.getTextInputValue('ethWallet');
             await ProfileDbUtils.updateEthWallet(profile.id, ethWallet);
         }
 
