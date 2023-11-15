@@ -28,8 +28,7 @@ export function walletModal(type: 'sol' | 'eth', walletButtonId: number): ModalB
             .setCustomId('solWallet')
             .setLabel('SOL Wallet')
             .setPlaceholder('Enter SOL Wallet')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true);
+            .setStyle(TextInputStyle.Short);
 
         const row = new ActionRowBuilder<TextInputBuilder>().addComponents([solWallet]);
 
@@ -41,8 +40,7 @@ export function walletModal(type: 'sol' | 'eth', walletButtonId: number): ModalB
             .setCustomId('ethWallet')
             .setLabel('ETH Wallet')
             .setPlaceholder('Enter ETH Wallet')
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true);
+            .setStyle(TextInputStyle.Short);
 
         const row = new ActionRowBuilder<TextInputBuilder>().addComponents([ethWallet]);
 
