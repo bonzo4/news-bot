@@ -128,7 +128,7 @@ export class ProfileButtons implements Button {
                 away === 1 ? '' : 's'
             } away)**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
                 code.code
-            }\n\n`;
+            }\n`;
 
             if (profile.sol_wallet && profile.sol_wallet !== '') {
                 messageBody += `💸┃SOL Wallet: ${profile.sol_wallet.slice(
@@ -141,7 +141,7 @@ export class ProfileButtons implements Button {
                 messageBody += `💸┃ETH Wallet: ${profile.eth_wallet.slice(
                     0,
                     5
-                )}...${profile.eth_wallet.slice(-3)}\n`;
+                )}...${profile.eth_wallet.slice(-3)}\n\n`;
             }
 
             if (referrals.length > 0) {

@@ -2,6 +2,7 @@ import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Command, CommandDeferType } from './index.js';
+import { walletButtons } from '../buttons/wallet-button-event.js';
 import { EventData } from '../models/internal-models.js';
 import DiscordActionDbUtils from '../utils/database/action-db-utils.js';
 import GuildRewardDbUtils from '../utils/database/guild-reward-db-utils.js';
@@ -90,7 +91,21 @@ export class ProfileCommand implements Command {
                 away === 1 ? '' : 's'
             } away)**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
                 code.code
-            }\n\n`;
+            }\n`;
+
+            if (profile.sol_wallet && profile.sol_wallet !== '') {
+                messageBody += `💸┃SOL Wallet: ${profile.sol_wallet.slice(
+                    0,
+                    3
+                )}...${profile.eth_wallet.slice(-3)}\n`;
+            }
+
+            if (profile.eth_wallet && profile.eth_wallet !== '') {
+                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet.slice(
+                    0,
+                    5
+                )}...${profile.eth_wallet.slice(-3)}\n\n`;
+            }
 
             if (referrals.length > 0) {
                 const referralSpliced = referrals.splice(0, 5);
@@ -126,7 +141,8 @@ export class ProfileCommand implements Command {
                         'https://cdn.discordapp.com/attachments/988242915027460146/1156733608766222347/image.png?ex=651df49f&is=651ca31f&hm=4052db0f3d3752a83e818f094de9cf439cedfaa34a6605bf545c1947c54e78de&'
                     )
                     .setColor(0x000),
-                true
+                true,
+                [walletButtons()]
             );
         } catch (err) {
             await InteractionUtils.error(intr, 'Could not get profile, please try again later.');
