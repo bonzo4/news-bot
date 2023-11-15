@@ -91,20 +91,14 @@ export class ProfileCommand implements Command {
                 away === 1 ? '' : 's'
             } away)**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
                 code.code
-            }\n`;
+            }\n\n`;
 
             if (profile.sol_wallet && profile.sol_wallet !== '') {
-                messageBody += `💸┃SOL Wallet: ${profile.sol_wallet.slice(
-                    0,
-                    3
-                )}...${profile.eth_wallet.slice(-3)}\n`;
+                messageBody += `💸┃SOL Wallet: ${profile.sol_wallet}\n`;
             }
 
             if (profile.eth_wallet && profile.eth_wallet !== '') {
-                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet.slice(
-                    0,
-                    5
-                )}...${profile.eth_wallet.slice(-3)}\n\n`;
+                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet}\n\n`;
             }
 
             if (referrals.length > 0) {
