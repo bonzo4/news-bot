@@ -131,18 +131,14 @@ export class ProfileButtons implements Button {
             }\n`;
 
             if (profile.sol_wallet && profile.sol_wallet !== '') {
-                messageBody += `💸┃SOL Wallet: ${profile.sol_wallet.slice(
-                    0,
-                    3
-                )}...${profile.eth_wallet.slice(-3)}\n`;
+                messageBody += `💸┃**SOL Wallet**: ${profile.sol_wallet}\n`;
             }
 
             if (profile.eth_wallet && profile.eth_wallet !== '') {
-                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet.slice(
-                    0,
-                    5
-                )}...${profile.eth_wallet.slice(-3)}\n\n`;
+                messageBody += `💸┃**ETH Wallet**: ${profile.eth_wallet}\n`;
             }
+
+            messageBody += '\n';
 
             if (referrals.length > 0) {
                 const referralSpliced = referrals.splice(0, 5);
