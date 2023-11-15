@@ -18,7 +18,7 @@ export function walletButtons(walletButton?: WalletButton): ActionRowBuilder<But
         row.addComponents([
             new ButtonBuilder()
                 .setCustomId(walletButtonId ? `wallet_sol_${walletButtonId}` : 'wallet_sol')
-                .setLabel('SOL Wallet')
+                .setLabel('Submit SOL Wallet')
                 .setStyle(ButtonStyle.Primary),
         ]);
     }
@@ -27,7 +27,7 @@ export function walletButtons(walletButton?: WalletButton): ActionRowBuilder<But
         row.addComponents([
             new ButtonBuilder()
                 .setCustomId(walletButtonId ? `wallet_eth_${walletButtonId}` : 'wallet_eth')
-                .setLabel('ETH Wallet')
+                .setLabel('Submit ETH Wallet')
                 .setStyle(ButtonStyle.Primary),
         ]);
     }
