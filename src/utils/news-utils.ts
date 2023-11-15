@@ -19,8 +19,10 @@ import { Input, InputDbUtils } from './database/input-db-utils.js';
 import { Link, LinkDbUtils } from './database/link-db-utils.js';
 import { MentionDbUtils } from './database/mention-db-utils.js';
 import { Poll, PollDbUtils } from './database/poll-db-utils.js';
+import { ProfileButtonDbUtils } from './database/profile-button-db-utils.js';
 import { Promo, PromoDbUtils } from './database/promo-db-utils.js';
 import { Quiz, QuizDbUtils } from './database/quiz-db-utils.js';
+import { WalletButtonDbUtils } from './database/wallet-button-db-utils.js';
 import { Logger } from '../services/logger.js';
 
 export type InteractionType = Poll | Quiz | Input | Link | Direct | Promo;
@@ -51,7 +53,7 @@ type UserSendOptions = {
 type SendContentOptions = {
     content: MessageCreateOptions;
     channel: GuildTextBasedChannel | DMChannel;
-}
+};
 
 export class NewsUtils {
     public static async getNewsChannels(
@@ -81,9 +83,9 @@ export class NewsUtils {
             content: {
                 embeds: [new EmbedBuilder().setTitle('Syndicate')],
             },
-            channel
+            channel,
         }).then(async message => {
-                await message.delete().catch(() => null);
+            await message.delete().catch(() => null);
         });
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
@@ -92,7 +94,7 @@ export class NewsUtils {
                     content: mention,
                 },
                 channel,
-            })
+            });
         }
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
@@ -104,17 +106,19 @@ export class NewsUtils {
                     },
                     channel,
                 });
-                
-                
+
                 if (message && reactions) {
                     for (const reaction of reactions) {
                         await message.react(reaction).catch(() => null);
                     }
                 }
 
-                if (index === content.length - 1 && hasThread) await message.startThread({
-                    name: 'Syndicate Network Discussion',
-                }).catch(() => null)
+                if (index === content.length - 1 && hasThread)
+                    await message
+                        .startThread({
+                            name: 'Syndicate Network Discussion',
+                        })
+                        .catch(() => null);
             }
         }
     }
@@ -129,7 +133,7 @@ export class NewsUtils {
                         components,
                     },
                     channel,
-                })
+                });
             }
         }
     }
@@ -137,8 +141,9 @@ export class NewsUtils {
     private static async sendContent(options: SendContentOptions): Promise<Message> {
         const { content, channel } = options;
         let resendError: any = null;
-        let message: Message<boolean>
-        await channel.send(content)
+        let message: Message<boolean>;
+        await channel
+            .send(content)
             .then((msg: Message<boolean>) => {
                 message = msg;
             })
@@ -148,7 +153,8 @@ export class NewsUtils {
             });
         while (!message && resendError && resendError.code === 429) {
             await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
-            await channel.send(content)
+            await channel
+                .send(content)
                 .then((msg: Message<boolean>) => {
                     message = msg;
                 })
@@ -185,6 +191,16 @@ export class NewsUtils {
                     break;
                 case 'PROMO':
                     interactionDocs = await PromoDbUtils.getPromosByEmbedId(embeds.id);
+                    break;
+                case 'PROFILE':
+                    interactionDocs = await ProfileButtonDbUtils.getProfileButtonsByEmbedId(
+                        embeds.id
+                    );
+                    break;
+                case 'WALLET':
+                    interactionDocs = await WalletButtonDbUtils.getWalletButtonsByEmbedId(
+                        embeds.id
+                    );
                     break;
                 default:
                     interactionDocs = [];

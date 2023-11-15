@@ -94,11 +94,11 @@ export class ProfileCommand implements Command {
             }\n\n`;
 
             if (profile.sol_wallet && profile.sol_wallet !== '') {
-                messageBody += `💸┃SOL Wallet: ${profile.sol_wallet}\n`;
+                messageBody += `💸┃**SOL Wallet**: ${profile.sol_wallet}\n`;
             }
 
             if (profile.eth_wallet && profile.eth_wallet !== '') {
-                messageBody += `💸┃ETH Wallet: ${profile.eth_wallet}\n`;
+                messageBody += `💸┃**ETH Wallet**: ${profile.eth_wallet}\n`;
             }
 
             messageBody += '\n';
