@@ -53,7 +53,7 @@ export function walletModal(type: 'sol' | 'eth', walletButtonId: number): ModalB
 }
 
 export class WalletModal implements ModalSubmit {
-    ids: string[] = ['code'];
+    ids: string[] = ['wallet'];
     cooldown = new RateLimiter(1, 5000);
     deferType = ModalDeferType.REPLY;
 
@@ -101,6 +101,11 @@ export class WalletModal implements ModalSubmit {
                 wallet_button_id: walletButtonId,
                 guild_id: intr.guildId,
                 news_id: embed.news_id,
+            });
+        } else {
+            await WalletInteractionDbUtils.createInteraction({
+                user_id: data.userData.id,
+                guild_id: intr.guildId,
             });
         }
 
