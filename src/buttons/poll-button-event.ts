@@ -27,15 +27,12 @@ function* pollStyler(): Generator<ButtonStyle> {
     }
 }
 
-export function pollButtons(
+function createRow(
     choices: PollChoice[],
-    randomized: boolean
-): ActionRowBuilder<ButtonBuilder>[] {
-    if (choices.length < 0) return [];
+    pollStyle: Generator<ButtonStyle>
+): ActionRowBuilder<ButtonBuilder> {
     const row = new ActionRowBuilder<ButtonBuilder>();
-    const randomChoices = randomized ? choices.sort(() => Math.random() - 0.5) : choices;
-    const pollStyle = pollStyler();
-    randomChoices.forEach(choice => {
+    choices.forEach(choice => {
         const button = new ButtonBuilder()
             .setCustomId(`poll_${choice.id}`)
             .setLabel(choice.text)
@@ -44,23 +41,48 @@ export function pollButtons(
         if (choice.emoji) button.setEmoji(choice.emoji);
         row.addComponents(button);
     });
-    if (row.components.length < 5) {
-        row.addComponents(
+    return row;
+}
+
+export function pollButtons(
+    choices: PollChoice[],
+    randomized: boolean
+): ActionRowBuilder<ButtonBuilder>[] {
+    if (choices.length < 0) return [];
+
+    const pollStyle = pollStyler();
+    const randomChoices = randomized ? choices.sort(() => Math.random() - 0.5) : choices;
+
+    const choiceRows: PollChoice[][] = [];
+
+    for (let i = 0; i < randomChoices.length; i += 5) {
+        choiceRows.push(randomChoices.slice(i, i + 5));
+    }
+
+    const rows: ActionRowBuilder<ButtonBuilder>[] = [];
+    choiceRows.forEach(choices => {
+        rows.push(createRow(choices, pollStyle));
+    });
+
+    if (randomChoices.length % 5 === 0) {
+        rows.push(
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`poll_results_${choices[0].poll_id}`)
+                    .setLabel('Results')
+                    .setStyle(ButtonStyle.Secondary)
+            )
+        );
+    } else {
+        rows[rows.length - 1].addComponents(
             new ButtonBuilder()
                 .setCustomId(`poll_results_${choices[0].poll_id}`)
                 .setLabel('Results')
                 .setStyle(ButtonStyle.Secondary)
         );
-        return [row];
     }
-    const row2 = new ActionRowBuilder<ButtonBuilder>();
-    row2.addComponents(
-        new ButtonBuilder()
-            .setCustomId(`poll_results_${choices[0].poll_id}`)
-            .setLabel('Results')
-            .setStyle(ButtonStyle.Secondary)
-    );
-    return [row, row2];
+
+    return rows;
 }
 
 export class PollButtons implements Button {
