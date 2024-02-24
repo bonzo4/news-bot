@@ -1,5 +1,3 @@
-import { Locale } from 'discord.js';
-
 import { StaffUser } from '../utils/database/staff-user-db-utils.js';
 import { UserDoc } from '../utils/database/user-db-utils.js';
 
@@ -7,10 +5,6 @@ import { UserDoc } from '../utils/database/user-db-utils.js';
 export class EventData {
     // TODO: Add any data you want to store
     constructor(
-        // Event language
-        public lang: Locale,
-        // Guild language
-        public langGuild: Locale,
         // User document
         public userData?: UserDoc | null,
         // Staff document

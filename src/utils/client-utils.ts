@@ -6,7 +6,6 @@ import {
     RESTJSONErrorCodes as DiscordApiErrors,
     Guild,
     GuildMember,
-    Locale,
     NewsChannel,
     Role,
     StageChannel,
@@ -16,7 +15,6 @@ import {
 } from 'discord.js';
 
 import { PermissionUtils, RegexUtils } from './index.js';
-import { Lang } from '../services/index.js';
 
 const FETCH_MEMBER_LIMIT = 20;
 const IGNORED_ERRORS = [
@@ -226,10 +224,7 @@ export class ClientUtils {
         }
     }
 
-    public static async findNotifyChannel(
-        guild: Guild,
-        langCode: Locale
-    ): Promise<TextChannel | NewsChannel> {
+    public static async findNotifyChannel(guild: Guild): Promise<TextChannel | NewsChannel> {
         // Prefer the system channel
         let systemChannel = guild.systemChannel;
         if (systemChannel && PermissionUtils.canSend(systemChannel, true)) {
@@ -240,8 +235,7 @@ export class ClientUtils {
         return (await guild.channels.fetch()).find(
             channel =>
                 (channel instanceof TextChannel || channel instanceof NewsChannel) &&
-                PermissionUtils.canSend(channel, true) &&
-                Lang.getRegex('channelRegexes.bot', langCode).test(channel.name)
+                PermissionUtils.canSend(channel, true)
         ) as TextChannel | NewsChannel;
     }
 }
