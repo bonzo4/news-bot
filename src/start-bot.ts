@@ -31,6 +31,7 @@ import {
     NewsCommandMetadata,
 } from './commands/metadata.js';
 import { ApproveCommand } from './commands/news/approve-command.js';
+import { ChangeTopicCommand } from './commands/news/change-topic.js';
 import { DirectCommand } from './commands/news/direct-command.js';
 import { NewsCommand } from './commands/news/news-command.js';
 import { UnsubscribeCommand } from './commands/news/unsubscribe-command.js';
@@ -108,6 +109,7 @@ async function start(): Promise<void> {
         new SetupCommand(),
         new ReferralCommand(),
         new MentionCommand(),
+        new ChangeTopicCommand(),
     ];
 
     // Buttons

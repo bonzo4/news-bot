@@ -41,6 +41,7 @@ import { SetupMessages } from '../messages/setup.js';
 import { JobService, Logger } from '../services/index.js';
 import { NewsDbUtils } from '../utils/database/news-db-utils.js';
 import {
+    ChannelDbUtils,
     GuildDbUtils,
     GuildSettingsDbUtils,
     InteractionUtils,
@@ -144,6 +145,9 @@ export class Bot {
                 await this.userReferral(referrerId, userId, this.options.client);
             }
         );
+        this.options.client.on('changeTopic', async ({ topic }: { topic: string }) => {
+            await this.onChangeTopic({ topic });
+        });
         this.options.client.rest.on(
             RESTEvents.RateLimited,
             async (rateLimitData: RateLimitData) => await this.onRateLimit(rateLimitData)
@@ -646,5 +650,38 @@ export class Bot {
             .setTimestamp();
 
         await userReferralChannel.send({ embeds: [embed] });
+    }
+
+    private async onChangeTopic({ topic }: { topic: string }): Promise<void> {
+        const guildIds = Array.from(this.options.client.guilds.cache.keys());
+        for (const guildId of guildIds) {
+            try {
+                const guild = this.options.client.guilds.cache.get(guildId);
+                if (!guild) continue;
+                const guildSettings = await GuildSettingsDbUtils.getGuildSettings(guildId);
+                if (!guildSettings) continue;
+                const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                for (const { id } of channels) {
+                    const channel = guild.channels.cache.get(id);
+                    if (!channel) continue;
+                    await channel.edit({ topic }).catch(async error => {
+                        await Logger.error({
+                            message: 'Error changing topic',
+                            obj: error,
+                            guildId: guildId,
+                        });
+                    });
+                }
+            } catch (err) {
+                await Logger.error({
+                    message: `Error changing topic news to guild: ${err}`,
+                    guildId,
+                }).catch(async err => {
+                    await Logger.error({
+                        message: `Error logging error: ${err}`,
+                    });
+                });
+            }
+        }
     }
 }

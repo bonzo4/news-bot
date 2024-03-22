@@ -1,4 +1,5 @@
 import {
+    APIApplicationCommandBasicOption,
     APIApplicationCommandChannelOption,
     APIApplicationCommandOption,
     APIApplicationCommandRoleOption,
@@ -50,5 +51,11 @@ export class Args {
         name: 'manage',
         description: 'Manage roles that are mentioned when a news article is posted.',
         type: ApplicationCommandOptionType.Subcommand,
+    };
+    public static readonly TOPIC_COMMAND: APIApplicationCommandBasicOption = {
+        name: 'topic',
+        description: 'The tag to display.',
+        type: ApplicationCommandOptionType.String,
+        required: true,
     };
 }

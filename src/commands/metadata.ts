@@ -3,6 +3,8 @@ import {
     RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord.js';
 
+import { Args } from './args.js';
+
 // import { Args } from './index.js';
 
 export const NewsCommandMetadata: {
@@ -121,6 +123,20 @@ export const GeneralCommandMetadata: {
         dm_permission: true,
         default_member_permissions: undefined,
         options: [],
+    },
+    changeTopic: {
+        type: ApplicationCommandType.ChatInput,
+        name: `change-topic`,
+        description: 'Change the topic of the syndicate global channel.',
+        name_localizations: {},
+        description_localizations: {},
+        dm_permission: false,
+        default_member_permissions: undefined,
+        options: [
+            {
+                ...Args.TOPIC_COMMAND,
+            },
+        ],
     },
 };
 
