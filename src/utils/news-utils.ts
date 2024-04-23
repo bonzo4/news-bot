@@ -1,7 +1,6 @@
 import {
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle,
     Client,
     DMChannel,
     EmbedBuilder,
@@ -76,7 +75,6 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 1000));
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
@@ -97,13 +95,23 @@ export class NewsUtils {
                 channel,
             });
         }
-        let topMessage: Message;
+        let topMessage: Message<boolean>;
+
+        const sortedContent: SendContent[] = [];
+        for (const { embed, components, tag, reactions } of content) {
+            const lastContent = sortedContent[sortedContent.length - 1];
+            if (!lastContent) {
+                sortedContent.push([{ embed, components, tag, reactions }]);
+                continue;
+            }
+        }
+
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
             if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
                 const message = await this.sendContent({
                     content: {
-                        embeds: [embed],
+                        embeds: [...embed],
                         components,
                     },
                     channel,
@@ -115,7 +123,7 @@ export class NewsUtils {
                     }
                 }
 
-                if (index === content.length - 1) topMessage = message;
+                if (index === 0) topMessage = message;
                 if (hasThread)
                     await message
                         .startThread({
@@ -124,21 +132,21 @@ export class NewsUtils {
                         .catch(() => null);
             }
         }
-        if (tags.includes('news'))
-            await this.sendContent({
-                content: {
-                    components: [
-                        new ActionRowBuilder<ButtonBuilder>().setComponents(
-                            new ButtonBuilder()
-                                .setStyle(ButtonStyle.Link)
-                                .setURL(topMessage.url)
-                                .setEmoji('⬆')
-                                .setLabel('To the Top')
-                        ),
-                    ],
-                },
-                channel,
-            });
+        // if (options.tags.includes('news'))
+        //     await this.sendContent({
+        //         content: {
+        //             components: [
+        //                 new ActionRowBuilder<ButtonBuilder>().setComponents(
+        //                     new ButtonBuilder()
+        //                         .setStyle(ButtonStyle.Link)
+        //                         .setURL(topMessage.url)
+        //                         .setEmoji('⬆')
+        //                         .setLabel('To the Top')
+        //                 ),
+        //             ],
+        //         },
+        //         channel,
+        //     });
     }
 
     public static async sendToUser(options: UserSendOptions): Promise<void> {
@@ -147,7 +155,7 @@ export class NewsUtils {
             if (!tag || tag === 'all' || tag === 'direct' || tags.includes(tag)) {
                 await this.sendContent({
                     content: {
-                        embeds: [embed],
+                        embeds: [...embed],
                         components,
                     },
                     channel,
@@ -160,17 +168,8 @@ export class NewsUtils {
         const { content, channel } = options;
         let resendError: any = null;
         let message: Message<boolean>;
-        await channel
-            .send(content)
-            .then((msg: Message<boolean>) => {
-                message = msg;
-            })
-            .catch(async error => {
-                if (error.code !== 429) throw new Error(error.message ? error.message : error);
-                resendError = error;
-            });
-        while (!message && resendError && resendError.code === 429) {
-            await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+        // do while loop
+        do {
             await channel
                 .send(content)
                 .then((msg: Message<boolean>) => {
@@ -180,7 +179,9 @@ export class NewsUtils {
                     if (error.code !== 429) throw new Error(error.message ? error.message : error);
                     resendError = error;
                 });
-        }
+            if (resendError && resendError.code === 429)
+                await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
+        } while (!message && resendError && resendError.code === 429);
 
         return message;
     }

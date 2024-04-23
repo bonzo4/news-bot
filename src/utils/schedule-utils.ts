@@ -141,30 +141,38 @@ export class ScheduledNews extends CronJob {
     private async sendToAllGuilds(options: SendOptions): Promise<void> {
         const { news } = options;
         const guildIds = Array.from(this.client.guilds.cache.keys());
-        for (const guildId of guildIds) {
+
+        // Helper function to handle sending and error logging
+        const sendWithHandling = async (guildId: string): Promise<void> => {
             try {
-                await this.sendToGuild({
-                    ...options,
-                    guildId,
-                });
+                await this.sendToGuild({ ...options, guildId });
             } catch (err) {
-                await Logger.error({
-                    message: `Error sending news to guild: ${err}`,
-                    guildId,
-                    newsId: news.id,
-                }).catch(async err => {
+                // Log the error
+                try {
                     await Logger.error({
-                        message: `Error logging error: ${err}`,
+                        message: `Error sending news to guild: ${err}`,
+                        guildId,
+                        newsId: news.id,
                     });
-                });
+                } catch (logError) {
+                    await Logger.error({
+                        message: `Error logging error: ${logError}`,
+                    });
+                }
             }
-        }
+        };
+
+        // Use Promise.all to execute all sending operations concurrently
+        await Promise.all(guildIds.map(sendWithHandling));
     }
 
     private async sendToAllUsers(options: SendOptions): Promise<void> {
         const directChannels = await ChannelDbUtils.getAllDirectNewsChannels();
 
-        for (const directChannel of directChannels) {
+        const sendWithHandling = async (directChannel: {
+            id: string;
+            user_id: string;
+        }): Promise<void> => {
             try {
                 const dmChannel = (await this.client.channels.fetch(directChannel.id)) as DMChannel;
                 await this.sendToUser({
@@ -175,13 +183,16 @@ export class ScheduledNews extends CronJob {
                 await Logger.error({
                     message: `Error sending news to user: ${err}`,
                     userId: directChannel.user_id,
+                    newsId: options.news.id,
                 }).catch(async err => {
                     await Logger.error({
                         message: `Error logging error: ${err}`,
                     });
                 });
             }
-        }
+        };
+
+        await Promise.all(directChannels.map(sendWithHandling));
     }
 
     private async sendToTags(options: SendToTagsOptions): Promise<void> {
@@ -201,7 +212,8 @@ export class ScheduledNews extends CronJob {
         const { tags, news } = options;
         const guildIds = Array.from(this.client.guilds.cache.keys());
         const guildsWithTags = await TagDbUtils.getGuildsWithTags(tags, guildIds);
-        for (const guildId of guildsWithTags) {
+
+        const sendWithHandling = async (guildId: string): Promise<void> => {
             try {
                 await this.sendToGuild({
                     ...options,
@@ -218,13 +230,16 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
-        }
+        };
+
+        await Promise.all(guildsWithTags.map(sendWithHandling));
     }
 
     private async sendToUserTags(options: SendToTagsOptions): Promise<void> {
         const { tags, news } = options;
         const userWithTags = await TagDbUtils.getUsersWithTags(tags);
-        for (const userId of userWithTags) {
+
+        const sendWithHandling = async (userId: string): Promise<void> => {
             try {
                 const directChannel = await ChannelDbUtils.getDirectNewsChannel(userId);
                 if (!directChannel) {
@@ -233,7 +248,7 @@ export class ScheduledNews extends CronJob {
                         userId,
                         newsId: news.id,
                     });
-                    continue;
+                    return;
                 }
                 const dmChannel = (await this.client.channels.fetch(directChannel.id)) as DMChannel;
                 await this.sendToUser({
@@ -251,7 +266,9 @@ export class ScheduledNews extends CronJob {
                     });
                 });
             }
-        }
+        };
+
+        await Promise.all(userWithTags.map(sendWithHandling));
     }
 
     private async sendToGuild(options: GuildSendOptions): Promise<void> {
@@ -288,7 +305,7 @@ export class ScheduledNews extends CronJob {
                 interactions,
             });
             contentForGuild.push({
-                embed: guildEmbed,
+                embed: [guildEmbed],
                 components,
                 tag: embed.tag,
                 reactions: embed.reactions,
@@ -335,7 +352,7 @@ export class ScheduledNews extends CronJob {
                 userId,
             });
             contentForDirect.push({
-                embed: directEmbed,
+                embed: [directEmbed],
                 components,
                 tag: embed.tag,
                 reactions: embed.reactions,
