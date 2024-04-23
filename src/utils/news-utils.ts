@@ -1,6 +1,7 @@
 import {
     ActionRowBuilder,
     ButtonBuilder,
+    ButtonStyle,
     Client,
     DMChannel,
     EmbedBuilder,
@@ -96,6 +97,7 @@ export class NewsUtils {
                 channel,
             });
         }
+        let topMessage: Message;
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
             if (!tag || tag === 'all' || tag === 'guild' || tags.includes(tag)) {
@@ -113,7 +115,8 @@ export class NewsUtils {
                     }
                 }
 
-                if (index === content.length - 1 && hasThread)
+                if (index === content.length - 1) topMessage = message;
+                if (hasThread)
                     await message
                         .startThread({
                             name: 'Syndicate Network Discussion',
@@ -121,6 +124,21 @@ export class NewsUtils {
                         .catch(() => null);
             }
         }
+        if (tags.includes('news'))
+            await this.sendContent({
+                content: {
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().setComponents(
+                            new ButtonBuilder()
+                                .setStyle(ButtonStyle.Link)
+                                .setURL(topMessage.url)
+                                .setEmoji('⬆')
+                                .setLabel('To the Top')
+                        ),
+                    ],
+                },
+                channel,
+            });
     }
 
     public static async sendToUser(options: UserSendOptions): Promise<void> {
