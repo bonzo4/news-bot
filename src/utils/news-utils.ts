@@ -76,7 +76,6 @@ export class NewsUtils {
     }
 
     public static async sendToGuild(options: GuildSendOptions): Promise<void> {
-        await new Promise(resolve => setTimeout(resolve, 1000));
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
@@ -115,7 +114,7 @@ export class NewsUtils {
                     }
                 }
 
-                if (index === content.length - 1) topMessage = message;
+                if (index === 0) topMessage = message;
                 if (hasThread)
                     await message
                         .startThread({
