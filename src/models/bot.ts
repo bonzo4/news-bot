@@ -535,7 +535,7 @@ export class Bot {
                 return;
             }
             await adminChannel.send(
-                `Shard (${shard + 1}/${9}) finished sending news ${newsId}, now restarting...`
+                `Shard (${shard + 1}/${12}) finished sending news ${newsId}, now restarting...`
             );
         } catch (error) {
             await Logger.error({
