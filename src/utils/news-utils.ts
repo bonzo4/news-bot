@@ -170,7 +170,10 @@ export class NewsUtils {
                         limit: 2,
                     })) as Collection<string, Message<true>>;
                     const duplicateMessages = messages.last();
-                    if (duplicateMessages.embeds.toString() === msg.embeds.toString()) {
+                    if (
+                        duplicateMessages.embeds.toString() === msg.embeds.toString() &&
+                        duplicateMessages.id !== msg.id
+                    ) {
                         await duplicateMessages.delete().catch(() => null);
                     }
                 })
