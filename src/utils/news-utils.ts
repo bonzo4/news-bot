@@ -167,18 +167,12 @@ export class NewsUtils {
                 .then(async (msg: Message<boolean>) => {
                     message = msg;
                     const messages = (await channel.messages.fetch({
-                        limit: 10,
-                        before: msg.id,
+                        limit: 2,
                     })) as Collection<string, Message<true>>;
-                    const duplicateMessages = messages.filter(
-                        m => m.embeds.toString() === msg.embeds.toString() && m.id !== msg.id
-                    );
-
-                    await Promise.all(
-                        duplicateMessages.map(async m => {
-                            await m.delete().catch(() => null);
-                        })
-                    );
+                    const duplicateMessages = messages.last();
+                    if (duplicateMessages.embeds.toString() === msg.embeds.toString()) {
+                        await duplicateMessages.delete().catch(() => null);
+                    }
                 })
                 .catch(async error => {
                     if (error.code !== 429) throw new Error(error.message ? error.message : error);
