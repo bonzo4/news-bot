@@ -1,9 +1,10 @@
 import {
     ActionRowBuilder,
     ButtonBuilder,
+    // ButtonStyle,
     Client,
+    Collection,
     DMChannel,
-    EmbedBuilder,
     Guild,
     GuildTextBasedChannel,
     Message,
@@ -78,14 +79,14 @@ export class NewsUtils {
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
-        await this.sendContent({
-            content: {
-                embeds: [new EmbedBuilder().setTitle('Syndicate')],
-            },
-            channel,
-        }).then(async message => {
-            await message.delete().catch(() => null);
-        });
+        // await this.sendContent({
+        //     content: {
+        //         embeds: [new EmbedBuilder().setTitle('Syndicate')],
+        //     },
+        //     channel,
+        // }).then(async message => {
+        //     await message.delete().catch(() => null);
+        // });
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({
@@ -95,16 +96,7 @@ export class NewsUtils {
                 channel,
             });
         }
-        let topMessage: Message<boolean>;
-
-        const sortedContent: SendContent[] = [];
-        for (const { embed, components, tag, reactions } of content) {
-            const lastContent = sortedContent[sortedContent.length - 1];
-            if (!lastContent) {
-                sortedContent.push([{ embed, components, tag, reactions }]);
-                continue;
-            }
-        }
+        // let topMessage: Message<boolean>;
 
         for (let index = 0; index < content.length; index++) {
             const { embed, components, tag, reactions } = content[index];
@@ -123,8 +115,8 @@ export class NewsUtils {
                     }
                 }
 
-                if (index === 0) topMessage = message;
-                if (hasThread)
+                // if (index === 0) topMessage = message;
+                if (index === content.length - 1 && hasThread)
                     await message
                         .startThread({
                             name: 'Syndicate Network Discussion',
@@ -132,7 +124,7 @@ export class NewsUtils {
                         .catch(() => null);
             }
         }
-        // if (options.tags.includes('news'))
+        // if (tags.includes('news'))
         //     await this.sendContent({
         //         content: {
         //             components: [
@@ -172,8 +164,21 @@ export class NewsUtils {
         do {
             await channel
                 .send(content)
-                .then((msg: Message<boolean>) => {
+                .then(async (msg: Message<boolean>) => {
                     message = msg;
+                    const messages = (await channel.messages.fetch({
+                        limit: 10,
+                        before: msg.id,
+                    })) as Collection<string, Message<true>>;
+                    const duplicateMessages = messages.filter(
+                        m => m.embeds.toString() === msg.embeds.toString() && m.id !== msg.id
+                    );
+
+                    await Promise.all(
+                        duplicateMessages.map(async m => {
+                            await m.delete().catch(() => null);
+                        })
+                    );
                 })
                 .catch(async error => {
                     if (error.code !== 429) throw new Error(error.message ? error.message : error);
