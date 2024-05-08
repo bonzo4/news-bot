@@ -3,8 +3,8 @@ import {
     ButtonBuilder,
     // ButtonStyle,
     Client,
-    Collection,
     DMChannel,
+    EmbedBuilder,
     Guild,
     GuildTextBasedChannel,
     Message,
@@ -79,14 +79,26 @@ export class NewsUtils {
         // let sentFirstEmbed = false;
         const { channel, content, mention, hasMention, hasThread, tags } = options;
 
-        // await this.sendContent({
-        //     content: {
-        //         embeds: [new EmbedBuilder().setTitle('Syndicate')],
-        //     },
-        //     channel,
-        // }).then(async message => {
-        //     await message.delete().catch(() => null);
-        // });
+        await this.sendContent({
+            content: {
+                embeds: [new EmbedBuilder().setTitle('Syndicate')],
+            },
+            channel,
+        }).then(async message => {
+            await message.delete().catch(() => null);
+        });
+
+        const messages = await channel.messages.fetch({
+            limit: 5,
+        });
+
+        const testMessages = messages.filter(m => Date.now() - m.createdTimestamp > 1000 * 60);
+
+        await Promise.all(
+            testMessages.map(async message => {
+                await message.delete().catch(() => null);
+            })
+        );
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({
@@ -166,16 +178,6 @@ export class NewsUtils {
                 .send(content)
                 .then(async (msg: Message<boolean>) => {
                     message = msg;
-                    const messages = (await channel.messages.fetch({
-                        limit: 5,
-                    })) as Collection<string, Message<true>>;
-                    const duplicateMessages = messages.last();
-                    if (
-                        duplicateMessages.embeds.toString() === msg.embeds.toString() &&
-                        duplicateMessages.id !== msg.id
-                    ) {
-                        await duplicateMessages.delete().catch(() => null);
-                    }
                 })
                 .catch(async error => {
                     if (error.code !== 429) throw new Error(error.message ? error.message : error);
