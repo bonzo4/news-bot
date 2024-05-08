@@ -167,7 +167,7 @@ export class NewsUtils {
                 .then(async (msg: Message<boolean>) => {
                     message = msg;
                     const messages = (await channel.messages.fetch({
-                        limit: 2,
+                        limit: 5,
                     })) as Collection<string, Message<true>>;
                     const duplicateMessages = messages.last();
                     if (
