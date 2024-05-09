@@ -1,9 +1,9 @@
-import { ActivityType, Client, ShardingManager } from 'discord.js';
+import { ActivityType, Client, Presence, ShardingManager } from 'discord.js';
 
 import { Job } from './index.js';
 import { botSites } from '../config/botSites.js';
 import { config } from '../config/config.js';
-import { CustomClient } from '../extensions/index.js';
+import { SetShardPresenceContext } from '../controllers/shards-controller.js';
 import { BotSite } from '../models/config-models.js';
 import { HttpService, Logger } from '../services/index.js';
 import { ShardUtils } from '../utils/index.js';
@@ -27,9 +27,17 @@ export class UpdateServerCountJob implements Job {
         let name = `to ${guildCount.toLocaleString()} Communities`;
         let url = 'https://twitter.com/SyndicateNTWRK';
 
-        await this.shardManager.broadcastEval(
-            (client: CustomClient, context) => {
-                return client.setPresence(context.type, context.name, context.url);
+        await this.shardManager.broadcastEval<Presence, SetShardPresenceContext>(
+            (client: Client, context) => {
+                return client.user.setPresence({
+                    activities: [
+                        {
+                            type: ActivityType.Listening,
+                            name: context.name,
+                            url: context.url,
+                        },
+                    ],
+                });
             },
             { context: { type, name, url } }
         );
