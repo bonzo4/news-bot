@@ -1,7 +1,7 @@
 export const debug = {
     override: {
         shardMode: {
-            enabled: false,
+            enabled: true,
             value: 'worker',
         },
     },
