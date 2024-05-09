@@ -41,7 +41,7 @@ export const config = {
     },
     sharding: {
         spawnDelay: 5,
-        spawnTimeout: 300,
+        spawnTimeout: 60,
         serversPerShard: 100,
     },
     clustering: {
