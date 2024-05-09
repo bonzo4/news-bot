@@ -1,11 +1,10 @@
-import { ActivityType, ShardingManager } from 'discord.js';
+import { ActivityType, Client, Presence, ShardingManager } from 'discord.js';
 import { Request, Response, Router } from 'express';
 import router from 'express-promise-router';
 import { createRequire } from 'node:module';
 
 import { Controller } from './index.js';
 import { config } from '../config/config.js';
-import { CustomClient } from '../extensions/index.js';
 import { mapClass } from '../middleware/index.js';
 import {
     GetShardsResponse,
@@ -71,9 +70,17 @@ export class ShardsController implements Controller {
     private async setShardPresences(req: Request, res: Response): Promise<void> {
         let reqBody: SetShardPresencesRequest = res.locals.input;
 
-        await this.shardManager.broadcastEval(
-            (client: CustomClient, context) => {
-                return client.setPresence(context.type, context.name, context.url);
+        await this.shardManager.broadcastEval<Presence, SetShardPresenceContext>(
+            (client: Client, context) => {
+                return client.user.setPresence({
+                    activities: [
+                        {
+                            type: context.type,
+                            name: context.name,
+                            url: context.url,
+                        },
+                    ],
+                });
             },
             { context: { type: ActivityType[reqBody.type], name: reqBody.name, url: reqBody.url } }
         );
@@ -81,3 +88,9 @@ export class ShardsController implements Controller {
         res.sendStatus(200);
     }
 }
+
+export type SetShardPresenceContext = {
+    type: ActivityType;
+    name: string;
+    url: string;
+};
