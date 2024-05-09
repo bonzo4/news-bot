@@ -88,17 +88,17 @@ export class NewsUtils {
             await message.delete().catch(() => null);
         });
 
-        const messages = await channel.messages.fetch({
-            limit: 5,
-        });
+        // const messages = await channel.messages.fetch({
+        //     limit: 5,
+        // });
 
-        const testMessages = messages.filter(m => Date.now() - m.createdTimestamp > 1000 * 60);
+        // const testMessages = messages.filter(m => Date.now() - m.createdTimestamp > 1000 * 60);
 
-        await Promise.all(
-            testMessages.map(async message => {
-                await message.delete().catch(() => null);
-            })
-        );
+        // await Promise.all(
+        //     testMessages.map(async message => {
+        //         await message.delete().catch(() => null);
+        //     })
+        // );
 
         if (hasMention && mention && mention !== '' && mention !== ' ') {
             await this.sendContent({
