@@ -61,6 +61,7 @@ export class PromoButtons implements Button {
                 });
 
                 await intr.reply({
+                    ephemeral: true,
                     content: `Click here to follow ${screenName} on X: ${url}`,
                 });
             }
@@ -76,6 +77,7 @@ export class PromoButtons implements Button {
                 });
 
                 await intr.reply({
+                    ephemeral: true,
                     content: `Click here to like the Post: ${url}`,
                 });
             }
@@ -92,6 +94,7 @@ export class PromoButtons implements Button {
                 });
 
                 await intr.reply({
+                    ephemeral: true,
                     content: `Click here to retweet the Post: ${url}`,
                 });
             }
