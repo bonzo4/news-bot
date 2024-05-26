@@ -4,6 +4,7 @@ import { EmbedDoc } from './database/embed-db-utils.js';
 import { LinkDbUtils } from './database/link-db-utils.js';
 import { PollChoicesDbUtils } from './database/poll-choice-db-utils.js';
 import { Poll } from './database/poll-db-utils.js';
+import { Promo } from './database/promo-db-utils.js';
 import { QuizChoicesDbUtils } from './database/quiz-choice-db-utils.js';
 import { Quiz } from './database/quiz-db-utils.js';
 import { WalletButtonDbUtils } from './database/wallet-button-db-utils.js';
@@ -17,6 +18,7 @@ import {
 } from '../buttons/link-button-event.js';
 import { pollButtons } from '../buttons/poll-button-event.js';
 import { profileButtons } from '../buttons/profile-button-event.js';
+import { promoButtons } from '../buttons/promo-button-event.js';
 import { quizButtons } from '../buttons/quiz-button-event.js';
 import { walletButtons } from '../buttons/wallet-button-event.js';
 
@@ -77,9 +79,10 @@ export class ComponentUtils {
                     component = [walletButtons(wallet)];
                     break;
                 }
-                case 'PROMO':
-                    throw new Error('Promo not implemented yet.');
-                // component = getPromoComponents(interaction as Promo);
+                case 'PROMO': {
+                    const promo = interaction as Promo;
+                    component = [promoButtons(promo)];
+                }
             }
 
             if (component) {

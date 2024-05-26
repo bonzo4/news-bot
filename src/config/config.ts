@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 export const config = {
     developers: ['1010780163811856445'],
-    syndicateGuildId: '980331064029495358',
+    syndicateGuildId: '1241108569135251597',
     syndicateInvite: 'https://discord.gg/syndicatenetwork',
     syndicateChannels: {
-        guildJoined: '1065018457441177714',
+        guildJoined: '1241404979135254619',
         guildCount: '1111837698559328316',
         memberCount: '1111837810740183080',
-        ambassadorJoined: '1142635510041419877',
+        ambassadorJoined: '1243644907265069126',
     },
     syndicateIcon:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',
