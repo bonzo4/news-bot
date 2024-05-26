@@ -57,6 +57,7 @@ export class PromoButtons implements Button {
                     promo_button_id: promoId,
                     news_id: embed.news_id,
                     user_id: userData.id,
+                    guild_id: intr.guildId,
                     type: 'FOLLOW',
                 });
 
@@ -73,6 +74,7 @@ export class PromoButtons implements Button {
                     promo_button_id: promoId,
                     news_id: embed.news_id,
                     user_id: userData.id,
+                    guild_id: intr.guildId,
                     type: 'LIKE',
                 });
 
@@ -90,6 +92,7 @@ export class PromoButtons implements Button {
                     promo_button_id: promoId,
                     news_id: embed.news_id,
                     user_id: userData.id,
+                    guild_id: intr.guildId,
                     type: 'RETWEET',
                 });
 

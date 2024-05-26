@@ -11,6 +11,7 @@ import { InputButtons } from './buttons/input-button-event.js';
 import { MentionButtons } from './buttons/mention-button-event.js';
 import { PollButtons } from './buttons/poll-button-event.js';
 import { ProfileButtons } from './buttons/profile-button-event.js';
+import { PromoButtons } from './buttons/promo-button-event.js';
 import { QuizButtons } from './buttons/quiz-button-event.js';
 import { SetupButtons } from './buttons/setup/setup-button-1.js';
 import { SetupReferralButtons } from './buttons/setup/setup-button-1a.js';
@@ -127,6 +128,7 @@ async function start(): Promise<void> {
         new MentionButtons(),
         new QuizButtons(),
         new PollButtons(),
+        new PromoButtons(),
         new InputButtons(),
         new DirectButtons(),
         new ApproveNewsButtons(),

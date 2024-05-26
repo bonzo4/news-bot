@@ -144,9 +144,10 @@ export class ComponentUtils {
                     component = [walletButtons(wallet)];
                     break;
                 }
-                case 'PROMO':
-                    throw new Error('Promo not implemented yet.');
-                // component = getPromoComponents(interaction as Promo);
+                case 'PROMO': {
+                    const promo = interaction as Promo;
+                    component = [promoButtons(promo)];
+                }
             }
 
             if (component) {
@@ -208,9 +209,10 @@ export class ComponentUtils {
                     component = [walletButtons(wallet)];
                     break;
                 }
-                case 'PROMO':
-                    throw new Error('Promo not implemented yet.');
-                // component = getPromoComponents(interaction as Promo);
+                case 'PROMO': {
+                    const promo = interaction as Promo;
+                    component = [promoButtons(promo)];
+                }
             }
 
             if (component) {
