@@ -139,6 +139,9 @@ export class Bot {
                 await this.guildReferral(guildId, userId, this.options.client);
             }
         );
+        this.options.client.on('guildReferralGoal', async ({ userId }: { userId: string }) => {
+            await this.guildReferralGoal(userId, this.options.client);
+        });
         this.options.client.on(
             'userReferral',
             async ({ referrerId, userId }: { referrerId: string; userId: string }) => {
@@ -619,6 +622,16 @@ export class Bot {
         if (guildDoc.invite) embed.setURL(guildDoc.invite);
 
         await guildReferralChannel.send({ embeds: [embed] });
+    }
+
+    private async guildReferralGoal(userId: string, client: Client): Promise<void> {
+        const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
+        if (!syndicateGuild) return;
+        const role = await syndicateGuild.roles.fetch('1241601642416308235');
+        if (!role) return;
+        const user = await syndicateGuild.members.fetch(userId);
+        if (!user) return;
+        await user.roles.add(role);
     }
 
     private async userReferral(referrerId: string, userId: string, client: Client): Promise<void> {

@@ -12,6 +12,7 @@ import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
 import { previewButtons } from '../buttons/setup/setup-button-2.js';
 import { SetupMessages } from '../messages/setup.js';
 import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
+import { supabase } from '../utils/database/index.js';
 import ReferralCodeDbUtils from '../utils/database/referral-code-db-utils.js';
 import { GuildReferralDbUtils } from '../utils/database/referral-db-utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
@@ -69,6 +70,22 @@ export class ReferralModal implements ModalSubmit {
                 referralCode.discord_id
             );
 
+            // new ambassador date to today as in 5 27 2024
+            const newAmbassadorDate = new Date();
+            newAmbassadorDate.setFullYear(2024, 4, 27);
+
+            const { count } = await supabase
+                .from('guild_referrals')
+                .select('', { count: 'exact' })
+                .eq('user_id', referralCode.discord_id)
+                .gt('created_at', newAmbassadorDate);
+
+            if (count === 5) {
+                await broadcastReferralGoal(intr.client, {
+                    userId: referralCode.discord_id,
+                });
+            }
+
             await InteractionUtils.success(intr, 'Referral code used!');
             await broadcastReferral(intr.client, {
                 guildId: intr.guild.id,
@@ -108,4 +125,11 @@ export async function broadcastReferral(
     { guildId, userId }: { guildId: string; userId: string }
 ): Promise<void> {
     client.emit('guildReferral', { guildId, userId });
+}
+
+export async function broadcastReferralGoal(
+    client: Client,
+    { userId }: { userId: string }
+): Promise<void> {
+    client.emit('guildReferralGoal', { userId });
 }
