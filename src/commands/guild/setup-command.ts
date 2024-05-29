@@ -123,21 +123,21 @@ export class SetupCommand implements Command {
                 .send({
                     embeds: [SetupMessages.setupMessage1()],
                 })
-                .catch(console.log);
+                .catch(err => console.log(err));
 
             await systemChannel
                 .send({
                     embeds: [SetupMessages.setupMessage2()],
                     components: [await setupChainMenu()],
                 })
-                .catch(console.log);
+                .catch(err => console.log(err));
 
             await systemChannel
                 .send({
                     embeds: [SetupMessages.setupMessage3()],
                     components: [mentionButtons()],
                 })
-                .catch(console.log);
+                .catch(err => console.log(err));
 
             const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
             if (newsChannels.length >= 5) {
