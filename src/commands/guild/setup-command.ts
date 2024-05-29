@@ -121,6 +121,14 @@ export class SetupCommand implements Command {
 
             await systemChannel.send({
                 embeds: [SetupMessages.setupMessage1()],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Get Support')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL('https://discord.gg/vsFzFfqfGD')
+                    ),
+                ],
             });
 
             await systemChannel.send({
