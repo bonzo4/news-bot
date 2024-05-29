@@ -63,7 +63,7 @@ export function systemLinks(): ActionRowBuilder<ButtonBuilder> {
     const discordLink = new ButtonBuilder()
         .setLabel('Discord')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://discord.gg/syndicatenetwork');
+        .setURL('https://discord.gg/vsFzFfqfGD');
 
     const twitterLink = new ButtonBuilder()
         .setLabel('Twitter')
@@ -116,16 +116,18 @@ export class SystemButtons implements Button {
             case 'help': {
                 await InteractionUtils.success(
                     intr,
-                    'Please go here for help: **https://discord.gg/syndicatenetwork**.'
+                    'Please go here for help: **https://discord.gg/vsFzFfqfGD**.'
                 );
                 break;
             }
             case 'moreNews': {
-                await InteractionUtils.send(intr,
+                await InteractionUtils.send(
+                    intr,
                     {
-                        embeds: premiumEmbed
+                        embeds: premiumEmbed,
                     },
-                    true);
+                    true
+                );
             }
         }
     }

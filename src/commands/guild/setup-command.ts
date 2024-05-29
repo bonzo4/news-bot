@@ -1,4 +1,7 @@
 import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     CategoryChannel,
     CommandInteraction,
     GuildTextBasedChannel,
@@ -6,17 +9,20 @@ import {
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
-import { setupButtons } from '../../buttons/setup/setup-button-1.js';
+import { mentionButtons } from '../../buttons/mention-button-event.js';
+import { setupChainMenu } from '../../menus/chain-menu-event.js';
 import { SetupMessages } from '../../messages/setup.js';
 import { Logger } from '../../services/logger.js';
 import {
     BannerUtils,
+    ChannelDbUtils,
     ChannelUtils,
     GuildDbUtils,
     GuildSettingsDbUtils,
     GuildUtils,
     InteractionUtils,
 } from '../../utils/index.js';
+import { NewsChannelsUtils } from '../../utils/news-channels-utils.js';
 import { Command, CommandDeferType } from '../index.js';
 
 export class SetupCommand implements Command {
@@ -49,14 +55,35 @@ export class SetupCommand implements Command {
                     announcementChannel,
                 });
                 await systemChannel.send({
-                    embeds: [SetupMessages.setupStart(banner)],
-                    components: [setupButtons()],
+                    embeds: [SetupMessages.setupMessage1()],
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setLabel('Get Support')
+                                .setStyle(ButtonStyle.Link)
+                                .setURL('https://discord.gg/vsFzFfqfGD')
+                        ),
+                    ],
                 });
 
-                await InteractionUtils.success(
-                    intr,
-                    `Setup has been completed. Please check ${systemChannel.toString()} for more information.`
-                );
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage2()],
+                    components: [await setupChainMenu()],
+                });
+
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage3()],
+                    components: [mentionButtons()],
+                });
+
+                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                if (newsChannels.length >= 5) {
+                    return;
+                }
+                const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
+                await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+
+                await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
                 return;
             }
             if (guildSettings.category_id)
@@ -93,9 +120,35 @@ export class SetupCommand implements Command {
             }
 
             await systemChannel.send({
-                embeds: [SetupMessages.setupStart(banner)],
-                components: [setupButtons()],
+                embeds: [SetupMessages.setupMessage1()],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Get Support')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL('https://discord.gg/vsFzFfqfGD')
+                    ),
+                ],
             });
+
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage2()],
+                components: [await setupChainMenu()],
+            });
+
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage3()],
+                components: [mentionButtons()],
+            });
+
+            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+            if (newsChannels.length >= 5) {
+                return;
+            }
+            const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
+            await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+
+            await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
 
             await InteractionUtils.success(
                 intr,

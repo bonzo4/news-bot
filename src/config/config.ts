@@ -2,7 +2,7 @@
 export const config = {
     developers: ['1010780163811856445'],
     syndicateGuildId: '1241108569135251597',
-    syndicateInvite: 'https://discord.gg/syndicatenetwork',
+    syndicateInvite: 'https://discord.gg/vsFzFfqfGD',
     syndicateChannels: {
         guildJoined: '1241404979135254619',
         guildCount: '1111837698559328316',

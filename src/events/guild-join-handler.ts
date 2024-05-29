@@ -1,16 +1,27 @@
-import { CategoryChannel, Client, Guild, GuildTextBasedChannel } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    CategoryChannel,
+    Client,
+    Guild,
+    GuildTextBasedChannel,
+} from 'discord.js';
 
 import { EventHandler } from './index.js';
-import { setupButtons } from '../buttons/setup/setup-button-1.js';
+import { mentionButtons } from '../buttons/mention-button-event.js';
+import { setupChainMenu } from '../menus/chain-menu-event.js';
 import { SetupMessages } from '../messages/setup.js';
 import { Logger } from '../services/index.js';
 import {
     BannerUtils,
+    ChannelDbUtils,
     ChannelUtils,
     GuildDbUtils,
     GuildSettingsDbUtils,
     GuildUtils,
 } from '../utils/index.js';
+import { NewsChannelsUtils } from '../utils/news-channels-utils.js';
 
 export class GuildJoinHandler implements EventHandler {
     public async process(guild: Guild): Promise<void> {
@@ -39,9 +50,36 @@ export class GuildJoinHandler implements EventHandler {
                     announcementChannel,
                 });
                 await systemChannel.send({
-                    embeds: [SetupMessages.setupStart(banner)],
-                    components: [setupButtons()],
+                    embeds: [SetupMessages.setupMessage1()],
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setLabel('Get Support')
+                                .setStyle(ButtonStyle.Link)
+                                .setURL('https://discord.gg/vsFzFfqfGD')
+                        ),
+                    ],
                 });
+
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage2()],
+                    components: [await setupChainMenu()],
+                });
+
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage3()],
+                    components: [mentionButtons()],
+                });
+
+                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                if (newsChannels.length >= 5) {
+                    return;
+                }
+                const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
+                await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+
+                await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
+
                 return;
             }
             if (guildSettings.category_id)
@@ -70,12 +108,38 @@ export class GuildJoinHandler implements EventHandler {
             }
 
             await systemChannel.send({
-                embeds: [SetupMessages.setupStart(banner)],
-                components: [setupButtons()],
+                embeds: [SetupMessages.setupMessage1()],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Get Support')
+                            .setStyle(ButtonStyle.Link)
+                            .setURL('https://discord.gg/vsFzFfqfGD')
+                    ),
+                ],
             });
+
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage2()],
+                components: [await setupChainMenu()],
+            });
+
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage3()],
+                components: [mentionButtons()],
+            });
+
+            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+            if (newsChannels.length >= 5) {
+                return;
+            }
+            const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
+            await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+
+            await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
         } catch (err) {
             await Logger.error({
-                message: `Error setting up guild: ${err}`,
+                message: `Error setting up guild: ${err.message || err}`,
                 guildId: guild.id,
             });
         }

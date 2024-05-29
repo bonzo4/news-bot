@@ -13,21 +13,21 @@ export function mentionButtons(): ActionRowBuilder<ButtonBuilder> {
             new ButtonBuilder()
                 .setCustomId(`mention_add`)
                 .setEmoji('⚫')
-                .setLabel('Add a role to mention when news is posted.')
+                .setLabel('Add a role.')
                 .setStyle(ButtonStyle.Primary)
         )
         .addComponents(
             new ButtonBuilder()
                 .setCustomId(`mention_remove`)
                 .setEmoji('✖')
-                .setLabel('Remove a role from being mentioned when news is posted.')
+                .setLabel('Remove a role.')
                 .setStyle(ButtonStyle.Danger)
         )
         .addComponents(
             new ButtonBuilder()
                 .setCustomId(`mention_view`)
                 .setEmoji('👀')
-                .setLabel('View roles that will be mentioned when news is posted.')
+                .setLabel('View roles.')
                 .setStyle(ButtonStyle.Secondary)
         );
     return row;

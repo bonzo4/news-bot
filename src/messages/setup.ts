@@ -3,6 +3,65 @@ import { EmbedBuilder } from 'discord.js';
 import { config } from '../config/config.js';
 
 export class SetupMessages {
+    public static setupMessage1(): EmbedBuilder {
+        return new EmbedBuilder()
+            .setTitle('**🌐 Welcome to the Syndicate Network**')
+            .setThumbnail(
+                'https://cdn.discordapp.com/attachments/1058782973178150912/1245131767694753863/NTWRKMediaLogoRainbow.png?ex=6657a2d2&is=66565152&hm=7128e958c2b2e0c12c0c58d3c8c109530c239560f6c6b28e85157bcf4b391f48&'
+            )
+            .setDescription(
+                'The global network of Web3 news media.\n\nWe provide your Discord community with daily news and insights on stocks, crypto, and NFTs, for free.\n\n**Do not delete this channel.** It is necessary for the Syndicate News channel to operate properly.\n\n**[Earn $10 for every server you refer to the Syndicate Network!](https://cryptocurrencyjobs.co/post-a-job/)**'
+            )
+            .addFields([
+                {
+                    inline: true,
+                    name: '',
+                    value: '[🌐 **NTWRK Media**](https://www.syndicatenetwork.io/)\n[<:NEWSTwitter:1087824982295453696> **Twitter**](https://twitter.com/SyndicateNTWRK)',
+                },
+                {
+                    inline: true,
+                    name: '',
+                    value: '[🌐 **Syndicate**](https://www.syndicatenetwork.io/)\n[<:NEWSDiscord:1087824981427224576> **Community**](https://discord.gg/vsFzFfqfGD)',
+                },
+                {
+                    inline: true,
+                    name: '',
+                    value: '[🪂 **DROPPER**](https://syndicate-newsletter.beehiiv.com/)\n[📬 **Newsletter**](https://syndicate-newsletter.beehiiv.com/)',
+                },
+            ])
+            .setColor('#00C2FF');
+    }
+
+    public static setupMessage2(): EmbedBuilder {
+        return new EmbedBuilder()
+            .setTitle('📰 **Want more free news?**')
+            .setThumbnail(
+                'https://cdn.discordapp.com/attachments/1058782973178150912/1245131558957088789/NTWRKMediaLogo.png?ex=6657a2a1&is=66565121&hm=28b51ed9270dc57cba4bf960eb22179f31eed84e8c733b6e98399cc4f4ecd500&'
+            )
+            .addFields([
+                {
+                    name: 'Please select one of the following free news add-ons for your community.',
+                    value: '*This is not required*',
+                },
+            ])
+            .setColor('#F3F3F3');
+    }
+
+    public static setupMessage3(): EmbedBuilder {
+        return new EmbedBuilder()
+            .setTitle('🔔 **Turn on notifications**')
+            .setThumbnail(
+                'https://cdn.discordapp.com/attachments/1058782973178150912/1245131558957088789/NTWRKMediaLogo.png?ex=6657a2a1&is=66565121&hm=28b51ed9270dc57cba4bf960eb22179f31eed84e8c733b6e98399cc4f4ecd500&'
+            )
+            .addFields([
+                {
+                    name: 'Please select a Discord role to get notified for news and giveaways.',
+                    value: '*This is not required*',
+                },
+            ])
+            .setColor('#F3F3F3');
+    }
+
     public static setupStart(welcomeBanner: string): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')

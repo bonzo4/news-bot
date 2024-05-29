@@ -11,7 +11,7 @@ export async function setupChainMenu(): Promise<ActionRowBuilder<StringSelectMen
     const tags = await TagDbUtils.getAllTags();
 
     const tagNames = tags
-        .filter(tag => tag.name === 'Solana' || tag.name === 'Ethereum')
+        .filter(tag => tag.name === 'Solana' || tag.name === 'Ethereum' || tag.name === 'Bitcoin')
         .map(tag => tag.name);
 
     return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents([
@@ -57,10 +57,12 @@ export class SetupChainMenu implements Menu {
 
         await TagDbUtils.addGuildTag(intr.guildId, tag);
 
-        if (intr.message.deletable) await intr.message.delete();
-        await intr.channel.send({
-            embeds: [SetupMessages.newsChannel()],
-            components: [setupNewsChannelButtons()],
-        });
+        await InteractionUtils.success(intr, `Chain tag **${tag}** has been added to the guild.`);
+
+        // if (intr.message.deletable) await intr.message.delete();
+        // await intr.channel.send({
+        //     embeds: [SetupMessages.newsChannel()],
+        //     components: [setupNewsChannelButtons()],
+        // });
     }
 }
