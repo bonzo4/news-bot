@@ -16,17 +16,17 @@ export class SetupMessages {
             .addFields([
                 {
                     inline: true,
-                    name: '',
+                    name: ' ',
                     value: '[🌐 **NTWRK Media**](https://www.syndicatenetwork.io/)\n[<:NEWSTwitter:1087824982295453696> **Twitter**](https://twitter.com/SyndicateNTWRK)',
                 },
                 {
                     inline: true,
-                    name: '',
+                    name: ' ',
                     value: '[🌐 **Syndicate**](https://www.syndicatenetwork.io/)\n[<:NEWSDiscord:1087824981427224576> **Community**](https://discord.gg/vsFzFfqfGD)',
                 },
                 {
                     inline: true,
-                    name: '',
+                    name: ' ',
                     value: '[🪂 **DROPPER**](https://syndicate-newsletter.beehiiv.com/)\n[📬 **Newsletter**](https://syndicate-newsletter.beehiiv.com/)',
                 },
             ])
