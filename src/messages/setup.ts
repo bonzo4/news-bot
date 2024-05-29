@@ -11,7 +11,7 @@ export class SetupMessages {
                 'https://cdn.discordapp.com/attachments/1058782973178150912/1245131767694753863/NTWRKMediaLogoRainbow.png?ex=6657a2d2&is=66565152&hm=7128e958c2b2e0c12c0c58d3c8c109530c239560f6c6b28e85157bcf4b391f48&'
             )
             .setDescription(
-                'The global network of Web3 news media.\n\nWe provide your Discord community with daily news and insights on stocks, crypto, and NFTs, for free.\n\n**Do not delete this channel.** It is necessary for the Syndicate News channel to operate properly.\n\n**[Earn $10 for every server you refer to the Syndicate Network!](https://cryptocurrencyjobs.co/post-a-job/)**'
+                'The global network of Web3 news media.\n\nWe provide your Discord community with daily news and insights on stocks, crypto, and NFTs, for free.\n\n**Do not delete this channel.** It is necessary for the Syndicate News channel to operate properly.\n\n**[Earn $10 for every server you refer to the Syndicate Network!](https://discord.gg/vsFzFfqfGD)**'
             )
             .addFields([
                 {

@@ -49,6 +49,7 @@ export class GuildJoinHandler implements EventHandler {
                     categoryChannel,
                     announcementChannel,
                 });
+                const newGuildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
                 await systemChannel.send({
                     embeds: [SetupMessages.setupMessage1()],
                     components: [
@@ -71,12 +72,14 @@ export class GuildJoinHandler implements EventHandler {
                     components: [mentionButtons()],
                 });
 
-                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(
+                    newGuildSettings
+                );
                 if (newsChannels.length >= 5) {
                     return;
                 }
                 const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
-                await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+                await ChannelDbUtils.createGuildChannel(newGuildSettings, newsChannel);
 
                 await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
 
