@@ -119,25 +119,19 @@ export class SetupCommand implements Command {
                 );
             }
 
-            // await systemChannel
-            //     .send({
-            //         embeds: [SetupMessages.setupMessage1()],
-            //     })
-            //     .catch(err => console.log(err));
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage1()],
+            });
 
-            // await systemChannel
-            //     .send({
-            //         embeds: [SetupMessages.setupMessage2()],
-            //         components: [await setupChainMenu()],
-            //     })
-            //     .catch(err => console.log(err));
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage2()],
+                components: [await setupChainMenu()],
+            });
 
-            // await systemChannel
-            //     .send({
-            //         embeds: [SetupMessages.setupMessage3()],
-            //         components: [mentionButtons()],
-            //     })
-            //     .catch(err => console.log(err));
+            await systemChannel.send({
+                embeds: [SetupMessages.setupMessage3()],
+                components: [mentionButtons()],
+            });
 
             const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
             if (newsChannels.length >= 5) {

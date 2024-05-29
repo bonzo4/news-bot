@@ -6,6 +6,7 @@ export class SetupMessages {
     public static setupMessage1(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('**🌐 Welcome to the Syndicate Network**')
+            .setDescription('')
             .setThumbnail(
                 'https://cdn.discordapp.com/attachments/1058782973178150912/1245131767694753863/NTWRKMediaLogoRainbow.png?ex=6657a2d2&is=66565152&hm=7128e958c2b2e0c12c0c58d3c8c109530c239560f6c6b28e85157bcf4b391f48&'
             )
@@ -35,6 +36,7 @@ export class SetupMessages {
     public static setupMessage2(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('📰 **Want more free news?**')
+            .setDescription('')
             .setThumbnail(
                 'https://cdn.discordapp.com/attachments/1058782973178150912/1245131558957088789/NTWRKMediaLogo.png?ex=6657a2a1&is=66565121&hm=28b51ed9270dc57cba4bf960eb22179f31eed84e8c733b6e98399cc4f4ecd500&'
             )
@@ -50,6 +52,7 @@ export class SetupMessages {
     public static setupMessage3(): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('🔔 **Turn on notifications**')
+            .setDescription('')
             .setThumbnail(
                 'https://cdn.discordapp.com/attachments/1058782973178150912/1245131558957088789/NTWRKMediaLogo.png?ex=6657a2a1&is=66565121&hm=28b51ed9270dc57cba4bf960eb22179f31eed84e8c733b6e98399cc4f4ecd500&'
             )
