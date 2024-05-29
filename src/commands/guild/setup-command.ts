@@ -119,27 +119,25 @@ export class SetupCommand implements Command {
                 );
             }
 
-            await systemChannel.send({
-                embeds: [SetupMessages.setupMessage1()],
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setLabel('Get Support')
-                            .setStyle(ButtonStyle.Link)
-                            .setURL('https://discord.gg/vsFzFfqfGD')
-                    ),
-                ],
-            });
+            await systemChannel
+                .send({
+                    embeds: [SetupMessages.setupMessage1()],
+                })
+                .catch(console.log);
 
-            await systemChannel.send({
-                embeds: [SetupMessages.setupMessage2()],
-                components: [await setupChainMenu()],
-            });
+            await systemChannel
+                .send({
+                    embeds: [SetupMessages.setupMessage2()],
+                    components: [await setupChainMenu()],
+                })
+                .catch(console.log);
 
-            await systemChannel.send({
-                embeds: [SetupMessages.setupMessage3()],
-                components: [mentionButtons()],
-            });
+            await systemChannel
+                .send({
+                    embeds: [SetupMessages.setupMessage3()],
+                    components: [mentionButtons()],
+                })
+                .catch(console.log);
 
             const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
             if (newsChannels.length >= 5) {
