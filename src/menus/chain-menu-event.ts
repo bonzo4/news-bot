@@ -2,8 +2,6 @@ import { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction 
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
-import { setupNewsChannelButtons } from '../buttons/setup/setup-button-4.js';
-import { SetupMessages } from '../messages/setup.js';
 import { TagDbUtils } from '../utils/database/tags-db.utils.js';
 import { InteractionUtils } from '../utils/index.js';
 
@@ -47,22 +45,10 @@ export class SetupChainMenu implements Menu {
                 intr,
                 'You can only have one chain tag per guild. Please run **/premium** to learn more about getting news for all chains.'
             );
-            if (intr.message.deletable) await intr.message.delete();
-            await intr.channel.send({
-                embeds: [SetupMessages.newsChannel()],
-                components: [setupNewsChannelButtons()],
-            });
-            return;
         }
 
         await TagDbUtils.addGuildTag(intr.guildId, tag);
 
         await InteractionUtils.success(intr, `Chain tag **${tag}** has been added to the guild.`);
-
-        // if (intr.message.deletable) await intr.message.delete();
-        // await intr.channel.send({
-        //     embeds: [SetupMessages.newsChannel()],
-        //     components: [setupNewsChannelButtons()],
-        // });
     }
 }
