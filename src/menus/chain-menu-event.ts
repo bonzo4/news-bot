@@ -37,6 +37,7 @@ export class SetupChainMenu implements Menu {
 
         if (!tag) {
             await InteractionUtils.warn(intr, 'Please select a valid tag');
+            return;
         }
 
         const tags = await TagDbUtils.getAllGuildTags(intr.guildId);
@@ -45,6 +46,7 @@ export class SetupChainMenu implements Menu {
                 intr,
                 'You can only have one chain tag per guild. Please run **/premium** to learn more about getting news for all chains.'
             );
+            return;
         }
 
         await TagDbUtils.addGuildTag(intr.guildId, tag);
