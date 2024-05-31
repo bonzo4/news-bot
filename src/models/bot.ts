@@ -638,20 +638,20 @@ export class Bot {
     private async userReferral(referrerId: string, userId: string, client: Client): Promise<void> {
         const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
         if (!syndicateGuild) return;
-        const userReferralChannel = syndicateGuild.channels.cache.get(
+        const userReferralChannel = (await syndicateGuild.channels.fetch(
             config.syndicateChannels.ambassadorJoined
-        ) as GuildTextBasedChannel;
+        )) as GuildTextBasedChannel;
 
-        const referrer = await client.users.fetch(referrerId);
-        const user = await client.users.fetch(userId);
+        const referrer = await syndicateGuild.members.fetch(referrerId);
+        const user = await syndicateGuild.members.fetch(userId);
 
         const embed = new EmbedBuilder()
-            .setTitle(`Ambassador Referral: ${user.tag}`)
+            .setTitle(`Ambassador Referral: ${user.displayName}`)
             .setAuthor({
-                name: referrer.tag,
-                iconURL: referrer.avatarURL() ?? undefined,
+                name: referrer.displayName,
+                iconURL: referrer.displayAvatarURL(),
             })
-            .setThumbnail(user.avatarURL() ?? undefined)
+            .setThumbnail(user.displayAvatarURL())
             .setDescription(
                 `Thank you for joining the Syndicate Network.\n\nReferred by ${userMention(
                     referrer.id
