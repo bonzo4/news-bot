@@ -600,17 +600,18 @@ export class Bot {
             config.syndicateChannels.guildJoined
         ) as GuildTextBasedChannel;
 
-        const guild = await client.guilds.fetch(guildId);
-        const user = await client.users.fetch(userId);
+        const user = await syndicateGuild.members.fetch(userId);
 
-        const guildDoc = await GuildDbUtils.getGuildById(guild.id);
+        if (!user) return;
+
+        const guildDoc = await GuildDbUtils.getGuildById(guildId);
 
         const embed = new EmbedBuilder()
             .setTitle(`Guild Referral`)
             .setImage(guildDoc.banner)
             .setAuthor({
-                name: user.tag,
-                iconURL: user.avatarURL() ?? undefined,
+                name: user.displayName,
+                iconURL: user.displayAvatarURL(),
             })
             .setDescription(`Referred by ${userMention(user.id)}`)
             .setFooter({

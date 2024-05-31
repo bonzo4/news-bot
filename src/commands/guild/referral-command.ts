@@ -35,17 +35,17 @@ export class ReferralCommand implements Command {
             return;
         }
 
-        const now = new Date();
-        const createdAt = new Date(referral.created_at);
-        const diff = now.getTime() - createdAt.getTime();
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        if (days > 7) {
-            await InteractionUtils.warn(
-                intr,
-                'It is too late to set up a referral for this server.'
-            );
-            return;
-        }
+        // const now = new Date();
+        // const createdAt = new Date(referral.created_at);
+        // const diff = now.getTime() - createdAt.getTime();
+        // const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        // if (days > 7) {
+        //     await InteractionUtils.warn(
+        //         intr,
+        //         'It is too late to set up a referral for this server.'
+        //     );
+        //     return;
+        // }
 
         const modal = referralModal(false);
 

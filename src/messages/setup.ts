@@ -65,6 +65,22 @@ export class SetupMessages {
             .setColor('#F3F3F3');
     }
 
+    public static setupMessage4(): EmbedBuilder {
+        return new EmbedBuilder()
+            .setTitle('📣 **Did you get referred?**')
+            .setDescription(' ')
+            .setThumbnail(
+                'https://cdn.discordapp.com/attachments/1058782973178150912/1245131558957088789/NTWRKMediaLogo.png?ex=6657a2a1&is=66565121&hm=28b51ed9270dc57cba4bf960eb22179f31eed84e8c733b6e98399cc4f4ecd500&'
+            )
+            .addFields([
+                {
+                    name: 'Please enter a referral code if someone helped you install our bot.',
+                    value: '*This is not required*',
+                },
+            ])
+            .setColor('#F3F3F3');
+    }
+
     public static setupStart(welcomeBanner: string): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle('⚫┃Syndicate Setup')

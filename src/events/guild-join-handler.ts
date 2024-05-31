@@ -10,9 +10,11 @@ import {
 
 import { EventHandler } from './index.js';
 import { mentionButtons } from '../buttons/mention-button-event.js';
+import { setupReferralButtons } from '../buttons/referral-button-event.js';
 import { setupChainMenu } from '../menus/chain-menu-event.js';
 import { SetupMessages } from '../messages/setup.js';
 import { Logger } from '../services/index.js';
+import { GuildReferralDbUtils } from '../utils/database/referral-db-utils.js';
 import {
     BannerUtils,
     ChannelDbUtils,
@@ -131,6 +133,15 @@ export class GuildJoinHandler implements EventHandler {
                 embeds: [SetupMessages.setupMessage3()],
                 components: [mentionButtons()],
             });
+
+            const referral = await GuildReferralDbUtils.getReferralByGuildId(guild.id);
+
+            if (!referral.discord_user_id) {
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage4()],
+                    components: [setupReferralButtons()],
+                });
+            }
 
             const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
             if (newsChannels.length >= 5) {

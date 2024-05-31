@@ -9,8 +9,6 @@ import {
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { ModalDeferType, ModalSubmit } from './modalSubmit.js';
-import { previewButtons } from '../buttons/setup/setup-button-2.js';
-import { SetupMessages } from '../messages/setup.js';
 import { AmbassadorCodeDbUtils } from '../utils/database/ambassador-code-db-utils.js';
 import { supabase } from '../utils/database/index.js';
 import ReferralCodeDbUtils from '../utils/database/referral-code-db-utils.js';
@@ -54,8 +52,6 @@ export class ReferralModal implements ModalSubmit {
             return;
         }
 
-        const setup = intr.customId.endsWith('true');
-
         const code = intr.fields.getTextInputValue('referralCode');
         if (!code) {
             await InteractionUtils.warn(intr, 'Please enter a referral code');
@@ -91,6 +87,7 @@ export class ReferralModal implements ModalSubmit {
                 guildId: intr.guild.id,
                 userId: referralCode.discord_id,
             });
+            return;
         }
 
         referralCode = await ReferralCodeDbUtils.getCodeByCode(code);
@@ -106,16 +103,9 @@ export class ReferralModal implements ModalSubmit {
                 guildId: intr.guild.id,
                 userId: referralCode.discord_id,
             });
-        }
-
-        if (setup) {
-            if (intr.message.deletable) await intr.message.delete();
-            await intr.channel.send({
-                embeds: [SetupMessages.newsPreview()],
-                components: [previewButtons()],
-            });
             return;
         }
+
         await InteractionUtils.warn(intr, 'Invalid referral code');
     }
 }

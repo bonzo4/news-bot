@@ -10,9 +10,11 @@ import {
 import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { mentionButtons } from '../../buttons/mention-button-event.js';
+import { setupReferralButtons } from '../../buttons/referral-button-event.js';
 import { setupChainMenu } from '../../menus/chain-menu-event.js';
 import { SetupMessages } from '../../messages/setup.js';
 import { Logger } from '../../services/logger.js';
+import { GuildReferralDbUtils } from '../../utils/database/referral-db-utils.js';
 import {
     BannerUtils,
     ChannelDbUtils,
@@ -140,6 +142,15 @@ export class SetupCommand implements Command {
                 embeds: [SetupMessages.setupMessage3()],
                 components: [mentionButtons()],
             });
+
+            const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guild.id);
+
+            if (!referral.discord_user_id) {
+                await systemChannel.send({
+                    embeds: [SetupMessages.setupMessage4()],
+                    components: [setupReferralButtons()],
+                });
+            }
 
             const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
             if (newsChannels.length >= 5) {
