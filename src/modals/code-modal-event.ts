@@ -75,9 +75,11 @@ export class CodeModal implements ModalSubmit {
                 return;
             }
             await UserReferralDbUtils.createReferral(data.userData.id, referrer.discord_id);
-            await broadcastUserReferral(intr.client, {
-                referrerId: referralCode.discord_id,
-                userId: data.userData.id,
+            await intr.client.shard.broadcastEval(broadcastUserReferral, {
+                context: {
+                    referrerId: referralCode.discord_id,
+                    userId: data.userData.id,
+                },
             });
         }
 

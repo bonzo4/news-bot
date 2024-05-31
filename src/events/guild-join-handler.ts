@@ -160,10 +160,10 @@ export class GuildJoinHandler implements EventHandler {
     }
 }
 
-export async function broadcastBanner(
+export function broadcastBanner(
     client: Client,
     { bannerUrl, guildId }: { bannerUrl: string; guildId: string }
-): Promise<void> {
+): void {
     client.emit('guildBanner', {
         bannerUrl,
         guildId,

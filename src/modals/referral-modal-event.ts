@@ -77,16 +77,14 @@ export class ReferralModal implements ModalSubmit {
                 .gt('created_at', newAmbassadorDate);
 
             if (count === 5) {
-                await broadcastReferralGoal(intr.client, {
-                    userId: referralCode.discord_id,
+                await intr.client.shard.broadcastEval(broadcastReferralGoal, {
+                    context: { userId: referralCode.discord_id },
                 });
             }
-
-            await InteractionUtils.success(intr, 'Referral code used!');
-            await broadcastReferral(intr.client, {
-                guildId: intr.guild.id,
-                userId: referralCode.discord_id,
+            await intr.client.shard.broadcastEval(broadcastReferral, {
+                context: { guildId: intr.guild.id, userId: referralCode.discord_id },
             });
+            await InteractionUtils.success(intr, 'Referral code used!');
             return;
         }
 
@@ -99,9 +97,8 @@ export class ReferralModal implements ModalSubmit {
             );
 
             await InteractionUtils.success(intr, 'Referral code used!');
-            await broadcastReferral(intr.client, {
-                guildId: intr.guild.id,
-                userId: referralCode.discord_id,
+            await intr.client.shard.broadcastEval(broadcastReferral, {
+                context: { guildId: intr.guild.id, userId: referralCode.discord_id },
             });
             return;
         }
@@ -110,16 +107,13 @@ export class ReferralModal implements ModalSubmit {
     }
 }
 
-export async function broadcastReferral(
+export function broadcastReferral(
     client: Client,
     { guildId, userId }: { guildId: string; userId: string }
-): Promise<void> {
+): void {
     client.emit('guildReferral', { guildId, userId });
 }
 
-export async function broadcastReferralGoal(
-    client: Client,
-    { userId }: { userId: string }
-): Promise<void> {
+export function broadcastReferralGoal(client: Client, { userId }: { userId: string }): void {
     client.emit('guildReferralGoal', { userId });
 }
