@@ -43,9 +43,7 @@ export class AmbassadorCommand implements Command {
             data.staffRole?.staff_role === 'TRIAL' ? 'a trial' : 'an'
         } Ambassador of the Syndicate Discord server!\n🔗┃Referral Code: **${
             referralCode.code
-        }**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
-            referralCode.code
-        }\n👥┃Guild Referrals: ${totalGuildReferrals}\n👤┃User Referrals: ${totalUserReferrals}`;
+        }**\n👥┃Guild Referrals: ${totalGuildReferrals}\n👤┃User Referrals: ${totalUserReferrals}`;
 
         let referralGuildString = '**👥┃Guild Referrals**\n';
         for (let i = 0; i < 5; i++) {

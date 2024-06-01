@@ -89,9 +89,7 @@ export class ProfileCommand implements Command {
                 referrals.length
             } Total**\n🏆┃**Next Reward: ${nextReward.title} (${away} referral${
                 away === 1 ? '' : 's'
-            } away)**\n🌐┃Referral Link: https://www.syndicatenetwork.io/bot/referral/${
-                code.code
-            }\n\n`;
+            } away)**\n\n`;
 
             if (profile.sol_wallet && profile.sol_wallet !== '') {
                 messageBody += `💸┃**SOL Wallet**: ${profile.sol_wallet}\n`;
