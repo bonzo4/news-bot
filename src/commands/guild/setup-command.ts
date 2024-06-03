@@ -44,6 +44,8 @@ export class SetupCommand implements Command {
 
             // check if guild settings exist in db & if channels exists
             const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+
+            const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guild.id);
             let categoryChannel: CategoryChannel;
             let systemChannel: GuildTextBasedChannel;
             if (!guildSettings) {
@@ -77,6 +79,13 @@ export class SetupCommand implements Command {
                     embeds: [SetupMessages.setupMessage3()],
                     components: [mentionButtons()],
                 });
+
+                if (!referral.discord_user_id) {
+                    await systemChannel.send({
+                        embeds: [SetupMessages.setupMessage4()],
+                        components: [setupReferralButtons()],
+                    });
+                }
 
                 const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
                 if (newsChannels.length >= 5) {
@@ -142,8 +151,6 @@ export class SetupCommand implements Command {
                 embeds: [SetupMessages.setupMessage3()],
                 components: [mentionButtons()],
             });
-
-            const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guild.id);
 
             if (!referral.discord_user_id) {
                 await systemChannel.send({

@@ -12,12 +12,12 @@ import { Button, ButtonDeferType } from '../button.js';
 export function setupReferralButtons(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents([
         new ButtonBuilder()
-            .setCustomId('setupReferral')
+            .setCustomId('setupReferralBroken')
             .setLabel('Submit')
             .setStyle(ButtonStyle.Secondary)
             .setEmoji('📄'),
         new ButtonBuilder()
-            .setCustomId('setupReferral_skip')
+            .setCustomId('setupReferralBroken_skip')
             .setLabel('Skip')
             .setStyle(ButtonStyle.Secondary)
             .setEmoji('❌'),
@@ -25,7 +25,7 @@ export function setupReferralButtons(): ActionRowBuilder<ButtonBuilder> {
 }
 
 export class SetupReferralButtons implements Button {
-    ids: string[] = ['setupReferral'];
+    ids: string[] = ['setupReferralBroken'];
     deferType = ButtonDeferType.NONE;
     requireGuild = true;
     requireEmbedAuthorTag = false;

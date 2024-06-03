@@ -39,6 +39,7 @@ export class GuildJoinHandler implements EventHandler {
             }
             // check if guild settings exist in db & if channels exists
             const guildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
+            const referral = await GuildReferralDbUtils.getReferralByGuildId(guild.id);
             let categoryChannel: CategoryChannel;
             let systemChannel: GuildTextBasedChannel;
             if (!guildSettings) {
@@ -73,6 +74,13 @@ export class GuildJoinHandler implements EventHandler {
                     embeds: [SetupMessages.setupMessage3()],
                     components: [mentionButtons()],
                 });
+
+                if (!referral.discord_user_id) {
+                    await systemChannel.send({
+                        embeds: [SetupMessages.setupMessage4()],
+                        components: [setupReferralButtons()],
+                    });
+                }
 
                 const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(
                     newGuildSettings
@@ -133,8 +141,6 @@ export class GuildJoinHandler implements EventHandler {
                 embeds: [SetupMessages.setupMessage3()],
                 components: [mentionButtons()],
             });
-
-            const referral = await GuildReferralDbUtils.getReferralByGuildId(guild.id);
 
             if (!referral.discord_user_id) {
                 await systemChannel.send({
