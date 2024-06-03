@@ -144,8 +144,8 @@ export class Bot {
         });
         this.options.client.on(
             'userReferral',
-            async ({ referrerId, userId }: { referrerId: string; userId: string }) => {
-                await this.userReferral(referrerId, userId, this.options.client);
+            async ({ referrerId, userId }: { referrerId?: string; userId: string }) => {
+                await this.userReferral(userId, this.options.client, referrerId);
             }
         );
         this.options.client.on('changeTopic', async ({ topic }: { topic: string }) => {
@@ -635,21 +635,41 @@ export class Bot {
         await user.roles.add(role);
     }
 
-    private async userReferral(referrerId: string, userId: string, client: Client): Promise<void> {
+    private async userReferral(userId: string, client: Client, referrerId?: string): Promise<void> {
         const syndicateGuild = client.guilds.cache.get(config.syndicateGuildId);
         if (!syndicateGuild) return;
         const userReferralChannel = (await syndicateGuild.channels.fetch(
             config.syndicateChannels.ambassadorJoined
         )) as GuildTextBasedChannel;
 
-        const referrer = await syndicateGuild.members.fetch(referrerId);
         const user = await syndicateGuild.members.fetch(userId);
 
+        if (!referrerId) {
+            const embed = new EmbedBuilder()
+                .setTitle(`Welcome ${user.displayName}!`)
+                .setAuthor({
+                    name: user.displayName,
+                    iconURL: user.displayAvatarURL(),
+                })
+                .setThumbnail(user.displayAvatarURL())
+                .setDescription(`Thank you for joining the Syndicate Network.`)
+                .setFooter({
+                    text: 'Syndicate Network',
+                    iconURL: config.syndicateIcon,
+                })
+                .setTimestamp();
+
+            await userReferralChannel.send({ embeds: [embed] });
+            return;
+        }
+
+        const referrer = await syndicateGuild.members.fetch(referrerId);
+
         const embed = new EmbedBuilder()
-            .setTitle(`Ambassador Referral: ${user.displayName}`)
+            .setTitle(`Welcome ${user.displayName}!`)
             .setAuthor({
-                name: referrer.displayName,
-                iconURL: referrer.displayAvatarURL(),
+                name: user.displayName,
+                iconURL: user.displayAvatarURL(),
             })
             .setThumbnail(user.displayAvatarURL())
             .setDescription(

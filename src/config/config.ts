@@ -7,7 +7,7 @@ export const config = {
         guildJoined: '1241404979135254619',
         guildCount: '1111837698559328316',
         memberCount: '1111837810740183080',
-        ambassadorJoined: '1243644907265069126',
+        ambassadorJoined: '1246994874058805250',
     },
     syndicateIcon:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',

@@ -68,30 +68,33 @@ export class CodeModal implements ModalSubmit {
             return;
         }
 
+        let referrerId: string | undefined = undefined;
         if (referrerCode && referrerCode !== code && referrerCode !== '') {
             const referrer = await AmbassadorCodeDbUtils.getCodeByCode(referrerCode);
             if (!referrer) {
                 await InteractionUtils.warn(intr, 'That recruitment code is invalid.');
                 return;
             }
+            referrerId = referrer.discord_id;
             await UserReferralDbUtils.createReferral(data.userData.id, referrer.discord_id);
-            await intr.client.shard.broadcastEval(broadcastUserReferral, {
-                context: {
-                    referrerId: referralCode.discord_id,
-                    userId: data.userData.id,
-                },
-            });
         }
 
         await AmbassadorCodeDbUtils.createCode(data.userData.id, code);
 
+        await intr.client.shard.broadcastEval(broadcastUserReferral, {
+            context: {
+                referrerId,
+                userId: data.userData.id,
+            },
+        });
         await InteractionUtils.success(intr, 'Thank you for becoming a Syndicate Ambassador!');
     }
 }
 
 export async function broadcastUserReferral(
     client: Client,
-    { referrerId, userId }: { referrerId: string; userId: string }
+    { referrerId, userId }: { referrerId?: string; userId: string }
 ): Promise<void> {
     client.emit('userReferral', { referrerId, userId });
 }
+// 1246994874058805250;
