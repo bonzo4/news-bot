@@ -52,7 +52,7 @@ export class NewsCommand implements Command {
             );
             return;
         }
-        const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+        const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
         if (newsChannels.length >= 5) {
             await InteractionUtils.warn(
                 intr,
@@ -62,7 +62,7 @@ export class NewsCommand implements Command {
         }
         const newsChannel = await ChannelUtils.createNewsChannel(category);
         await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
-        await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+        await ChannelDbUtils.createGuildChannel(intr.guildId, newsChannel);
         await InteractionUtils.success(intr, `Created news channel ${newsChannel.toString()}`);
     }
 }

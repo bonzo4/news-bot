@@ -1,6 +1,5 @@
 import { DMChannel, TextChannel } from 'discord.js';
 
-import { GuildSettings } from './guild-settings-db-utils.js';
 import { supabase } from './index.js';
 import { BotError } from '../../extensions/BotError.js';
 import { Database } from '../../types/supabase.js';
@@ -10,12 +9,12 @@ export type DirectChannel = Database['public']['Tables']['direct_channels']['Row
 
 export class ChannelDbUtils {
     public static async createGuildChannel(
-        guildSettings: GuildSettings,
+        guildId: string,
         newsChannel: TextChannel
     ): Promise<void> {
         const { error } = await supabase.from('news_channels').insert({
             id: newsChannel.id,
-            guild_id: guildSettings.guild_id,
+            guild_id: guildId,
         });
         if (error) throw new Error(error.message);
     }
@@ -64,13 +63,11 @@ export class ChannelDbUtils {
         return channels;
     }
 
-    public static async getAllNewsChannelsByGuild(
-        guildSettings: GuildSettings
-    ): Promise<NewsChannel[]> {
+    public static async getAllNewsChannelsByGuild(guildId: string): Promise<NewsChannel[]> {
         const { data: channels, error } = await supabase
             .from('news_channels')
             .select('*')
-            .eq('guild_id', guildSettings.guild_id);
+            .eq('guild_id', guildId);
         if (error) return [];
         return channels;
     }

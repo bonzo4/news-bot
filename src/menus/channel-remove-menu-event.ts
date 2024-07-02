@@ -3,7 +3,6 @@ import {
     ChannelSelectMenuInteraction,
     Guild,
     StringSelectMenuBuilder,
-    TextChannel,
 } from 'discord.js';
 import { RateLimiter } from 'discord.js-rate-limiter';
 
@@ -68,7 +67,7 @@ export class ChannelRemoveMenu implements Menu {
             await InteractionUtils.warn(intr, `Channel is not a news channel.`);
             return;
         }
-        await ChannelDbUtils.createGuildChannel(guildSettings, channel as TextChannel);
+        await ChannelDbUtils.deleteNewsChannel(channelDoc);
         await InteractionUtils.success(intr, `${channel.toString()} Channel removed.`);
     }
 }

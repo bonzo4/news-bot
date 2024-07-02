@@ -100,7 +100,7 @@ export class SetupNewsChannelButtons implements Button {
             );
             return;
         }
-        const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+        const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
         if (newsChannels.length >= 5) {
             if (intr.message.deletable) await intr.message.delete();
             await intr.channel.send({
@@ -113,7 +113,7 @@ export class SetupNewsChannelButtons implements Button {
             return;
         }
         const newsChannel = await ChannelUtils.createNewsChannel(category);
-        await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+        await ChannelDbUtils.createGuildChannel(intr.guildId, newsChannel);
 
         await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
     }

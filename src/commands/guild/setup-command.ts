@@ -43,7 +43,7 @@ export class SetupCommand implements Command {
             if (!banner) banner = await BannerUtils.createBanner(intr.guild);
 
             // check if guild settings exist in db & if channels exists
-            const guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
+            let guildSettings = await GuildSettingsDbUtils.getGuildSettings(intr.guildId);
 
             const referral = await GuildReferralDbUtils.getReferralByGuildId(intr.guild.id);
             let categoryChannel: CategoryChannel;
@@ -52,7 +52,7 @@ export class SetupCommand implements Command {
                 categoryChannel = await ChannelUtils.createParent(intr.guild);
                 systemChannel = await ChannelUtils.createSystemChannel(categoryChannel);
                 const announcementChannel = await GuildUtils.findAnnouncementChannel(intr.guild);
-                await GuildSettingsDbUtils.createGuildSettings({
+                guildSettings = await GuildSettingsDbUtils.createGuildSettings({
                     guildId: intr.guildId,
                     systemChannel,
                     categoryChannel,
@@ -87,12 +87,12 @@ export class SetupCommand implements Command {
                     });
                 }
 
-                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
                 if (newsChannels.length >= 5) {
                     return;
                 }
                 const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
-                await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+                await ChannelDbUtils.createGuildChannel(intr.guildId, newsChannel);
 
                 await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
                 return;
@@ -159,12 +159,12 @@ export class SetupCommand implements Command {
                 });
             }
 
-            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
             if (newsChannels.length >= 5) {
                 return;
             }
             const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
-            await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+            await ChannelDbUtils.createGuildChannel(intr.guildId, newsChannel);
 
             await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
 

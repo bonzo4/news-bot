@@ -54,13 +54,18 @@ export class GuildSettingsDbUtils {
         return guildSettings;
     }
 
-    public static async createGuildSettings(options: GuildSettingsOptions): Promise<void> {
-        const { error } = await supabase.from('guild_settings').insert({
-            guild_id: options.guildId,
-            category_id: options.categoryChannel.id,
-            system_id: options.systemChannel?.id,
-        });
+    public static async createGuildSettings(options: GuildSettingsOptions): Promise<GuildSettings> {
+        const { data, error } = await supabase
+            .from('guild_settings')
+            .insert({
+                guild_id: options.guildId,
+                category_id: options.categoryChannel.id,
+                system_id: options.systemChannel?.id,
+            })
+            .select('*')
+            .single();
         if (error) throw new Error(error.message);
+        return data;
     }
 
     public static async updateGuildSettings(options: UpdateGuildSettingsOptions): Promise<void> {

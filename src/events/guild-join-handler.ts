@@ -38,7 +38,7 @@ export class GuildJoinHandler implements EventHandler {
                 });
             }
             // check if guild settings exist in db & if channels exists
-            const guildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
+            let guildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
             const referral = await GuildReferralDbUtils.getReferralByGuildId(guild.id);
             let categoryChannel: CategoryChannel;
             let systemChannel: GuildTextBasedChannel;
@@ -46,13 +46,12 @@ export class GuildJoinHandler implements EventHandler {
                 const categoryChannel = await ChannelUtils.createParent(guild);
                 const systemChannel = await ChannelUtils.createSystemChannel(categoryChannel);
                 const announcementChannel = await GuildUtils.findAnnouncementChannel(guild);
-                await GuildSettingsDbUtils.createGuildSettings({
+                guildSettings = await GuildSettingsDbUtils.createGuildSettings({
                     guildId: guild.id,
                     systemChannel,
                     categoryChannel,
                     announcementChannel,
                 });
-                const newGuildSettings = await GuildSettingsDbUtils.getGuildSettings(guild.id);
                 await systemChannel.send({
                     embeds: [SetupMessages.setupMessage1()],
                     components: [
@@ -82,14 +81,12 @@ export class GuildJoinHandler implements EventHandler {
                     });
                 }
 
-                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(
-                    newGuildSettings
-                );
+                const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guild.id);
                 if (newsChannels.length >= 5) {
                     return;
                 }
                 const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
-                await ChannelDbUtils.createGuildChannel(newGuildSettings, newsChannel);
+                await ChannelDbUtils.createGuildChannel(guild.id, newsChannel);
 
                 await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
 
@@ -149,12 +146,12 @@ export class GuildJoinHandler implements EventHandler {
                 });
             }
 
-            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+            const newsChannels = await ChannelDbUtils.getAllNewsChannelsByGuild(guild.id);
             if (newsChannels.length >= 5) {
                 return;
             }
             const newsChannel = await ChannelUtils.createNewsChannel(categoryChannel);
-            await ChannelDbUtils.createGuildChannel(guildSettings, newsChannel);
+            await ChannelDbUtils.createGuildChannel(guild.id, newsChannel);
 
             await NewsChannelsUtils.sendLastThreeForGuild(newsChannel);
         } catch (err) {
