@@ -71,7 +71,7 @@ export class ChannelButtons implements Button {
                     break;
                 }
                 case 'remove': {
-                    const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                    const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
                     if (channels.length === 0) {
                         await InteractionUtils.warn(
                             intr,
@@ -88,7 +88,7 @@ export class ChannelButtons implements Button {
                     break;
                 }
                 case 'view': {
-                    const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                    const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(intr.guildId);
                     if (channels.length === 0) {
                         await InteractionUtils.warn(
                             intr,

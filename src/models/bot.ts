@@ -694,7 +694,7 @@ export class Bot {
                 if (!guild) continue;
                 const guildSettings = await GuildSettingsDbUtils.getGuildSettings(guildId);
                 if (!guildSettings) continue;
-                const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+                const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guild.id);
                 for (const { id } of channels) {
                     const channel = guild.channels.cache.get(id);
                     if (!channel) continue;

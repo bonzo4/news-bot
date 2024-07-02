@@ -66,7 +66,7 @@ export class ChannelAddMenu implements Menu {
             await InteractionUtils.warn(intr, `Channel is already a news channel.`);
             return;
         }
-        await ChannelDbUtils.createGuildChannel(guildSettings, channel as TextChannel);
+        await ChannelDbUtils.createGuildChannel(intr.guildId, channel as TextChannel);
         await InteractionUtils.success(intr, `${channel.toString()} Channel added.`);
     }
 }

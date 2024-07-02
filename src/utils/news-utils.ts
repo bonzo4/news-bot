@@ -69,7 +69,7 @@ export class NewsUtils {
             });
             return [];
         }
-        const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildSettings);
+        const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildId);
         return channels
             .map(channel => client.channels.cache.get(channel.id))
             .filter(channel => channel.isTextBased()) as TextBasedChannel[];

@@ -265,7 +265,7 @@ export class ScheduledNews extends CronJob {
             });
             return;
         }
-        const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(settings);
+        const channels = await ChannelDbUtils.getAllNewsChannelsByGuild(guildId);
         if (!channels.length) {
             await Logger.error({
                 message: `No news channels found for guild: ${guildId}`,
