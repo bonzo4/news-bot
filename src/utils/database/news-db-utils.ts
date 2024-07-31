@@ -50,6 +50,7 @@ export class NewsDbUtils {
             .select('news_id')
             .in('tag', ['news'])
             .order('news_id', { ascending: false })
+            .lt('schedule', now)
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
@@ -59,18 +60,20 @@ export class NewsDbUtils {
             .in(
                 'id',
                 tagDocs.map(tag => tag.news_id)
-            )
-            .lt('schedule', now);
+            );
+
         if (newsError) return [];
         return news;
     }
 
     public static async getLastThreeDirectApprovedNews(): Promise<DiscordNews[]> {
+        const now = new Date();
         const { data: tags, error: tagError } = await supabase
             .from('_news_tags')
             .select('news_id')
             .in('tag', ['news'])
             .order('news_id', { ascending: false })
+            .lt('schedule', now)
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
