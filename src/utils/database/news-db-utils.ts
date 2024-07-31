@@ -44,6 +44,7 @@ export class NewsDbUtils {
     }
 
     public static async getLastThreeGuildApprovedNews(): Promise<DiscordNews[]> {
+        const now = new Date();
         const { data: tagDocs, error: tagError } = await supabase
             .from('_news_tags')
             .select('news_id')
@@ -58,7 +59,8 @@ export class NewsDbUtils {
             .in(
                 'id',
                 tagDocs.map(tag => tag.news_id)
-            );
+            )
+            .lt('schedule', now);
         if (newsError) return [];
         return news;
     }
