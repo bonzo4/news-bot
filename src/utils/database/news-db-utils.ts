@@ -44,13 +44,14 @@ export class NewsDbUtils {
     }
 
     public static async getLastThreeGuildApprovedNews(): Promise<DiscordNews[]> {
+        // make sure the schedule is in the past
         const now = new Date();
         const { data: tagDocs, error: tagError } = await supabase
             .from('_news_tags')
             .select('news_id')
             .in('tag', ['news'])
             .order('news_id', { ascending: false })
-            .lt('schedule', now)
+            .lt('schedule', now.toISOString())
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
@@ -61,7 +62,6 @@ export class NewsDbUtils {
                 'id',
                 tagDocs.map(tag => tag.news_id)
             );
-
         if (newsError) return [];
         return news;
     }
@@ -73,7 +73,7 @@ export class NewsDbUtils {
             .select('news_id')
             .in('tag', ['news'])
             .order('news_id', { ascending: false })
-            .lt('schedule', now)
+            .lt('schedule', now.toISOString())
             .limit(3);
         if (tagError) return [];
         const { data: news, error: newsError } = await supabase
