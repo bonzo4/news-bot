@@ -91,8 +91,8 @@ export const config = {
             minTimeout: 30,
         },
     },
-    redirectUri: 'https://wlgzgjuyqpkmnqflgkog.supabase.co/functions/v1/redirect',
-    imageUrl: 'https://wlgzgjuyqpkmnqflgkog.supabase.co/functions/v1/image',
+    redirectUri: 'https://api.syndicatenetwork.io/functions/v1/redirect',
+    imageUrl: 'https://api.syndicatenetwork.io/functions/v1/image',
     iconUrl:
         'https://cdn.discordapp.com/attachments/945485798873128960/1049436634187309077/syndicatelogo_1.png',
     supabaseUrl: 'https://wlgzgjuyqpkmnqflgkog.supabase.co',
