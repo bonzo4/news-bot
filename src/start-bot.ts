@@ -97,8 +97,6 @@ async function start(): Promise<void> {
         },
     });
 
-    client.setMaxListeners(20);
-
     // Commands
     let commands: Command[] = [
         new PremiumCommand(),
