@@ -9,6 +9,7 @@ import {
     GuildTextBasedChannel,
     Message,
     MessageCreateOptions,
+    SnowflakeUtil,
     TextBasedChannel,
 } from 'discord.js';
 
@@ -159,8 +160,9 @@ export class NewsUtils {
         const { content, channel } = options;
         let resendError: any = null;
         let message: Message<boolean>;
+        const nonce = SnowflakeUtil.generate().toString();
         await channel
-            .send(content)
+            .send({ ...content, options: { enforceNonce: true, nonce } })
             .then((msg: Message<boolean>) => {
                 message = msg;
             })
@@ -171,7 +173,7 @@ export class NewsUtils {
         while (!message && resendError && resendError.code === 429) {
             await new Promise(resolve => setTimeout(resolve, resendError.retry_after));
             await channel
-                .send(content)
+                .send({ ...content, options: { enforceNonce: true, nonce } })
                 .then((msg: Message<boolean>) => {
                     message = msg;
                 })
