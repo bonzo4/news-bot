@@ -79,8 +79,10 @@ export class TagDbUtils {
         return usersWithTags;
     }
 
-    public static async addNewsTag(newsId: number, tag: string): Promise<void> {
-        const { error } = await supabase.from('_news_tags').insert({ tag, news_id: newsId });
+    public static async addNewsTag(newsId: number, tag: string, schedule: string): Promise<void> {
+        const { error } = await supabase
+            .from('_news_tags')
+            .insert({ tag, news_id: newsId, schedule: schedule });
         if (error) throw error.message;
     }
 

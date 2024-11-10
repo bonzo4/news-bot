@@ -3,6 +3,7 @@ import { RateLimiter } from 'discord.js-rate-limiter';
 
 import { Menu, MenuDeferType } from './menu.js';
 import { EventData } from '../models/internal-models.js';
+import { NewsDbUtils } from '../utils/database/news-db-utils.js';
 import { TagDbUtils } from '../utils/database/tags-db.utils.js';
 import { InteractionUtils } from '../utils/interaction-utils.js';
 
@@ -52,7 +53,9 @@ export class TagMenu implements Menu {
             return;
         }
 
-        await TagDbUtils.addNewsTag(newsId, tag);
+        const news = await NewsDbUtils.getNews(newsId);
+
+        await TagDbUtils.addNewsTag(newsId, tag, news.schedule);
 
         await InteractionUtils.success(intr, `Tag ${tag} added to news ${newsId}.`);
     }

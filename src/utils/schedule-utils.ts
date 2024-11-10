@@ -96,6 +96,9 @@ export class ScheduledNews extends CronJob {
                 embed,
                 interactions,
             });
+            if (embed.is_external) {
+                await this.sendToUniFi({ embed });
+            }
         }
 
         const tags = await TagDbUtils.getTagsByNewsId(news.id);
@@ -360,6 +363,36 @@ export class ScheduledNews extends CronJob {
         }
 
         return true;
+    }
+
+    private async sendToUniFi({ embed }: { embed: EmbedDoc }): Promise<void> {
+        const content = JSON.parse(embed.content.toString());
+        const response = await fetch('https://unifi.ag/api/post/syndicate-news', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-authorization': `Bearer ${process.env.UNIFI_API_KEY}`,
+            },
+            body: JSON.stringify({
+                title: `${content.title} ${new Date(embed.created_at).toLocaleDateString()}`,
+                content: content.description,
+                category: 'general',
+                photo: content.image.url.startsWith(
+                    'https://api.syndicatenetwork.io/storage/v1/object/public/News%20Images/GrayNonbanner.jpg'
+                )
+                    ? undefined
+                    : content.image.url,
+                externalLink: 'https://www.syndicatenetwork.io/',
+            }),
+        });
+
+        const data = (await response.json()) as any;
+
+        if (data.error) {
+            await Logger.error({
+                message: `Error sending news to UniFi: ${data.error}`,
+            });
+        }
     }
 }
 
