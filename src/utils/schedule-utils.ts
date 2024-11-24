@@ -96,7 +96,7 @@ export class ScheduledNews extends CronJob {
                 embed,
                 interactions,
             });
-            if (embed.is_external) {
+            if (embed.is_external && shardId === 0) {
                 await this.sendToUniFi({ embed });
             }
         }
