@@ -1,3 +1,44 @@
+```
+src/buttons/*               # Button Interactions
+src/commands/*              # Slash Commands
+src/config/*                # Config Files
+src/constants/*             # Constants
+src/controllers/*           # Command Controllers
+src/embeds/*                # Embeds
+src/enums/*                 # Enums
+src/events/*                # Event Handlers
+src/extensions/*            # Extensions
+src/jobs/*                  # Cron Jobs
+src/menus/*                 # Select Menus Interactions
+src/middlewares/*           # Middlewares
+src/modal/*                 # Modals Interactions
+src/models/*                # Database Models
+src/reactions/*             # Message Reactions Interactions
+src/services/*              # Services
+src/triggers/*              # Message Triggers
+src/types/*                 # Types
+src/utils/*                 # Utility Functions
+src/utils/database/*        # Data Fetching
+src/webhooks/*              # Webhooks
+```
+
+## Features
+
+-  **Slash Commands**: Create and manage slash commands.
+-  **Button Interactions**: Create and manage button interactions.
+-  **Select Menus Interactions**: Create and manage select menus interactions.
+-  **Message Reactions Interactions**: Create and manage message reactions interactions.
+-  **Modals Interactions**: Create and manage modals interactions.
+-  **Message Triggers**: Create and manage message triggers.
+-  **Cron Jobs**: Create and manage cron jobs.
+-  **Event Handlers**: Create and manage event handlers. - most happen in src/models/bot.ts
+- Supabase database
+- News is received via webhook in src/webhooks/news.ts
+- Send news at https://news-hook.vercel.app/
+- Start on server by running `yarn install` `yarn start:pm2`
+- 100 servers per shard
+
+
 # Discord Bot TypeScript Template
 
 [![discord.js](https://img.shields.io/github/package-json/dependency-version/KevinNovak/Discord-Bot-TypeScript-Template/discord.js)](https://discord.js.org/)
