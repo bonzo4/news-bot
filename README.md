@@ -1,3 +1,5 @@
+current production branch is safer
+
 ```
 src/buttons/*               # Button Interactions
 src/commands/*              # Slash Commands
